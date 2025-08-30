@@ -1,0 +1,29 @@
+import { Badge, Field, Input } from "@chakra-ui/react";
+
+export const FormField = (
+  label: string,
+  placeholder: string,
+  state: [string, (value: string) => void],
+  helperText?: any,
+  optional?: boolean
+) => {
+  return (
+    <Field.Root>
+      <Field.Label>
+        {label}
+        {optional && (
+          <Field.RequiredIndicator
+            fallback={<Badge>(Optional)</Badge>}
+          ></Field.RequiredIndicator>
+        )}
+      </Field.Label>
+      <Input
+        placeholder={placeholder}
+        value={state[0]}
+        onChange={(e) => state[1](e.target.value)}
+      />
+
+      {helperText && <Field.HelperText>{helperText}</Field.HelperText>}
+    </Field.Root>
+  );
+};
