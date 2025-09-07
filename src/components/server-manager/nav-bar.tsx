@@ -1,4 +1,4 @@
-"use client";
+'use client'
 
 import {
   Box,
@@ -11,15 +11,15 @@ import {
   Span,
   Spinner,
   Status,
-  useListCollection,
-} from "@chakra-ui/react";
-import { createContext, ReactNode, useContext, useState } from "react";
-import { useAsync } from "react-use";
-import { listContainersApiContainerListGet } from "../../client";
-import { FaGrav } from "react-icons/fa6";
-import { DialogBasic } from "../server-create/server-create-modal";
-import { TemplateCreateDialog } from "./template-create-modal";
-import { useSelectedServerContext } from "../../selected-server-context";
+  useListCollection
+} from '@chakra-ui/react'
+import { createContext, ReactNode, useContext, useState } from 'react'
+import { useAsync } from 'react-use'
+import { listContainersApiContainerListGet } from '../../client'
+import { FaGrav } from 'react-icons/fa6'
+import { DialogBasic } from './dialogs/server-create-modal'
+import { TemplateCreateDialog } from './dialogs/template-create-modal'
+import { useSelectedServerContext } from '../../selected-server-context'
 
 export const NavBar = () => {
   return (
@@ -38,8 +38,8 @@ export const NavBar = () => {
         <CreateNewMenu />
       </HStack>
     </Box>
-  );
-};
+  )
+}
 
 const CreateNewMenu = () => {
   return (
@@ -60,28 +60,28 @@ const CreateNewMenu = () => {
         </Menu.Content>
       </Menu.Positioner>
     </Menu.Root>
-  );
-};
+  )
+}
 
 export const SearchComboBox = () => {
-  const { selectedServer, setSelectedServer } = useSelectedServerContext();
+  const { selectedServer, setSelectedServer } = useSelectedServerContext()
 
   const { collection, set } = useListCollection<string>({
-    initialItems: [],
-  });
+    initialItems: []
+  })
 
   const state = useAsync(async () => {
-    const container_list = await listContainersApiContainerListGet();
-    set(container_list.data?.container ?? [""]);
-  }, [selectedServer, set]);
+    const container_list = await listContainersApiContainerListGet()
+    set(container_list.data?.container ?? [''])
+  }, [selectedServer, set])
 
   return (
     <Combobox.Root
       width="320px"
       collection={collection}
       placeholder="Search characters..."
-      onInputValueChange={(e) => setSelectedServer(e.inputValue)}
-      positioning={{ sameWidth: false, placement: "bottom-start" }}
+      onInputValueChange={e => setSelectedServer(e.inputValue)}
+      positioning={{ sameWidth: false, placement: 'bottom-start' }}
     >
       <Combobox.Control>
         <Combobox.Input placeholder="Type to search" />
@@ -104,7 +104,7 @@ export const SearchComboBox = () => {
                 Error fetching
               </Span>
             ) : (
-              collection.items?.map((container) => (
+              collection.items?.map(container => (
                 <Combobox.Item key={container} item={container}>
                   <HStack display="flex" justify="space-between" textStyle="sm">
                     <Status.Root>
@@ -122,5 +122,5 @@ export const SearchComboBox = () => {
         </Combobox.Positioner>
       </Portal>
     </Combobox.Root>
-  );
-};
+  )
+}
