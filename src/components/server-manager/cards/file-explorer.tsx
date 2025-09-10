@@ -7,7 +7,6 @@ import {
     getDirectoryFilenamesApiContainerContainerNameFsListGet,
     readFileApiContainerContainerNameFsGet
 } from '../../../client'
-import { extract } from 'tar'
 interface Node {
     id: string
     name: string
@@ -17,8 +16,6 @@ interface Node {
 }
 
 async function getPathFiles(path: string): Promise<Node[]> {
-    // const { selectedServer } = useSelectedServerContext()
-    // if (!selectedServer) return Promise.resolve([])
     const strings =
         await getDirectoryFilenamesApiContainerContainerNameFsListGet({
             path: { container_name: 'testter' },
@@ -55,11 +52,11 @@ const initialCollection = createTreeCollection<Node>({
     }
 })
 
-export const FileManager = () => {
+export const FileManager = ({ ...props }) => {
     return (
-        <ScrollArea.Root>
-            <ScrollArea.Viewport>
-                <ScrollArea.Content>
+        <ScrollArea.Root {...props}>
+            <ScrollArea.Viewport h="100%">
+                <ScrollArea.Content h="100%">
                     <FileTree />
                 </ScrollArea.Content>
                 <ScrollArea.Scrollbar>
@@ -91,13 +88,14 @@ const FileTree = () => {
     }
     return (
         <TreeView.Root
+            height="100%"
             collection={collection}
             loadChildren={loadChildren}
             onLoadChildrenComplete={e => setCollection(e.collection)}
             onSelectionChange={handleFileSelect}
         >
             <TreeView.Label>Tree</TreeView.Label>
-            <TreeView.Tree>
+            <TreeView.Tree height="100%">
                 <TreeView.Node<Node>
                     indentGuide={<TreeView.BranchIndentGuide />}
                     render={({ node, nodeState }) =>

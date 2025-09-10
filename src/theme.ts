@@ -2,8 +2,11 @@ import { createSystem, defaultConfig, defineConfig } from '@chakra-ui/react'
 
 const config = defineConfig({
   globalCss: {
-    '.chakra-card__body': {
-      minHeight: '20rem'
+    ".chakra-card__root": {
+      "p": "0"
+    },
+    ".chakra-card__title": {
+      "p": "24px 0 0 24px"
     }
   },
   theme: {

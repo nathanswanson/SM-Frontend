@@ -1,85 +1,49 @@
-import { Button, HStack, Stat, Text, VStack } from '@chakra-ui/react'
+import { Button, FileUpload, Flex, Group, Stat, VStack } from '@chakra-ui/react'
+import { HiUpload } from 'react-icons/hi'
 import {
     getContainerStatusApiContainerContainerNameStatusGet,
-    hardwareApiSystemHardwareGet,
-    HardwareInfoResponse,
     startContainerApiContainerNameStartGet,
     stopContainerApiContainerNameStopGet
 } from '../../../client'
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
+import { VscDebugRestart } from 'react-icons/vsc'
 import { useSelectedServerContext } from '../../../selected-server-context'
-import { VscDebugRestart, VscDebugStart, VscDebugStop } from 'react-icons/vsc'
 import { DangerConfirmation } from '../dialogs/danger-confirmation'
-import { useAsync } from 'react-use'
-import { convertToGB } from '../util/util'
+import { UploadPathPrompt } from '../dialogs/upload-path-prompt'
 
-export const ManageServer = () => {
+export const ServerOverview = ({ ...props }) => {
     return (
-        <VStack m="4" display="flow" justify="space-between">
-            <HardwareInfo />
-            <AllocatedResources />
-            <CommandButtons />
-        </VStack>
+        <Flex>
+            <UploadPathPrompt />
+            <CommandButtons width="50%" />
+        </Flex>
     )
 }
 
-const AllocatedResources = () => {
-    const { selectedServer } = useSelectedServerContext()
+const AllocatedResources = ({ ...props }) => {
     // memory, cpus, disk
     return (
-        <HStack align={'flex-start'}>
+        <Group {...props}>
             <Stat.Root>
                 <Stat.Label>Memory</Stat.Label>
                 <Stat.ValueText>16</Stat.ValueText>
+                <Stat.ValueUnit>GB</Stat.ValueUnit>
             </Stat.Root>
             <Stat.Root>
                 <Stat.Label>CPUs</Stat.Label>
                 <Stat.ValueText>4</Stat.ValueText>
+                <Stat.ValueUnit>Core</Stat.ValueUnit>
             </Stat.Root>
             <Stat.Root>
                 <Stat.Label>Disk</Stat.Label>
-                <Stat.ValueText>100 </Stat.ValueText>
+                <Stat.ValueText>100</Stat.ValueText>
+                <Stat.ValueUnit>GB</Stat.ValueUnit>
             </Stat.Root>
-        </HStack>
+        </Group>
     )
 }
 
-const HardwareInfo = () => {
-    const hardwareInfo = useState<HardwareInfoResponse | undefined>(undefined)
-    const state = useAsync(async () => {
-        const hardware_info = await hardwareApiSystemHardwareGet()
-        hardwareInfo[1](hardware_info.data)
-    }, [])
-
-    return state.loading ? (
-        'Loading...'
-    ) : (
-        <VStack>
-            <Stat.Root textAlign={'left'}>
-                <Stat.Label>CPU Architecture</Stat.Label>
-                <Stat.ValueText>
-                    {hardwareInfo[0]?.cpu.architecture}
-                </Stat.ValueText>
-            </Stat.Root>
-            <HStack align={'flex-start'}>
-                <Stat.Root>
-                    <Stat.Label>CPU Model</Stat.Label>
-                    <Stat.ValueText>
-                        {hardwareInfo[0]?.cpu.model_name}
-                    </Stat.ValueText>
-                </Stat.Root>
-                <Stat.Root>
-                    <Stat.Label>Memory</Stat.Label>
-                    <Stat.ValueText>
-                        {convertToGB(hardwareInfo[0]?.mem ?? 0)} GB
-                    </Stat.ValueText>
-                </Stat.Root>
-            </HStack>
-        </VStack>
-    )
-}
-
-const CommandButtons = () => {
+const CommandButtons = ({ ...props }) => {
     const { selectedServer, setSelectedServer } = useSelectedServerContext()
     const [serverRunning, setServerRunning] = useState<boolean | null>(null)
     const [loading, setLoading] = useState(true)
@@ -130,11 +94,13 @@ const CommandButtons = () => {
     }
 
     return (
-        <HStack>
+        <VStack width="100%" {...props}>
             <Button
+                size="lg"
                 loading={loading}
                 disabled={selectedServer == undefined || selectedServer == ''}
                 onClick={serverRunning ? stop_server : start_server}
+                width="100%"
             >
                 {serverRunning === null
                     ? 'Loading...'
@@ -143,17 +109,21 @@ const CommandButtons = () => {
                       : 'Start'}
                 {/* {serverRunning ? <VscDebugStop /> : <VscDebugStart />} */}
             </Button>
-            <Button disabled>
-                <VscDebugRestart />
-            </Button>
-            {/* <DangerConfirmation
-                disabled={
-                    selectedServer == undefined ||
-                    selectedServer == '' ||
-                    loading
-                }
-                colorPalette="red"
-            /> */}
-        </HStack>
+            <Group width="100%">
+                <Button width="50%" size="lg" disabled>
+                    <VscDebugRestart />
+                </Button>
+                <DangerConfirmation
+                    width="100%"
+                    size="lg"
+                    disabled={
+                        selectedServer == undefined ||
+                        selectedServer == '' ||
+                        loading
+                    }
+                    colorPalette="red"
+                />
+            </Group>
+        </VStack>
     )
 }

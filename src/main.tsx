@@ -9,26 +9,26 @@ import { system } from './theme'
 const DISABLE_MOCK = true
 
 async function enableMocking() {
-  if (process.env.NODE_ENV !== 'development' || DISABLE_MOCK) {
-    return
-  }
+    if (process.env.NODE_ENV !== 'development' || DISABLE_MOCK) {
+        return
+    }
 
-  const { worker } = await import('./mocks/browser')
+    const { worker } = await import('./mocks/browser')
 
-  // `worker.start()` returns a Promise that resolves
-  // once the Service Worker is up and ready to intercept requests.
-  return worker.start()
+    // `worker.start()` returns a Promise that resolves
+    // once the Service Worker is up and ready to intercept requests.
+    return worker.start()
 }
 enableMocking().then(() => {
-  ReactDOM.createRoot(document.getElementById('root')!).render(
-    <React.StrictMode>
-      <ChakraProvider value={system}>
-        <SelectedServerProvider>
-          <ThemeProvider attribute="class" disableTransitionOnChange>
-            <App />
-          </ThemeProvider>
-        </SelectedServerProvider>
-      </ChakraProvider>
-    </React.StrictMode>
-  )
+    ReactDOM.createRoot(document.getElementById('root')!).render(
+        <React.StrictMode>
+            <ChakraProvider value={system}>
+                <SelectedServerProvider>
+                    <ThemeProvider attribute="class" disableTransitionOnChange>
+                        <App />
+                    </ThemeProvider>
+                </SelectedServerProvider>
+            </ChakraProvider>
+        </React.StrictMode>
+    )
 })

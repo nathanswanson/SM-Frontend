@@ -39,7 +39,7 @@ export const LogView = () => {
         if (!selectedServer) return
 
         const logMessage = new EventSource(
-            `http://raspberrypi.home:8000/api/container/${selectedServer}/logs?line_count=${line_count}`
+            `http://localhost:8000/api/container/${selectedServer}/logs?line_count=${line_count}`
         )
         logMessage.onmessage = event => {
             setLogs(prev => {

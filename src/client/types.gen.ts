@@ -59,16 +59,6 @@ export type ContainerCreateRequest = {
 };
 
 /**
- * ContainerListResponse
- */
-export type ContainerListResponse = {
-    /**
-     * Container
-     */
-    container: Array<string>;
-};
-
-/**
  * HTTPValidationError
  */
 export type HttpValidationError = {
@@ -90,29 +80,13 @@ export type HardwareInfoResponse = {
 };
 
 /**
- * Resource
+ * StringListResponse
  */
-export type Resource = {
+export type StringListResponse = {
     /**
-     * Cpu
-     * The number of CPU cores allocated to the container.
+     * Values
      */
-    cpu?: number | null;
-    /**
-     * Memory
-     * The amount of memory allocated to the container, e.g., '2G' for 2 gigabytes.
-     */
-    memory?: string | null;
-};
-
-/**
- * SuccessResponse
- */
-export type SuccessResponse = {
-    /**
-     * Success
-     */
-    success: boolean;
+    values: Array<string>;
 };
 
 /**
@@ -121,44 +95,44 @@ export type SuccessResponse = {
 export type Template = {
     /**
      * Name
-     * The name of the template.
+     * Template name
      */
     name: string;
     /**
      * Image
-     * The name of the Docker image to use for the container.
+     * Docker image name
      */
     image: string;
     /**
      * Tags
-     * Additional Tags for the Docker image. defaults to 'latest'.
+     * Comma-separated tags for the template
      */
-    tags?: Array<string> | null;
+    tags: string | null;
     /**
-     * Description
-     * A brief description of the template.
+     * Default Env
+     * JSON string of default environment variables
      */
-    description?: string | null;
+    default_env: string | null;
     /**
-     * Minimum resource requirements/allocated for the container.
+     * Additional Env
+     * JSON string of environment variables that will be added to server creator
      */
-    resource?: Resource | null;
+    additional_env: string | null;
     /**
-     * Env
+     * Resource Min Cpu
+     * Minimum CPU resources required
      */
-    env?: Array<string | {
-        [key: string]: string;
-    }> | null;
-};
-
-/**
- * TemplateListResponse
- */
-export type TemplateListResponse = {
+    resource_min_cpu: number | null;
     /**
-     * Template
+     * Resource Min Disk
+     * Minimum Disk resources required
      */
-    template: Array<string>;
+    resource_min_disk: number | null;
+    /**
+     * Resource Min Mem
+     * Minimum Memory resources required
+     */
+    resource_min_mem: number | null;
 };
 
 /**
@@ -190,7 +164,7 @@ export type ListContainersApiContainerListGetResponses = {
     /**
      * Successful Response
      */
-    200: ContainerListResponse;
+    200: StringListResponse;
 };
 
 export type ListContainersApiContainerListGetResponse = ListContainersApiContainerListGetResponses[keyof ListContainersApiContainerListGetResponses];
@@ -598,7 +572,7 @@ export type ListTemplatesApiTemplateListGetResponses = {
     /**
      * Successful Response
      */
-    200: TemplateListResponse;
+    200: StringListResponse;
 };
 
 export type ListTemplatesApiTemplateListGetResponse = ListTemplatesApiTemplateListGetResponses[keyof ListTemplatesApiTemplateListGetResponses];
@@ -653,10 +627,8 @@ export type AddTemplateApiTemplateCreatePostResponses = {
     /**
      * Successful Response
      */
-    200: SuccessResponse;
+    200: unknown;
 };
-
-export type AddTemplateApiTemplateCreatePostResponse = AddTemplateApiTemplateCreatePostResponses[keyof AddTemplateApiTemplateCreatePostResponses];
 
 export type DeleteTemplateApiTemplateNameDeletePostData = {
     body?: never;
@@ -683,10 +655,8 @@ export type DeleteTemplateApiTemplateNameDeletePostResponses = {
     /**
      * Successful Response
      */
-    200: SuccessResponse;
+    200: unknown;
 };
-
-export type DeleteTemplateApiTemplateNameDeletePostResponse = DeleteTemplateApiTemplateNameDeletePostResponses[keyof DeleteTemplateApiTemplateNameDeletePostResponses];
 
 export type HardwareApiSystemHardwareGetData = {
     body?: never;
@@ -719,5 +689,5 @@ export type PingApiSystemPingGetResponses = {
 };
 
 export type ClientOptions = {
-    baseUrl: 'http://raspberrypi.home:8000' | (string & {});
+    baseUrl: 'http://localhost:8000' | (string & {});
 };
