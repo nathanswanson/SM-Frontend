@@ -10,16 +10,16 @@ import {
     Link,
     Portal
 } from '@chakra-ui/react'
-import { FormField } from '../util/util'
+import { FormField } from '../../../utils/util'
 import { useState } from 'react'
-import { useSelectedServerContext } from '../../../selected-server-context'
-import { addTemplateApiTemplateCreatePost } from '../../../client'
+import { useSelectedServerContext } from '../../providers/selected-server-context'
+import { addTemplateApiTemplateCreatePost } from '../../../lib/hey-api/client'
 export const TemplateCreateDialog = () => {
     const [template_name, setTemplateName] = useState('')
     const [template_image, setTemplateImage] = useState('')
     const [template_port, setTemplatePort] = useState('')
-    const [template_cpu, setTemplateCpu] = useState('2')
-    const [template_memory, setTemplateMemory] = useState('4G')
+    const [, setTemplateCpu] = useState('2')
+    const [, setTemplateMemory] = useState('4G')
 
     const { selectedServer } = useSelectedServerContext()
 

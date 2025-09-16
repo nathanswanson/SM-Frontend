@@ -15,48 +15,19 @@ import {
 } from '@chakra-ui/react'
 import { createContext, ReactNode, useContext, useState } from 'react'
 import { useAsync } from 'react-use'
-import { listContainersApiContainerListGet } from '../../client'
+import { listContainersApiContainerListGet } from '../../lib/hey-api/client'
 import { FaGrav } from 'react-icons/fa6'
-import { DialogBasic } from './dialogs/server-create-modal'
+import { ServerCreationDialog } from './dialogs/server-create-modal'
 import { TemplateCreateDialog } from './dialogs/template-create-modal'
-import { useSelectedServerContext } from '../../selected-server-context'
+import { useSelectedServerContext } from '../../app/providers/selected-server-context'
 
 export const NavBar = ({ ...props }) => {
     return (
-        <Box {...props}>
-            <HStack>
-                {/* icon left */}
-                <Box>
-                    <FaGrav />
-                </Box>
-                {/* search-bar center */}
-                <Center>
-                    <SearchComboBox />
-                </Center>
-                {/* create new button right */}
-                <CreateNewMenu />
-            </HStack>
-        </Box>
-    )
-}
-
-const CreateNewMenu = () => {
-    return (
-        <Menu.Root>
-            <Menu.Trigger asChild>
-                <Button>Create New</Button>
-            </Menu.Trigger>
-            <Menu.Positioner>
-                <Menu.Content>
-                    <Menu.Item closeOnSelect={false} value="Server">
-                        <DialogBasic />
-                    </Menu.Item>
-                    <Menu.Item closeOnSelect={false} value="Template">
-                        <TemplateCreateDialog />
-                    </Menu.Item>
-                </Menu.Content>
-            </Menu.Positioner>
-        </Menu.Root>
+        <HStack width="100%" {...props} as="nav" paddingY="3">
+            {/* search-bar center */}
+            <SearchComboBox />
+            {/* create new button right */}
+        </HStack>
     )
 }
 
@@ -74,7 +45,8 @@ export const SearchComboBox = () => {
 
     return (
         <Combobox.Root
-            width="320px"
+            width="30%"
+            size="lg"
             collection={collection}
             placeholder="Search characters..."
             onInputValueChange={e => setSelectedServer(e.inputValue)}

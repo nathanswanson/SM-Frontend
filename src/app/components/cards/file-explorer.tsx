@@ -6,7 +6,8 @@ import { LuFile, LuFolder, LuLoaderCircle } from 'react-icons/lu'
 import {
     getDirectoryFilenamesApiContainerContainerNameFsListGet,
     readFileApiContainerContainerNameFsGet
-} from '../../../client'
+} from '../../../lib/hey-api/client'
+import { useSelectedServerContext } from '../../providers/selected-server-context'
 interface Node {
     id: string
     name: string
@@ -15,10 +16,14 @@ interface Node {
     childrenCount?: number
 }
 
-async function getPathFiles(path: string): Promise<Node[]> {
+async function getPathFiles(
+    path: string,
+    selectedServer: string
+): Promise<Node[]> {
+    if (!selectedServer) return []
     const strings =
         await getDirectoryFilenamesApiContainerContainerNameFsListGet({
-            path: { container_name: 'testter' },
+            path: { container_name: selectedServer },
             query: { path: path }
         })
     if (!strings.data) return []
@@ -33,12 +38,6 @@ async function getPathFiles(path: string): Promise<Node[]> {
 }
 
 // function to load children of a node
-function loadChildren(
-    details: TreeView.LoadChildrenDetails<Node>
-): Promise<Node[]> {
-    const value = details.valuePath.join('')
-    return getPathFiles(value)
-}
 
 const initialCollection = createTreeCollection<Node>({
     nodeToValue: node => node.id,
@@ -55,8 +54,8 @@ const initialCollection = createTreeCollection<Node>({
 export const FileManager = ({ ...props }) => {
     return (
         <ScrollArea.Root {...props}>
-            <ScrollArea.Viewport h="100%">
-                <ScrollArea.Content h="100%">
+            <ScrollArea.Viewport h="95%">
+                <ScrollArea.Content h="95%">
                     <FileTree />
                 </ScrollArea.Content>
                 <ScrollArea.Scrollbar>
@@ -69,12 +68,22 @@ export const FileManager = ({ ...props }) => {
 
 const FileTree = () => {
     const [collection, setCollection] = useState(initialCollection)
+    const { selectedServer } = useSelectedServerContext()
 
+    function loadChildren(
+        details: TreeView.LoadChildrenDetails<Node>
+    ): Promise<Node[]> {
+        const value = details.valuePath.join('')
+        return getPathFiles(value, selectedServer || '')
+    }
     async function handleFileSelect(e: TreeView.SelectionChangeDetails<Node>) {
         if (e.focusedValue?.endsWith('/')) return
+        if (!selectedServer) return
+        console.log(selectedServer)
+        console.log(!selectedServer)
         const path = e.selectedNodes[0]['full_path']
         readFileApiContainerContainerNameFsGet({
-            path: { container_name: 'testter' },
+            path: { container_name: selectedServer },
             query: { path: path }
         }).then(dl => {
             const url = URL.createObjectURL(dl.data as Blob)
@@ -88,14 +97,15 @@ const FileTree = () => {
     }
     return (
         <TreeView.Root
-            height="100%"
+            aspectRatio={1 / 1.5}
+            size="md"
             collection={collection}
             loadChildren={loadChildren}
             onLoadChildrenComplete={e => setCollection(e.collection)}
             onSelectionChange={handleFileSelect}
         >
             <TreeView.Label>Tree</TreeView.Label>
-            <TreeView.Tree height="100%">
+            <TreeView.Tree height="95%">
                 <TreeView.Node<Node>
                     indentGuide={<TreeView.BranchIndentGuide />}
                     render={({ node, nodeState }) =>

@@ -1,8 +1,8 @@
 import { Button, Dialog, FileUpload, Input, Portal } from '@chakra-ui/react'
 import { BiUpload } from 'react-icons/bi'
-import { useSelectedServerContext } from '../../../selected-server-context'
+import { useSelectedServerContext } from '../../providers/selected-server-context'
 import { useState } from 'react'
-import { uploadFileApiContainerContainerNameFsUploadPost } from '../../../client'
+import { uploadFileApiContainerContainerNameFsUploadPost } from '../../../lib/hey-api/client'
 
 function upload_file(containerName: string, path: string, file: File) {
     // looks like a bug in relativePath, if file is in folder the first directory
@@ -22,7 +22,8 @@ export const UploadPathPrompt = () => {
         <Dialog.Root role="alertdialog">
             <Dialog.Trigger asChild>
                 <Button
-                    variant="outline"
+                    size="lg"
+                    variant="surface"
                     disabled={
                         selectedServer == undefined || selectedServer == ''
                     }

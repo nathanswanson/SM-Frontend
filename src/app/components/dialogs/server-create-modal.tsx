@@ -17,7 +17,8 @@ import { useAsync } from 'react-use'
 import {
     createContainerApiContainerCreateTemplateNamePost,
     listTemplatesApiTemplateListGet
-} from '../../../client'
+} from '../../../lib/hey-api/client'
+import { FaServer } from 'react-icons/fa6'
 
 function parsedPort(
     serverPort: string
@@ -48,7 +49,7 @@ function parsedEnv(serverEnv: string): { [key: string]: string } {
     return entries
 }
 
-export const DialogBasic = () => {
+export const ServerCreationDialog = () => {
     const [serverPort, setPort] = useState<string>('')
     const [serverEnv, setServerEnv] = useState<string>('')
     const [serverName, setServerName] = useState<string>('')
@@ -67,14 +68,8 @@ export const DialogBasic = () => {
     return (
         <Dialog.Root>
             <Dialog.Trigger asChild>
-                <Button
-                    variant="plain"
-                    unstyled
-                    w="100%"
-                    justifyContent="flex-start"
-                    textAlign="left"
-                >
-                    New Server...
+                <Button size="lg" color="white" variant={'surface'}>
+                    New Server
                 </Button>
             </Dialog.Trigger>
             <Portal>

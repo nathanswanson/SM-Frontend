@@ -304,34 +304,6 @@ export type GetContainerStatusApiContainerContainerNameStatusGetResponses = {
     200: unknown;
 };
 
-export type GetContainerMetricsApiContainerContainerNameMetricsGetData = {
-    body?: never;
-    path: {
-        /**
-         * Container Name
-         */
-        container_name: string;
-    };
-    query?: never;
-    url: '/api/container/{container_name}/metrics';
-};
-
-export type GetContainerMetricsApiContainerContainerNameMetricsGetErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type GetContainerMetricsApiContainerContainerNameMetricsGetError = GetContainerMetricsApiContainerContainerNameMetricsGetErrors[keyof GetContainerMetricsApiContainerContainerNameMetricsGetErrors];
-
-export type GetContainerMetricsApiContainerContainerNameMetricsGetResponses = {
-    /**
-     * Successful Response
-     */
-    200: unknown;
-};
-
 export type GetLogMessageApiContainerContainerNameLogsGetData = {
     body?: never;
     path: {
@@ -360,10 +332,13 @@ export type GetLogMessageApiContainerContainerNameLogsGetError = GetLogMessageAp
 
 export type GetLogMessageApiContainerContainerNameLogsGetResponses = {
     /**
+     * Response Get Log Message Api Container  Container Name  Logs Get
      * Successful Response
      */
-    200: unknown;
+    200: Array<string>;
 };
+
+export type GetLogMessageApiContainerContainerNameLogsGetResponse = GetLogMessageApiContainerContainerNameLogsGetResponses[keyof GetLogMessageApiContainerContainerNameLogsGetResponses];
 
 export type GetDirectoryFilenamesApiContainerContainerNameFsListGetData = {
     body?: never;
@@ -689,5 +664,5 @@ export type PingApiSystemPingGetResponses = {
 };
 
 export type ClientOptions = {
-    baseUrl: 'http://localhost:8000' | (string & {});
+    baseUrl: 'http://nathan.local:8000' | (string & {});
 };

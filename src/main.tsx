@@ -3,11 +3,15 @@ import { ThemeProvider } from 'next-themes'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
-import { SelectedServerProvider } from './selected-server-context'
+import { SelectedServerProvider } from './app/providers/selected-server-context'
 import { system } from './theme'
+import { WebSocketProvider } from './app/providers/web-socket'
 
 const DISABLE_MOCK = true
-
+async function preLoad() {
+    await enableMocking()
+    return
+}
 async function enableMocking() {
     if (process.env.NODE_ENV !== 'development' || DISABLE_MOCK) {
         return
@@ -19,14 +23,20 @@ async function enableMocking() {
     // once the Service Worker is up and ready to intercept requests.
     return worker.start()
 }
-enableMocking().then(() => {
+
+preLoad().then(() => {
     ReactDOM.createRoot(document.getElementById('root')!).render(
         <React.StrictMode>
             <ChakraProvider value={system}>
                 <SelectedServerProvider>
-                    <ThemeProvider attribute="class" disableTransitionOnChange>
-                        <App />
-                    </ThemeProvider>
+                    <WebSocketProvider>
+                        <ThemeProvider
+                            attribute="class"
+                            disableTransitionOnChange
+                        >
+                            <App />
+                        </ThemeProvider>
+                    </WebSocketProvider>
                 </SelectedServerProvider>
             </ChakraProvider>
         </React.StrictMode>
