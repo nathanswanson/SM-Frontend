@@ -1,10 +1,31 @@
 import { AbsoluteCenter, Card, Field, FieldLabel, Fieldset, IconButton, Input } from '@chakra-ui/react'
 import { PasswordInput } from '../../lib/chakra/password-input'
 import { VscArrowRight } from 'react-icons/vsc'
-import { loginUserTokenPost } from '../../lib/hey-api/client'
+import { loginUserTokenPost, pingApiSystemPingGet } from '../../lib/hey-api/client'
 import { useState } from 'react'
 
-export const Login = ({ onLoginSuccess }: { onLoginSuccess: (token: string) => void }) => {
+export async function checkLoginStatus() {
+    const controller = new AbortController()
+    setTimeout(() => controller.abort(), 5000)
+    try {
+        return await pingApiSystemPingGet()
+            .then(response => {
+                return response.response.status === 200
+            })
+            .catch(() => {
+                return false
+            })
+    } catch (err: any) {
+        if (err.name === 'AbortError') {
+            console.error('Request timed out')
+        } else {
+            console.error('Fetch error:', err)
+        }
+        return false
+    }
+}
+
+export const Login = () => {
     const [username, setUsername] = useState<string>('')
     const [password, setPassword] = useState<string>('')
     const [loginLoading, setLoginLoading] = useState<boolean>(false)
@@ -13,10 +34,9 @@ export const Login = ({ onLoginSuccess }: { onLoginSuccess: (token: string) => v
         loginUserTokenPost({
             body: { username: username, password: String(password) }
         })
-            .then(response => {
+            .then(() => {
                 setUsername('')
                 setPassword('')
-                onLoginSuccess((response.data as any)['access_token'])
             })
             .finally(() => {
                 setLoginLoading(false)
