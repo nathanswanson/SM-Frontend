@@ -1,92 +1,114 @@
-import { AbsoluteCenter, Card, Field, FieldLabel, Fieldset, IconButton, Input } from '@chakra-ui/react'
+import { AbsoluteCenter, Box, Card, Field, FieldLabel, Fieldset, IconButton, Input, Spinner } from '@chakra-ui/react'
 import { PasswordInput } from '../../lib/chakra/password-input'
 import { VscArrowRight } from 'react-icons/vsc'
 import { loginUserTokenPost, pingApiSystemPingGet } from '../../lib/hey-api/client'
-import { useState } from 'react'
-import { on } from 'events'
+import { useState, useEffect } from 'react'
+import { Toaster, toaster } from '../../lib/chakra/toaster'
 
 export async function checkLoginStatus() {
-    const controller = new AbortController()
-    setTimeout(() => controller.abort(), 5000)
     try {
-        return await pingApiSystemPingGet()
-            .then(response => {
-                return response.response.status === 200
-            })
-            .catch(() => {
-                return false
-            })
-    } catch (err: any) {
-        if (err.name === 'AbortError') {
-            console.error('Request timed out')
-        } else {
-            console.error('Fetch error:', err)
-        }
+        const response = await pingApiSystemPingGet({
+            credentials: 'include'
+        })
+        return response.response.status === 200
+    } catch {
         return false
     }
 }
 
-export const Login = (onLoggedIn: (loggedIn: boolean) => void) => {
+export const Login = ({ children }: { children: React.ReactNode }) => {
     const [username, setUsername] = useState<string>('')
     const [password, setPassword] = useState<string>('')
     const [loginLoading, setLoginLoading] = useState<boolean>(false)
-    const login = () => {
-        setLoginLoading(true)
-        loginUserTokenPost({
-            body: { username: username, password: String(password) }
+    const [checkingStatus, setCheckingStatus] = useState<boolean>(true)
+    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false)
+
+    useEffect(() => {
+        // Check login status on mount
+        checkLoginStatus().then(loggedIn => {
+            setIsLoggedIn(loggedIn)
+            setCheckingStatus(false)
         })
-            .then(() => {
-                setUsername('')
-                setPassword('')
-                onLoggedIn(true)
+    }, [])
+
+    const login = async () => {
+        setLoginLoading(true)
+        try {
+            await loginUserTokenPost({
+                body: { username, password },
+                credentials: 'include'
+            }).then(response => {
+                if (response.response.status === 200) {
+                    setIsLoggedIn(true)
+                } else {
+                    console.log('response', response)
+                    toaster.error({
+                        title: 'Login Failed',
+                        description: 'Invalid username or password.'
+                    })
+                }
             })
-            .finally(() => {
-                setLoginLoading(false)
-            })
+            setUsername('')
+        } finally {
+            setPassword('')
+            setLoginLoading(false)
+        }
     }
+
+    if (checkingStatus) {
+        return (
+            <AbsoluteCenter>
+                <Spinner size="lg" />
+            </AbsoluteCenter>
+        )
+    }
+
+    if (isLoggedIn) {
+        return <Box>{children}</Box>
+    }
+
     return (
-        <AbsoluteCenter width="100vw" height="100vh">
-            <Card.Root>
-                <Card.Header>
-                    <Card.Title>Login</Card.Title>
-                    <Card.Description>Please login to continue</Card.Description>
-                </Card.Header>
-                <form id="login-form" onSubmit={e => e.preventDefault()}>
-                    <Card.Body>
-                        <Fieldset.Root form="login-form" size="lg">
-                            <Field.Root>
-                                <Field.Label>Username</Field.Label>
-                                <Input
-                                    name="username"
-                                    autoComplete="username"
-                                    onChange={e => {
-                                        setUsername(e.target.value)
-                                    }}
-                                    value={username}
-                                    required
-                                />
-                            </Field.Root>
-                            <Field.Root>
-                                <FieldLabel>Password</FieldLabel>
-                                <PasswordInput
-                                    name="password"
-                                    autoComplete="current-password"
-                                    onChange={e => {
-                                        setPassword(e.target.value)
-                                    }}
-                                    value={password}
-                                    required
-                                />
-                            </Field.Root>
-                        </Fieldset.Root>
-                    </Card.Body>
-                    <Card.Footer justifyContent={'end'}>
-                        <IconButton type="submit" loading={loginLoading} onClick={login}>
-                            <VscArrowRight />
-                        </IconButton>
-                    </Card.Footer>
-                </form>
-            </Card.Root>
-        </AbsoluteCenter>
+        <>
+            <AbsoluteCenter width="100vw" height="100vh" zIndex={1}>
+                <Card.Root>
+                    <Card.Header>
+                        <Card.Title paddingLeft={0}>Login</Card.Title>
+                        <Card.Description>Please login to continue</Card.Description>
+                    </Card.Header>
+                    <form id="login-form" onSubmit={e => e.preventDefault()}>
+                        <Card.Body>
+                            <Fieldset.Root form="login-form" size="lg">
+                                <Field.Root>
+                                    <Field.Label>Username</Field.Label>
+                                    <Input
+                                        name="username"
+                                        autoComplete="username"
+                                        onChange={e => setUsername(e.target.value)}
+                                        value={username}
+                                        required
+                                    />
+                                </Field.Root>
+                                <Field.Root>
+                                    <FieldLabel>Password</FieldLabel>
+                                    <PasswordInput
+                                        name="password"
+                                        autoComplete="current-password"
+                                        onChange={e => setPassword(e.target.value)}
+                                        value={password}
+                                        required
+                                    />
+                                </Field.Root>
+                            </Fieldset.Root>
+                        </Card.Body>
+                        <Card.Footer justifyContent={'end'}>
+                            <IconButton type="submit" loading={loginLoading} onClick={login}>
+                                <VscArrowRight />
+                            </IconButton>
+                        </Card.Footer>
+                    </form>
+                </Card.Root>
+            </AbsoluteCenter>
+            <Toaster />
+        </>
     )
 }

@@ -59,6 +59,7 @@ export const LogManager = () => {
     function submit_command(container: string | undefined, command: string) {
         if (container) {
             sendCommandApiContainerContainerNameCommandGet({
+                credentials: 'include',
                 path: {
                     container_name: container
                 },

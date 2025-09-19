@@ -6,7 +6,6 @@ import App from './App'
 import { SelectedServerProvider } from './app/providers/selected-server-context'
 import { system } from './theme'
 import { WebSocketProvider } from './app/providers/web-socket'
-import { LoginProvider } from './app/providers/login-provider-context'
 import { CookiesProvider } from 'react-cookie'
 
 const DISABLE_MOCK = true
@@ -31,13 +30,11 @@ preLoad().then(() => {
         <React.StrictMode>
             <ChakraProvider value={system}>
                 <SelectedServerProvider>
-                    <LoginProvider>
-                        <WebSocketProvider>
-                            <ThemeProvider attribute="class" disableTransitionOnChange>
-                                <App />
-                            </ThemeProvider>
-                        </WebSocketProvider>
-                    </LoginProvider>
+                    <WebSocketProvider>
+                        <ThemeProvider attribute="class" disableTransitionOnChange>
+                            <App />
+                        </ThemeProvider>
+                    </WebSocketProvider>
                 </SelectedServerProvider>
             </ChakraProvider>
         </React.StrictMode>

@@ -64,6 +64,7 @@ const FileTree = () => {
     async function getPathFiles(path: string, selectedServer: string): Promise<Node[]> {
         if (!selectedServer) return []
         const strings = await getDirectoryFilenamesApiContainerContainerNameFsListGet({
+            credentials: 'include',
             path: { container_name: selectedServer },
             query: { path: path }
         })
@@ -88,6 +89,7 @@ const FileTree = () => {
         if (!selectedServer) return
         const path = e.selectedNodes[0]['full_path']
         const dl = await readFileApiContainerContainerNameFsGet({
+            credentials: 'include',
             path: { container_name: selectedServer },
             query: { path: path }
         })

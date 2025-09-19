@@ -97,6 +97,7 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
             sendMessage(WSPacketCmdType.UNSUBCRIBE, `01+${selectedServer}`)
         } else {
             getLogMessageApiContainerContainerNameLogsGet({
+                credentials: 'include',
                 path: { container_name: selectedServer },
                 query: { line_count: 50 }
             }).then(logs => {

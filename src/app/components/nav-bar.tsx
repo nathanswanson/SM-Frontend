@@ -26,7 +26,7 @@ export const SearchComboBox = () => {
     })
 
     const state = useAsync(async () => {
-        const container_list = await listContainersApiContainerListGet({})
+        const container_list = await listContainersApiContainerListGet({ credentials: 'include' })
         setServerList(container_list.data?.values ?? [''])
     }, [selectedServer, openState])
 

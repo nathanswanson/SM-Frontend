@@ -43,6 +43,7 @@ const CommandButtons = ({ ...props }) => {
         async function fetchStatus() {
             if (selectedServer) {
                 const serverStatus = await getContainerStatusApiContainerContainerNameStatusGet({
+                    credentials: 'include',
                     path: { container_name: selectedServer }
                 })
                 const status = (serverStatus.data as { running?: boolean } | undefined)?.running
@@ -58,6 +59,7 @@ const CommandButtons = ({ ...props }) => {
         if (selectedServer) {
             try {
                 await stopContainerApiContainerNameStopGet({
+                    credentials: 'include',
                     path: { name: selectedServer }
                 })
                 setServerRunning(false)
@@ -72,6 +74,7 @@ const CommandButtons = ({ ...props }) => {
         if (selectedServer) {
             try {
                 await startContainerApiContainerNameStartGet({
+                    credentials: 'include',
                     path: { name: selectedServer }
                 })
                 setServerRunning(true)

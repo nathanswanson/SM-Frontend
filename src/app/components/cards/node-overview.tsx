@@ -83,7 +83,7 @@ const NodeControls = ({ ...props }) => {
 const HardwareInfo = ({ ...props }) => {
     const hardwareInfo = useState<HardwareInfoResponse | undefined>(undefined)
     const state = useAsync(async () => {
-        const hardware_info = await hardwareApiSystemHardwareGet({})
+        const hardware_info = await hardwareApiSystemHardwareGet({ credentials: 'include' })
         hardwareInfo[1](hardware_info.data)
     }, [])
 

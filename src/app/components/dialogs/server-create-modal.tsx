@@ -58,13 +58,14 @@ export const ServerCreationDialog = () => {
     const [open, setOpen] = useState(false)
 
     const state = useAsync(async () => {
-        const template_list = await listTemplatesApiTemplateListGet({})
+        const template_list = await listTemplatesApiTemplateListGet({ credentials: 'include' })
         setTemplateList(template_list.data?.values ?? [''])
     }, [selectedTemplate, setTemplateList])
 
     const createServer = async () => {
         setCreateServerLoading(true)
         createContainerApiContainerCreateTemplateNamePost({
+            credentials: 'include',
             body: {
                 template: selectedTemplate,
                 server_name: serverName,
