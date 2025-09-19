@@ -1,25 +1,10 @@
-import {
-    Button,
-    Grid,
-    GridItem,
-    Group,
-    Menu,
-    Portal,
-    SimpleGrid,
-    Skeleton,
-    Stat,
-    VStack
-} from '@chakra-ui/react'
-import {
-    hardwareApiSystemHardwareGet,
-    HardwareInfoResponse
-} from '../../../lib/hey-api/client'
+import { Button, Grid, GridItem, Group, Menu, Portal, SimpleGrid, Skeleton, Stat, VStack } from '@chakra-ui/react'
+import { hardwareApiSystemHardwareGet, HardwareInfoResponse } from '../../../lib/hey-api/client'
 import { useState } from 'react'
 import { useAsync } from 'react-use'
 import { convertToGB, roundToNearest4GB } from '../../../utils/util'
 import { TemplateCreateDialog } from '../dialogs/template-create-modal'
 import { FaLinkSlash } from 'react-icons/fa6'
-import { useLoginProvider } from '../../providers/login-provider-context'
 
 export const NodeOverview = () => {
     return (
@@ -30,19 +15,8 @@ export const NodeOverview = () => {
             <GridItem h="100%">
                 <HardwareInfo />
             </GridItem>
-            <GridItem
-                width="100%"
-                minH={0}
-                h="100%"
-                alignSelf="stretch"
-                overflow="auto"
-            >
-                <NodeControls
-                    alignItems="flex-end"
-                    height="100%"
-                    width="100%"
-                    alignContent={'flex-end'}
-                />
+            <GridItem width="100%" minH={0} h="100%" alignSelf="stretch" overflow="auto">
+                <NodeControls alignItems="flex-end" height="100%" width="100%" alignContent={'flex-end'} />
             </GridItem>
         </Grid>
     )
@@ -109,10 +83,7 @@ const NodeControls = ({ ...props }) => {
 const HardwareInfo = ({ ...props }) => {
     const hardwareInfo = useState<HardwareInfoResponse | undefined>(undefined)
     const state = useAsync(async () => {
-        const { cookie } = useLoginProvider()
-        const hardware_info = await hardwareApiSystemHardwareGet({
-            auth: cookie['token']
-        })
+        const hardware_info = await hardwareApiSystemHardwareGet({})
         hardwareInfo[1](hardware_info.data)
     }, [])
 
@@ -120,27 +91,18 @@ const HardwareInfo = ({ ...props }) => {
         <Skeleton h="100%" w="100%"></Skeleton>
     ) : (
         <VStack w="100%" height="100%">
-            <SimpleGrid
-                height="100%"
-                templateColumns={'1fr 1fr'}
-                templateRows={'1fr 1fr 1fr'}
-                width={'100%'}
-            >
+            <SimpleGrid height="100%" templateColumns={'1fr 1fr'} templateRows={'1fr 1fr 1fr'} width={'100%'}>
                 <GridItem colSpan={2}>
                     <Stat.Root p="2">
                         <Stat.Label>CPU Architecture</Stat.Label>
-                        <Stat.ValueText>
-                            {hardwareInfo[0]?.cpu.architecture}
-                        </Stat.ValueText>
+                        <Stat.ValueText>{hardwareInfo[0]?.cpu.architecture}</Stat.ValueText>
                     </Stat.Root>
                 </GridItem>
 
                 <GridItem>
                     <Stat.Root p="2">
                         <Stat.Label>Arch</Stat.Label>
-                        <Stat.ValueText>
-                            {hardwareInfo[0]?.cpu.model_name}
-                        </Stat.ValueText>
+                        <Stat.ValueText>{hardwareInfo[0]?.cpu.model_name}</Stat.ValueText>
                     </Stat.Root>
                 </GridItem>
 
@@ -179,10 +141,7 @@ const HardwareInfo = ({ ...props }) => {
                     <Stat.Root p="2">
                         <Stat.Label>Memory</Stat.Label>
                         <Stat.ValueText>
-                            24.34 /{' '}
-                            {roundToNearest4GB(
-                                convertToGB(hardwareInfo[0]?.mem ?? 0)
-                            )}
+                            24.34 / {roundToNearest4GB(convertToGB(hardwareInfo[0]?.mem ?? 0))}
                         </Stat.ValueText>
                         <Stat.ValueUnit>GB / GB</Stat.ValueUnit>
                     </Stat.Root>

@@ -3,16 +3,14 @@ import { BiUpload } from 'react-icons/bi'
 import { useSelectedServerContext } from '../../providers/selected-server-context'
 import { useState } from 'react'
 import { uploadFileApiContainerContainerNameFsUploadPost } from '../../../lib/hey-api/client'
-import { useLoginProvider } from '../../providers/login-provider-context'
 
 export const UploadPathPrompt = () => {
     const { selectedServer } = useSelectedServerContext()
     const [selectedPath, setSelectedPath] = useState<string>('')
     const [pendingFiles, setPendingFiles] = useState<File>()
-    const { cookie } = useLoginProvider()
+
     function upload_file(containerName: string, path: string, file: File) {
         uploadFileApiContainerContainerNameFsUploadPost({
-            auth: cookie['token'],
             path: { container_name: containerName },
             query: { path: path },
             body: { file: file }
@@ -21,13 +19,7 @@ export const UploadPathPrompt = () => {
     return (
         <Dialog.Root role="alertdialog">
             <Dialog.Trigger asChild>
-                <Button
-                    size="lg"
-                    variant="surface"
-                    disabled={
-                        selectedServer == undefined || selectedServer == ''
-                    }
-                >
+                <Button size="lg" variant="surface" disabled={selectedServer == undefined || selectedServer == ''}>
                     <BiUpload /> Upload File
                 </Button>
             </Dialog.Trigger>
@@ -35,9 +27,7 @@ export const UploadPathPrompt = () => {
                 <Dialog.Backdrop />
                 <Dialog.Positioner>
                     <Dialog.Content>
-                        <Dialog.Header>
-                            Upload File - {selectedServer}
-                        </Dialog.Header>
+                        <Dialog.Header>Upload File - {selectedServer}</Dialog.Header>
                         <Dialog.CloseTrigger />
                         <Dialog.Content>
                             <FileUpload.Root
@@ -49,24 +39,14 @@ export const UploadPathPrompt = () => {
                                         <BiUpload /> Drag File Here
                                     </FileUpload.DropzoneContent>
                                 </FileUpload.Dropzone>
-                                <FileUpload.List
-                                    clearable={true}
-                                    showSize={true}
-                                />
+                                <FileUpload.List clearable={true} showSize={true} />
                             </FileUpload.Root>
-                            <Input
-                                value={selectedPath}
-                                onChange={e => setSelectedPath(e.target.value)}
-                            />
+                            <Input value={selectedPath} onChange={e => setSelectedPath(e.target.value)} />
                             <Dialog.CloseTrigger>
                                 <Button
                                     onClick={() => {
                                         if (selectedServer && pendingFiles)
-                                            upload_file(
-                                                selectedServer,
-                                                selectedPath,
-                                                pendingFiles
-                                            )
+                                            upload_file(selectedServer, selectedPath, pendingFiles)
                                     }}
                                 ></Button>
                             </Dialog.CloseTrigger>

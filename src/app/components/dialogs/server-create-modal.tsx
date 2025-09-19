@@ -18,11 +18,8 @@ import {
     createContainerApiContainerCreateTemplateNamePost,
     listTemplatesApiTemplateListGet
 } from '../../../lib/hey-api/client'
-import { useLoginProvider } from '../../providers/login-provider-context'
 
-function parsedPort(
-    serverPort: string
-): { [key: string]: number | null } | null {
+function parsedPort(serverPort: string): { [key: string]: number | null } | null {
     const entries: Record<string, number | null> = {}
     serverPort.split(',').forEach(entry => {
         const portSplit = entry.split(':', 2)
@@ -54,22 +51,38 @@ export const ServerCreationDialog = () => {
     const [serverEnv, setServerEnv] = useState<string>('')
     const [serverName, setServerName] = useState<string>('')
     const [selectedTemplate, setSelectedTemplate] = useState<string>('')
-
-    const { collection: templateList, set: setTemplateList } =
-        useListCollection<string>({
-            initialItems: ['']
-        })
-    const { cookie } = useLoginProvider()
+    const [createServerLoading, setCreateServerLoading] = useState<boolean>(false)
+    const { collection: templateList, set: setTemplateList } = useListCollection<string>({
+        initialItems: ['']
+    })
+    const [open, setOpen] = useState(false)
 
     const state = useAsync(async () => {
-        const template_list = await listTemplatesApiTemplateListGet({
-            auth: cookie['token']
-        })
+        const template_list = await listTemplatesApiTemplateListGet({})
         setTemplateList(template_list.data?.values ?? [''])
     }, [selectedTemplate, setTemplateList])
 
+    const createServer = async () => {
+        setCreateServerLoading(true)
+        createContainerApiContainerCreateTemplateNamePost({
+            body: {
+                template: selectedTemplate,
+                server_name: serverName,
+                port: parsedPort(serverPort),
+                env: parsedEnv(serverEnv)
+            }
+        })
+            .finally(() => {
+                // Server Responded
+                setCreateServerLoading(false)
+            })
+            .then(() => {
+                // Created successfully
+                setOpen(false)
+            })
+    }
     return (
-        <Dialog.Root>
+        <Dialog.Root open={open} onOpenChange={e => setOpen(e.open)}>
             <Dialog.Trigger asChild>
                 <Button size="lg" color="white" variant={'surface'}>
                     New Server
@@ -90,9 +103,7 @@ export const ServerCreationDialog = () => {
                                         collection={templateList}
                                         placeholder="Search characters..."
                                         onInputValueChange={value => {
-                                            setSelectedTemplate(
-                                                value.inputValue
-                                            )
+                                            setSelectedTemplate(value.inputValue)
                                         }}
                                         positioning={{
                                             sameWidth: false,
@@ -111,36 +122,22 @@ export const ServerCreationDialog = () => {
                                             <Combobox.Content minW="sm">
                                                 {state.loading ? (
                                                     <HStack p="4">
-                                                        <Spinner
-                                                            size="xs"
-                                                            borderWidth="1px"
-                                                        />
+                                                        <Spinner size="xs" borderWidth="1px" />
                                                         <Span>Loading...</Span>
                                                     </HStack>
                                                 ) : state.error ? (
-                                                    <Span
-                                                        p="4"
-                                                        color="fg.error"
-                                                    >
+                                                    <Span p="4" color="fg.error">
                                                         Error fetching
                                                     </Span>
                                                 ) : (
-                                                    templateList.items?.map(
-                                                        container => (
-                                                            <Combobox.Item
-                                                                key={container}
-                                                                item={container}
-                                                            >
-                                                                <Span
-                                                                    fontWeight="medium"
-                                                                    truncate
-                                                                >
-                                                                    {container}
-                                                                </Span>
-                                                                <Combobox.ItemIndicator />
-                                                            </Combobox.Item>
-                                                        )
-                                                    )
+                                                    templateList.items?.map(container => (
+                                                        <Combobox.Item key={container} item={container}>
+                                                            <Span fontWeight="medium" truncate>
+                                                                {container}
+                                                            </Span>
+                                                            <Combobox.ItemIndicator />
+                                                        </Combobox.Item>
+                                                    ))
                                                 )}
                                             </Combobox.Content>
                                         </Combobox.Positioner>
@@ -149,19 +146,14 @@ export const ServerCreationDialog = () => {
                                 <Field.Root>
                                     <Field.Label>Server Name</Field.Label>
                                     <Input
-                                        onChange={e =>
-                                            setServerName(e.target.value)
-                                        }
+                                        onChange={e => setServerName(e.target.value)}
                                         name="server_name"
                                         value={serverName}
                                     ></Input>
                                 </Field.Root>
                                 <Field.Root>
                                     <Field.Label>Port</Field.Label>
-                                    <Field.HelperText>
-                                        ex. 25565 ex. 25565/tcp ex.
-                                        25565:25565/tcp
-                                    </Field.HelperText>
+                                    <Field.HelperText>ex. 25565 ex. 25565/tcp ex. 25565:25565/tcp</Field.HelperText>
                                     <Input
                                         value={serverPort}
                                         onChange={value => {
@@ -170,12 +162,9 @@ export const ServerCreationDialog = () => {
                                     ></Input>
                                 </Field.Root>
                                 <Field.Root>
-                                    <Field.Label>
-                                        Environment Variables
-                                    </Field.Label>
+                                    <Field.Label>Environment Variables</Field.Label>
                                     <Field.HelperText>
-                                        Must be in comma seperate format ex.
-                                        EULA=TRUE,MODDED=TRUE
+                                        Must be in comma seperate format ex. EULA=TRUE,MODDED=TRUE
                                     </Field.HelperText>
                                     <Input
                                         value={serverEnv}
@@ -190,21 +179,7 @@ export const ServerCreationDialog = () => {
                             <Dialog.ActionTrigger asChild>
                                 <Button variant="outline">Cancel</Button>
                             </Dialog.ActionTrigger>
-                            <Button
-                                onClick={() => {
-                                    createContainerApiContainerCreateTemplateNamePost(
-                                        {
-                                            body: {
-                                                template: selectedTemplate,
-                                                server_name: serverName,
-                                                port: parsedPort(serverPort),
-                                                env: parsedEnv(serverEnv)
-                                            },
-                                            auth: cookie['token']
-                                        }
-                                    )
-                                }}
-                            >
+                            <Button onClick={createServer} loading={createServerLoading}>
                                 Create
                             </Button>
                         </Dialog.Footer>

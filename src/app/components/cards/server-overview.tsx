@@ -5,26 +5,16 @@ import {
     stopContainerApiContainerNameStopGet
 } from '../../../lib/hey-api/client'
 import { useState, useEffect } from 'react'
-import {
-    VscDebugRestart,
-    VscDebugStart,
-    VscDebugStop,
-    VscTrash
-} from 'react-icons/vsc'
+import { VscDebugRestart, VscDebugStart, VscDebugStop, VscTrash } from 'react-icons/vsc'
 import { useSelectedServerContext } from '../../providers/selected-server-context'
 import { UploadPathPrompt } from '../dialogs/upload-path-prompt'
 import { ServerCreationDialog } from '../dialogs/server-create-modal'
-import { useLoginProvider } from '../../providers/login-provider-context'
 
 export const ServerOverview = ({ ...props }) => {
     const { selectedServer } = useSelectedServerContext()
     return (
         <HStack justifyContent={'space-between'} {...props}>
-            <Button
-                size="lg"
-                variant="surface"
-                disabled={selectedServer == undefined || selectedServer == ''}
-            >
+            <Button size="lg" variant="surface" disabled={selectedServer == undefined || selectedServer == ''}>
                 Export Server
             </Button>
             <UploadPathPrompt />
@@ -48,18 +38,14 @@ const CommandButtons = ({ ...props }) => {
     const { selectedServer } = useSelectedServerContext()
     const [serverRunning, setServerRunning] = useState<boolean | null>(null)
     const [loading, setLoading] = useState(true)
-    const { cookie } = useLoginProvider()
+
     useEffect(() => {
         async function fetchStatus() {
             if (selectedServer) {
-                const serverStatus =
-                    await getContainerStatusApiContainerContainerNameStatusGet({
-                        auth: cookie['token'],
-                        path: { container_name: selectedServer }
-                    })
-                const status = (
-                    serverStatus.data as { running?: boolean } | undefined
-                )?.running
+                const serverStatus = await getContainerStatusApiContainerContainerNameStatusGet({
+                    path: { container_name: selectedServer }
+                })
+                const status = (serverStatus.data as { running?: boolean } | undefined)?.running
                 setServerRunning(status ?? false)
                 setLoading(false)
             }
@@ -72,7 +58,6 @@ const CommandButtons = ({ ...props }) => {
         if (selectedServer) {
             try {
                 await stopContainerApiContainerNameStopGet({
-                    auth: cookie['token'],
                     path: { name: selectedServer }
                 })
                 setServerRunning(false)
@@ -87,7 +72,6 @@ const CommandButtons = ({ ...props }) => {
         if (selectedServer) {
             try {
                 await startContainerApiContainerNameStartGet({
-                    auth: cookie['token'],
                     path: { name: selectedServer }
                 })
                 setServerRunning(true)
@@ -102,23 +86,11 @@ const CommandButtons = ({ ...props }) => {
             <IconButton
                 loading={loading && serverRunning != null}
                 disabled={selectedServer == undefined || selectedServer == ''}
-                bg={
-                    selectedServer != undefined && selectedServer != ''
-                        ? serverRunning
-                            ? 'green'
-                            : 'red'
-                        : ''
-                }
+                bg={selectedServer != undefined && selectedServer != '' ? (serverRunning ? 'green' : 'red') : ''}
                 color="white"
                 onClick={serverRunning ? stop_server : start_server}
             >
-                {serverRunning === null ? (
-                    <VscDebugStart />
-                ) : serverRunning ? (
-                    <VscDebugStop />
-                ) : (
-                    <VscDebugStart />
-                )}
+                {serverRunning === null ? <VscDebugStart /> : serverRunning ? <VscDebugStop /> : <VscDebugStart />}
             </IconButton>
             <IconButton disabled={!serverRunning}>
                 <VscDebugRestart />

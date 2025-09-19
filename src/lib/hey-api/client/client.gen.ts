@@ -2,6 +2,7 @@
 
 import type { ClientOptions } from './types.gen';
 import { type ClientOptions as DefaultClientOptions, type Config, createClient, createConfig } from './client';
+import { getBaseUrl } from '../../../utils/urlIntercept';
 
 /**
  * The `createClientConfig()` function will be called on client initialization
@@ -14,5 +15,5 @@ import { type ClientOptions as DefaultClientOptions, type Config, createClient, 
 export type CreateClientConfig<T extends DefaultClientOptions = ClientOptions> = (override?: Config<DefaultClientOptions & T>) => Config<Required<DefaultClientOptions> & T>;
 
 export const client = createClient(createConfig<ClientOptions>({
-    baseUrl: 'https://home.nathanswanson.online'
+    baseUrl: getBaseUrl()
 }));

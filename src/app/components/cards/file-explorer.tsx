@@ -1,7 +1,7 @@
 'use client'
 
 import { ScrollArea, TreeView, createTreeCollection } from '@chakra-ui/react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { LuFile, LuFolder, LuLoaderCircle } from 'react-icons/lu'
 import {
     getDirectoryFilenamesApiContainerContainerNameFsListGet,
@@ -9,13 +9,14 @@ import {
 } from '../../../lib/hey-api/client'
 import { useSelectedServerContext } from '../../providers/selected-server-context'
 import { TextEditorDialog } from '../dialogs/text-editor'
-import { useLoginProvider } from '../../providers/login-provider-context'
+
 interface Node {
     id: string
     name: string
     full_path: string
     children?: Node[]
     childrenCount?: number
+    disabled?: boolean
 }
 
 // function to load children of a node
@@ -28,7 +29,14 @@ const initialCollection = createTreeCollection<Node>({
         name: '',
         full_path: '',
         // single placeholder entry for the root; real children will be loaded via loadChildren
-        children: [{ id: '/', name: '/', full_path: '/', childrenCount: 1 }]
+        children: [
+            {
+                id: '/',
+                name: '/',
+                full_path: '/',
+                childrenCount: 1
+            }
+        ]
     }
 })
 
@@ -50,21 +58,15 @@ export const FileManager = ({ ...props }) => {
 const FileTree = () => {
     const [collection, setCollection] = useState(initialCollection)
     const { selectedServer } = useSelectedServerContext()
-    const [editorInputStream, setEditorInputStream] =
-        useState<ReadableStream<Uint8Array> | null>(null)
+    const [editorInputStream, setEditorInputStream] = useState<ReadableStream<Uint8Array> | null>(null)
     const [isEditorOpen, setIsEditorOpen] = useState(false)
-    const { cookie } = useLoginProvider()
-    async function getPathFiles(
-        path: string,
-        selectedServer: string
-    ): Promise<Node[]> {
+
+    async function getPathFiles(path: string, selectedServer: string): Promise<Node[]> {
         if (!selectedServer) return []
-        const strings =
-            await getDirectoryFilenamesApiContainerContainerNameFsListGet({
-                auth: cookie['token'],
-                path: { container_name: selectedServer },
-                query: { path: path }
-            })
+        const strings = await getDirectoryFilenamesApiContainerContainerNameFsListGet({
+            path: { container_name: selectedServer },
+            query: { path: path }
+        })
         if (!strings.data) return []
         return strings.data.map(filePath => {
             return {
@@ -76,9 +78,7 @@ const FileTree = () => {
         })
     }
 
-    function loadChildren(
-        details: TreeView.LoadChildrenDetails<Node>
-    ): Promise<Node[]> {
+    function loadChildren(details: TreeView.LoadChildrenDetails<Node>): Promise<Node[]> {
         const value = details.valuePath.join('')
         return getPathFiles(value, selectedServer || '')
     }
@@ -88,20 +88,16 @@ const FileTree = () => {
         if (!selectedServer) return
         const path = e.selectedNodes[0]['full_path']
         const dl = await readFileApiContainerContainerNameFsGet({
-            auth: cookie['token'],
             path: { container_name: selectedServer },
             query: { path: path }
         })
 
         if (dl?.data && typeof (dl.data as Blob).stream === 'function') {
-            setEditorInputStream(
-                (dl.data as Blob).stream() as ReadableStream<Uint8Array>
-            )
+            setEditorInputStream((dl.data as Blob).stream() as ReadableStream<Uint8Array>)
             setIsEditorOpen(true)
         } else if (dl?.data) {
             // fallback: convert blob to stream using Response
-            const stream = new Response(dl.data as Blob)
-                .body as ReadableStream<Uint8Array> | null
+            const stream = new Response(dl.data as Blob).body as ReadableStream<Uint8Array> | null
             if (stream) {
                 setEditorInputStream(stream)
                 setIsEditorOpen(true)
@@ -109,9 +105,15 @@ const FileTree = () => {
         }
     }
 
-    async function handleEditorOutputStream(
-        outStream: ReadableStream<Uint8Array> | undefined
-    ) {
+    useEffect(() => {
+        if (initialCollection.rootNode.children) {
+            initialCollection.rootNode['children'][0].disabled = !selectedServer
+
+            setCollection(initialCollection)
+        }
+    }, [selectedServer])
+
+    async function handleEditorOutputStream(outStream: ReadableStream<Uint8Array> | undefined) {
         if (!outStream) return
         const res = new Response(outStream)
         const blob = await res.blob()
@@ -144,16 +146,12 @@ const FileTree = () => {
                                     ) : (
                                         <LuFolder />
                                     )}
-                                    <TreeView.BranchText>
-                                        {node.name}
-                                    </TreeView.BranchText>
+                                    <TreeView.BranchText>{node.name}</TreeView.BranchText>
                                 </TreeView.BranchControl>
                             ) : (
                                 <TreeView.Item>
                                     <LuFile />
-                                    <TreeView.ItemText>
-                                        {node.name}
-                                    </TreeView.ItemText>
+                                    <TreeView.ItemText>{node.name}</TreeView.ItemText>
                                 </TreeView.Item>
                             )
                         }

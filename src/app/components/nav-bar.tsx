@@ -1,18 +1,10 @@
 'use client'
 
-import {
-    Combobox,
-    HStack,
-    Portal,
-    Span,
-    Spinner,
-    Status,
-    useListCollection
-} from '@chakra-ui/react'
+import { Combobox, HStack, Portal, Span, Spinner, Status, useListCollection } from '@chakra-ui/react'
 import { useAsync } from 'react-use'
 import { listContainersApiContainerListGet } from '../../lib/hey-api/client'
 import { useSelectedServerContext } from '../../app/providers/selected-server-context'
-import { useLoginProvider } from '../providers/login-provider-context'
+
 import { useState } from 'react'
 
 export const NavBar = ({ ...props }) => {
@@ -27,17 +19,14 @@ export const NavBar = ({ ...props }) => {
 
 export const SearchComboBox = () => {
     const { selectedServer, setSelectedServer } = useSelectedServerContext()
-    const { cookie } = useLoginProvider()
+
     const [openState, setOpenState] = useState<Boolean>(false)
-    const { collection: serverList, set: setServerList } =
-        useListCollection<string>({
-            initialItems: []
-        })
+    const { collection: serverList, set: setServerList } = useListCollection<string>({
+        initialItems: []
+    })
 
     const state = useAsync(async () => {
-        const container_list = await listContainersApiContainerListGet({
-            auth: cookie['token']
-        })
+        const container_list = await listContainersApiContainerListGet({})
         setServerList(container_list.data?.values ?? [''])
     }, [selectedServer, openState])
 
@@ -76,11 +65,7 @@ export const SearchComboBox = () => {
                         ) : (
                             serverList.items?.map(container => (
                                 <Combobox.Item key={container} item={container}>
-                                    <HStack
-                                        display="flex"
-                                        justify="space-between"
-                                        textStyle="sm"
-                                    >
+                                    <HStack display="flex" justify="space-between" textStyle="sm">
                                         <Status.Root>
                                             <Status.Indicator />
                                         </Status.Root>

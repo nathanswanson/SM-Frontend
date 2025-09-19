@@ -1,11 +1,4 @@
-import {
-    Button,
-    Container,
-    HStack,
-    Input,
-    ScrollArea,
-    VStack
-} from '@chakra-ui/react'
+import { Button, Container, HStack, Input, ScrollArea, VStack } from '@chakra-ui/react'
 
 import { useEffect, useState } from 'react'
 import { useSelectedServerContext } from '../../providers/selected-server-context'
@@ -14,7 +7,6 @@ import { purify } from '../../../utils/dom'
 import { sendCommandApiContainerContainerNameCommandGet } from '../../../lib/hey-api/client'
 import { VscChevronRight } from 'react-icons/vsc'
 import { useWebSocketProvider } from '../../providers/web-socket'
-import { useLoginProvider } from '../../providers/login-provider-context'
 
 export const LogView = () => {
     const { logMessages } = useWebSocketProvider()
@@ -23,7 +15,7 @@ export const LogView = () => {
     // Initialize Shiki highlighter
     useEffect(() => {
         createHighlighter({
-            themes: ['vitesse-black'], // or any theme you prefer
+            themes: ['github-dark-high-contrast'], // or any theme you prefer
             langs: ['log', 'shell', 'bash', 'text']
         }).then(setHighlighter)
     }, [])
@@ -31,7 +23,7 @@ export const LogView = () => {
     // Listen for log messages from the server
 
     return (
-        <ScrollArea.Root height="100%" background="black">
+        <ScrollArea.Root height="100%" background="#0a0c10">
             <ScrollArea.Viewport height="100%">
                 <ScrollArea.Content height="100px" textStyle="sm">
                     {logMessages.map((log, idx) => (
@@ -43,7 +35,7 @@ export const LogView = () => {
                                 __html: highlighter
                                     ? highlighter.codeToHtml(log, {
                                           lang: 'log',
-                                          theme: 'vitesse-black'
+                                          theme: 'github-dark-high-contrast'
                                       })
                                     : purify(log) // fallback, make sure to sanitize
                             }}
@@ -63,12 +55,10 @@ export const LogView = () => {
 export const LogManager = () => {
     const [commandText, setCommandText] = useState('')
     const { selectedServer } = useSelectedServerContext()
-    const { cookie } = useLoginProvider()
 
     function submit_command(container: string | undefined, command: string) {
         if (container) {
             sendCommandApiContainerContainerNameCommandGet({
-                auth: cookie['token'],
                 path: {
                     container_name: container
                 },

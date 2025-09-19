@@ -745,5 +745,5 @@ export type IndexGetResponses = {
 };
 
 export type ClientOptions = {
-    baseUrl: 'https://home.nathanswanson.online' | (string & {});
+    baseUrl: 'http://localhost:8000' | (string & {});
 };

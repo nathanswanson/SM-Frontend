@@ -1,16 +1,8 @@
-import {
-    createContext,
-    ReactNode,
-    useCallback,
-    useContext,
-    useEffect,
-    useRef,
-    useState
-} from 'react'
+import { createContext, ReactNode, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { io, Socket } from 'socket.io-client'
 import { useSelectedServerContext } from './selected-server-context'
 import { getLogMessageApiContainerContainerNameLogsGet } from '../../lib/hey-api/client'
-import { useLoginProvider } from './login-provider-context'
+
 const METRICS_SIZE = 50
 const LOG_SIZE = 50
 
@@ -38,26 +30,18 @@ const webSocketContext = createContext<IWebSocketContext | undefined>(undefined)
 export const useWebSocketProvider = () => {
     const context = useContext(webSocketContext)
     if (!context) {
-        throw new Error(
-            'useWebSocketProvider must be used within a WebSocketProvider'
-        )
+        throw new Error('useWebSocketProvider must be used within a WebSocketProvider')
     }
     return context
 }
 
 export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
-    const { cookie } = useLoginProvider()
-
     const socketRef = useRef<Socket | null>(null)
-    const [connectionStatus, setConnectionStatus] = useState<ConnectionState>(
-        ConnectionState.disconnected
-    )
+    const [connectionStatus, setConnectionStatus] = useState<ConnectionState>(ConnectionState.disconnected)
     const [logMessages, setLogMessages] = useState<string[]>([])
-    const [metricMessages, setMetricMessages] = useState<number[][]>([
-        [0, 0, 0, 0, 0, 0]
-    ])
+    const [metricMessages, setMetricMessages] = useState<number[][]>([[0, 0, 0, 0, 0, 0]])
     useEffect(() => {
-        const socket = io(`wss://${import.meta.env.VITE_BACKEND_HOST}:80`, {
+        const socket = io(import.meta.env.VITE_BACKEND_WEBSOCKET || 'ws://localhost:8000', {
             autoConnect: true
         })
         socketRef.current = socket
@@ -113,16 +97,12 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
             sendMessage(WSPacketCmdType.UNSUBCRIBE, `01+${selectedServer}`)
         } else {
             getLogMessageApiContainerContainerNameLogsGet({
-                auth: cookie['token'],
                 path: { container_name: selectedServer },
                 query: { line_count: 50 }
             }).then(logs => {
                 if (logs?.data) {
                     setLogMessages(logs.data)
-                    sendMessage(
-                        WSPacketCmdType.SUBSCRIBE,
-                        `01+${selectedServer}`
-                    )
+                    sendMessage(WSPacketCmdType.SUBSCRIBE, `01+${selectedServer}`)
                 }
             })
         }
