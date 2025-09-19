@@ -3,6 +3,7 @@ import { PasswordInput } from '../../lib/chakra/password-input'
 import { VscArrowRight } from 'react-icons/vsc'
 import { loginUserTokenPost, pingApiSystemPingGet } from '../../lib/hey-api/client'
 import { useState } from 'react'
+import { on } from 'events'
 
 export async function checkLoginStatus() {
     const controller = new AbortController()
@@ -25,7 +26,7 @@ export async function checkLoginStatus() {
     }
 }
 
-export const Login = () => {
+export const Login = (onLoggedIn: (loggedIn: boolean) => void) => {
     const [username, setUsername] = useState<string>('')
     const [password, setPassword] = useState<string>('')
     const [loginLoading, setLoginLoading] = useState<boolean>(false)
@@ -37,6 +38,7 @@ export const Login = () => {
             .then(() => {
                 setUsername('')
                 setPassword('')
+                onLoggedIn(true)
             })
             .finally(() => {
                 setLoginLoading(false)
