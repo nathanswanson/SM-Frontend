@@ -19,15 +19,20 @@ export const Login = ({
 }) => {
     const [username, setUsername] = useState<string>('')
     const [password, setPassword] = useState<string>('')
-
+    const [loginLoading, setLoginLoading] = useState<boolean>(false)
     const login = () => {
+        setLoginLoading(true)
         loginUserTokenPost({
             body: { username: username, password: String(password) }
-        }).then(response => {
-            setUsername('')
-            setPassword('')
-            onLoginSuccess((response.data as any)['access_token'])
         })
+            .then(response => {
+                setUsername('')
+                setPassword('')
+                onLoginSuccess((response.data as any)['access_token'])
+            })
+            .finally(() => {
+                setLoginLoading(false)
+            })
     }
     return (
         <AbsoluteCenter width="100vw" height="100vh">
@@ -61,7 +66,7 @@ export const Login = ({
                     </Fieldset.Root>
                 </Card.Body>
                 <Card.Footer justifyContent={'end'}>
-                    <IconButton onClick={login}>
+                    <IconButton loading={loginLoading} onClick={login}>
                         <VscArrowRight />
                     </IconButton>
                 </Card.Footer>

@@ -13,6 +13,7 @@ import { useAsync } from 'react-use'
 import { listContainersApiContainerListGet } from '../../lib/hey-api/client'
 import { useSelectedServerContext } from '../../app/providers/selected-server-context'
 import { useLoginProvider } from '../providers/login-provider-context'
+import { useState } from 'react'
 
 export const NavBar = ({ ...props }) => {
     return (
@@ -27,26 +28,30 @@ export const NavBar = ({ ...props }) => {
 export const SearchComboBox = () => {
     const { selectedServer, setSelectedServer } = useSelectedServerContext()
     const { cookie } = useLoginProvider()
-
-    const { collection, set } = useListCollection<string>({
-        initialItems: []
-    })
+    const [openState, setOpenState] = useState<Boolean>(false)
+    const { collection: serverList, set: setServerList } =
+        useListCollection<string>({
+            initialItems: []
+        })
 
     const state = useAsync(async () => {
         const container_list = await listContainersApiContainerListGet({
             auth: cookie['token']
         })
-        set(container_list.data?.values ?? [''])
-    }, [selectedServer, set])
+        setServerList(container_list.data?.values ?? [''])
+    }, [selectedServer, openState])
 
     return (
         <Combobox.Root
             width="30%"
             size="lg"
-            collection={collection}
+            collection={serverList}
             placeholder="Search characters..."
             onInputValueChange={e => setSelectedServer(e.inputValue)}
             positioning={{ sameWidth: false, placement: 'bottom-start' }}
+            onOpenChange={value => {
+                if (value.open) setOpenState(prev => !prev)
+            }}
         >
             <Combobox.Control>
                 <Combobox.Input placeholder="Type to search" />
@@ -69,7 +74,7 @@ export const SearchComboBox = () => {
                                 Error fetching
                             </Span>
                         ) : (
-                            collection.items?.map(container => (
+                            serverList.items?.map(container => (
                                 <Combobox.Item key={container} item={container}>
                                     <HStack
                                         display="flex"
