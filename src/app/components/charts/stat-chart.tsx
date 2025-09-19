@@ -1,12 +1,5 @@
-import { Box, HStack, Stat } from '@chakra-ui/react'
-import {
-    Area,
-    AreaChart,
-    Line,
-    LineChart,
-    ResponsiveContainer,
-    Tooltip
-} from 'recharts'
+import { HStack, Stat } from '@chakra-ui/react'
+import { Area, AreaChart, ResponsiveContainer, Tooltip } from 'recharts'
 import { convertToGB } from '../../../utils/util'
 
 export interface ChartDisplayProps {

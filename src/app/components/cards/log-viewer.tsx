@@ -1,9 +1,7 @@
 import {
-    Box,
     Button,
     Container,
     HStack,
-    IconButton,
     Input,
     ScrollArea,
     VStack
@@ -12,17 +10,13 @@ import {
 import { useEffect, useState } from 'react'
 import { useSelectedServerContext } from '../../providers/selected-server-context'
 import { createHighlighter } from 'shiki'
-import { useStickToBottom } from 'use-stick-to-bottom'
-import { LuArrowDown } from 'react-icons/lu'
 import { purify } from '../../../utils/dom'
 import { sendCommandApiContainerContainerNameCommandGet } from '../../../lib/hey-api/client'
 import { VscChevronRight } from 'react-icons/vsc'
 import { useWebSocketProvider } from '../../providers/web-socket'
-
-const line_count = 30
+import { useLoginProvider } from '../../providers/login-provider-context'
 
 export const LogView = () => {
-    // const stickToBottom = useStickToBottom()
     const { logMessages } = useWebSocketProvider()
     const [highlighter, setHighlighter] = useState<any>(null)
 
@@ -66,22 +60,25 @@ export const LogView = () => {
     )
 }
 
-function submit_command(container: string | undefined, command: string) {
-    if (container) {
-        sendCommandApiContainerContainerNameCommandGet({
-            path: {
-                container_name: container
-            },
-            query: {
-                command: command
-            }
-        })
-    }
-}
-
 export const LogManager = () => {
     const [commandText, setCommandText] = useState('')
     const { selectedServer } = useSelectedServerContext()
+    const { cookie } = useLoginProvider()
+
+    function submit_command(container: string | undefined, command: string) {
+        if (container) {
+            sendCommandApiContainerContainerNameCommandGet({
+                auth: cookie['token'],
+                path: {
+                    container_name: container
+                },
+                query: {
+                    command: command
+                }
+            })
+        }
+    }
+
     return (
         <VStack h="100%">
             {LogView()}

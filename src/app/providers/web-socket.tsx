@@ -9,8 +9,8 @@ import {
 } from 'react'
 import { io, Socket } from 'socket.io-client'
 import { useSelectedServerContext } from './selected-server-context'
-import { eventNames } from 'process'
 import { getLogMessageApiContainerContainerNameLogsGet } from '../../lib/hey-api/client'
+import { useLoginProvider } from './login-provider-context'
 const METRICS_SIZE = 50
 const LOG_SIZE = 50
 
@@ -46,6 +46,8 @@ export const useWebSocketProvider = () => {
 }
 
 export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
+    const { cookie } = useLoginProvider()
+
     const socketRef = useRef<Socket | null>(null)
     const [connectionStatus, setConnectionStatus] = useState<ConnectionState>(
         ConnectionState.disconnected
@@ -55,7 +57,7 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
         [0, 0, 0, 0, 0, 0]
     ])
     useEffect(() => {
-        const socket = io(`ws://${import.meta.env.VITE_BACKEND_HOST}:8000`, {
+        const socket = io(`wss://${import.meta.env.VITE_BACKEND_HOST}:80`, {
             autoConnect: true
         })
         socketRef.current = socket
@@ -77,7 +79,24 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
         socket.on(WSPacketCmdType.METRICS, msg => {
             console.debug(`in: metrics: ${msg}`)
             setMetricMessages(prev => {
-                return [...prev, eval(msg)].slice(-METRICS_SIZE)
+                let parsed: number[] = []
+                if (Array.isArray(msg)) {
+                    parsed = msg.map((v: any) => Number(v))
+                } else if (typeof msg === 'string') {
+                    try {
+                        const maybe = JSON.parse(msg)
+                        if (Array.isArray(maybe)) {
+                            parsed = maybe.map((v: any) => Number(v))
+                        } else {
+                            // not an array after parsing, attempt comma-separated fallback
+                            parsed = msg.split(',').map(s => Number(s.trim()))
+                        }
+                    } catch {
+                        // fallback for plain comma-separated string
+                        parsed = msg.split(',').map(s => Number(s.trim()))
+                    }
+                }
+                return [...prev, parsed].slice(-METRICS_SIZE)
             })
         })
     }, [])
@@ -94,6 +113,7 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
             sendMessage(WSPacketCmdType.UNSUBCRIBE, `01+${selectedServer}`)
         } else {
             getLogMessageApiContainerContainerNameLogsGet({
+                auth: cookie['token'],
                 path: { container_name: selectedServer },
                 query: { line_count: 50 }
             }).then(logs => {

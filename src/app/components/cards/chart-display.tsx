@@ -1,4 +1,4 @@
-import { Flex, SimpleGrid, VStack } from '@chakra-ui/react'
+import { SimpleGrid } from '@chakra-ui/react'
 import { StatChart } from '../charts/stat-chart'
 
 //0: cpu 1: mem*100

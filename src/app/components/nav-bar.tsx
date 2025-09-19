@@ -1,25 +1,18 @@
 'use client'
 
 import {
-    Box,
-    Button,
-    Center,
     Combobox,
     HStack,
-    Menu,
     Portal,
     Span,
     Spinner,
     Status,
     useListCollection
 } from '@chakra-ui/react'
-import { createContext, ReactNode, useContext, useState } from 'react'
 import { useAsync } from 'react-use'
 import { listContainersApiContainerListGet } from '../../lib/hey-api/client'
-import { FaGrav } from 'react-icons/fa6'
-import { ServerCreationDialog } from './dialogs/server-create-modal'
-import { TemplateCreateDialog } from './dialogs/template-create-modal'
 import { useSelectedServerContext } from '../../app/providers/selected-server-context'
+import { useLoginProvider } from '../providers/login-provider-context'
 
 export const NavBar = ({ ...props }) => {
     return (
@@ -33,13 +26,16 @@ export const NavBar = ({ ...props }) => {
 
 export const SearchComboBox = () => {
     const { selectedServer, setSelectedServer } = useSelectedServerContext()
+    const { cookie } = useLoginProvider()
 
     const { collection, set } = useListCollection<string>({
         initialItems: []
     })
 
     const state = useAsync(async () => {
-        const container_list = await listContainersApiContainerListGet()
+        const container_list = await listContainersApiContainerListGet({
+            auth: cookie['token']
+        })
         set(container_list.data?.values ?? [''])
     }, [selectedServer, set])
 

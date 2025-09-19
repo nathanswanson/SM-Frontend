@@ -8,33 +8,14 @@ import {
     readFileApiContainerContainerNameFsGet
 } from '../../../lib/hey-api/client'
 import { useSelectedServerContext } from '../../providers/selected-server-context'
+import { TextEditorDialog } from '../dialogs/text-editor'
+import { useLoginProvider } from '../../providers/login-provider-context'
 interface Node {
     id: string
     name: string
     full_path: string
     children?: Node[]
     childrenCount?: number
-}
-
-async function getPathFiles(
-    path: string,
-    selectedServer: string
-): Promise<Node[]> {
-    if (!selectedServer) return []
-    const strings =
-        await getDirectoryFilenamesApiContainerContainerNameFsListGet({
-            path: { container_name: selectedServer },
-            query: { path: path }
-        })
-    if (!strings.data) return []
-    return strings.data.map(filePath => {
-        return {
-            id: filePath,
-            full_path: path + filePath,
-            name: filePath,
-            ...(filePath.includes('.') ? {} : { childrenCount: 1 })
-        }
-    })
 }
 
 // function to load children of a node
@@ -69,6 +50,31 @@ export const FileManager = ({ ...props }) => {
 const FileTree = () => {
     const [collection, setCollection] = useState(initialCollection)
     const { selectedServer } = useSelectedServerContext()
+    const [editorInputStream, setEditorInputStream] =
+        useState<ReadableStream<Uint8Array> | null>(null)
+    const [isEditorOpen, setIsEditorOpen] = useState(false)
+    const { cookie } = useLoginProvider()
+    async function getPathFiles(
+        path: string,
+        selectedServer: string
+    ): Promise<Node[]> {
+        if (!selectedServer) return []
+        const strings =
+            await getDirectoryFilenamesApiContainerContainerNameFsListGet({
+                auth: cookie['token'],
+                path: { container_name: selectedServer },
+                query: { path: path }
+            })
+        if (!strings.data) return []
+        return strings.data.map(filePath => {
+            return {
+                id: filePath,
+                full_path: path + filePath,
+                name: filePath,
+                ...(filePath.includes('.') ? {} : { childrenCount: 1 })
+            }
+        })
+    }
 
     function loadChildren(
         details: TreeView.LoadChildrenDetails<Node>
@@ -76,65 +82,90 @@ const FileTree = () => {
         const value = details.valuePath.join('')
         return getPathFiles(value, selectedServer || '')
     }
+
     async function handleFileSelect(e: TreeView.SelectionChangeDetails<Node>) {
         if (e.focusedValue?.endsWith('/')) return
         if (!selectedServer) return
-        console.log(selectedServer)
-        console.log(!selectedServer)
         const path = e.selectedNodes[0]['full_path']
-        readFileApiContainerContainerNameFsGet({
+        const dl = await readFileApiContainerContainerNameFsGet({
+            auth: cookie['token'],
             path: { container_name: selectedServer },
             query: { path: path }
-        }).then(dl => {
-            const url = URL.createObjectURL(dl.data as Blob)
-            const a = document.createElement('a')
-            a.href = url
-            a.download = e.selectedNodes[0]['id']
-            a.click()
-            a.remove()
-            URL.revokeObjectURL(url)
         })
+
+        if (dl?.data && typeof (dl.data as Blob).stream === 'function') {
+            setEditorInputStream(
+                (dl.data as Blob).stream() as ReadableStream<Uint8Array>
+            )
+            setIsEditorOpen(true)
+        } else if (dl?.data) {
+            // fallback: convert blob to stream using Response
+            const stream = new Response(dl.data as Blob)
+                .body as ReadableStream<Uint8Array> | null
+            if (stream) {
+                setEditorInputStream(stream)
+                setIsEditorOpen(true)
+            }
+        }
     }
+
+    async function handleEditorOutputStream(
+        outStream: ReadableStream<Uint8Array> | undefined
+    ) {
+        if (!outStream) return
+        const res = new Response(outStream)
+        const blob = await res.blob()
+        // TODO: send `blob` back
+    }
+
     return (
-        <TreeView.Root
-            aspectRatio={1 / 1.5}
-            size="md"
-            collection={collection}
-            loadChildren={loadChildren}
-            onLoadChildrenComplete={e => setCollection(e.collection)}
-            onSelectionChange={handleFileSelect}
-        >
-            <TreeView.Label>Tree</TreeView.Label>
-            <TreeView.Tree height="95%">
-                <TreeView.Node<Node>
-                    indentGuide={<TreeView.BranchIndentGuide />}
-                    render={({ node, nodeState }) =>
-                        nodeState.isBranch ? (
-                            <TreeView.BranchControl>
-                                {nodeState.loading ? (
-                                    <LuLoaderCircle
-                                        style={{
-                                            animation: 'spin 1s infinite'
-                                        }}
-                                    />
-                                ) : (
-                                    <LuFolder />
-                                )}
-                                <TreeView.BranchText>
-                                    {node.name}
-                                </TreeView.BranchText>
-                            </TreeView.BranchControl>
-                        ) : (
-                            <TreeView.Item>
-                                <LuFile />
-                                <TreeView.ItemText>
-                                    {node.name}
-                                </TreeView.ItemText>
-                            </TreeView.Item>
-                        )
-                    }
-                />
-            </TreeView.Tree>
-        </TreeView.Root>
+        <>
+            <TreeView.Root
+                aspectRatio={1 / 1.5}
+                size="md"
+                collection={collection}
+                loadChildren={loadChildren}
+                onLoadChildrenComplete={e => setCollection(e.collection)}
+                onSelectionChange={handleFileSelect}
+            >
+                <TreeView.Label>Tree</TreeView.Label>
+                <TreeView.Tree height="95%">
+                    <TreeView.Node<Node>
+                        indentGuide={<TreeView.BranchIndentGuide />}
+                        render={({ node, nodeState }) =>
+                            nodeState.isBranch ? (
+                                <TreeView.BranchControl>
+                                    {nodeState.loading ? (
+                                        <LuLoaderCircle
+                                            style={{
+                                                animation: 'spin 1s infinite'
+                                            }}
+                                        />
+                                    ) : (
+                                        <LuFolder />
+                                    )}
+                                    <TreeView.BranchText>
+                                        {node.name}
+                                    </TreeView.BranchText>
+                                </TreeView.BranchControl>
+                            ) : (
+                                <TreeView.Item>
+                                    <LuFile />
+                                    <TreeView.ItemText>
+                                        {node.name}
+                                    </TreeView.ItemText>
+                                </TreeView.Item>
+                            )
+                        }
+                    />
+                </TreeView.Tree>
+            </TreeView.Root>
+            <TextEditorDialog
+                isOpen={isEditorOpen}
+                setIsOpen={setIsEditorOpen}
+                inputStream={editorInputStream as any}
+                onSave={handleEditorOutputStream}
+            />
+        </>
     )
 }

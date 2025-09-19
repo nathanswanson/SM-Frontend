@@ -1,12 +1,9 @@
 import {
-    Box,
     Button,
     CloseButton,
     Collapsible,
     Dialog,
-    Field,
     Fieldset,
-    Input,
     Link,
     Portal
 } from '@chakra-ui/react'
@@ -14,6 +11,7 @@ import { FormField } from '../../../utils/util'
 import { useState } from 'react'
 import { useSelectedServerContext } from '../../providers/selected-server-context'
 import { addTemplateApiTemplateCreatePost } from '../../../lib/hey-api/client'
+import { useLoginProvider } from '../../providers/login-provider-context'
 export const TemplateCreateDialog = () => {
     const [template_name, setTemplateName] = useState('')
     const [template_image, setTemplateImage] = useState('')
@@ -22,7 +20,7 @@ export const TemplateCreateDialog = () => {
     const [, setTemplateMemory] = useState('4G')
 
     const { selectedServer } = useSelectedServerContext()
-
+    const { cookie } = useLoginProvider()
     return (
         <Dialog.Root>
             <Dialog.Trigger asChild>
@@ -92,6 +90,7 @@ export const TemplateCreateDialog = () => {
                             <Button
                                 onClick={() =>
                                     addTemplateApiTemplateCreatePost({
+                                        auth: cookie['token'],
                                         body: {
                                             name: template_name,
                                             image: template_image,

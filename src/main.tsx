@@ -1,4 +1,4 @@
-import { ChakraProvider, defaultSystem } from '@chakra-ui/react'
+import { ChakraProvider } from '@chakra-ui/react'
 import { ThemeProvider } from 'next-themes'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
@@ -6,19 +6,21 @@ import App from './App'
 import { SelectedServerProvider } from './app/providers/selected-server-context'
 import { system } from './theme'
 import { WebSocketProvider } from './app/providers/web-socket'
+import { LoginProvider } from './app/providers/login-provider-context'
+import { CookiesProvider } from 'react-cookie'
 
 const DISABLE_MOCK = true
 async function preLoad() {
     await enableMocking()
     return
 }
+
 async function enableMocking() {
     if (process.env.NODE_ENV !== 'development' || DISABLE_MOCK) {
         return
     }
 
     const { worker } = await import('./mocks/browser')
-
     // `worker.start()` returns a Promise that resolves
     // once the Service Worker is up and ready to intercept requests.
     return worker.start()
@@ -28,16 +30,20 @@ preLoad().then(() => {
     ReactDOM.createRoot(document.getElementById('root')!).render(
         <React.StrictMode>
             <ChakraProvider value={system}>
-                <SelectedServerProvider>
-                    <WebSocketProvider>
-                        <ThemeProvider
-                            attribute="class"
-                            disableTransitionOnChange
-                        >
-                            <App />
-                        </ThemeProvider>
-                    </WebSocketProvider>
-                </SelectedServerProvider>
+                <CookiesProvider>
+                    <SelectedServerProvider>
+                        <LoginProvider>
+                            <WebSocketProvider>
+                                <ThemeProvider
+                                    attribute="class"
+                                    disableTransitionOnChange
+                                >
+                                    <App />
+                                </ThemeProvider>
+                            </WebSocketProvider>
+                        </LoginProvider>
+                    </SelectedServerProvider>
+                </CookiesProvider>
             </ChakraProvider>
         </React.StrictMode>
     )

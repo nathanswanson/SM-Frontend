@@ -1,16 +1,6 @@
-import { VscTrash } from 'react-icons/vsc'
 import { useSelectedServerContext } from '../../providers/selected-server-context'
-import {
-    Button,
-    CloseButton,
-    Dialog,
-    Group,
-    Input,
-    Portal,
-    Text
-} from '@chakra-ui/react'
+import { Dialog, Group, Input, Portal, Text } from '@chakra-ui/react'
 import { useState } from 'react'
-import { deleteContainerApiContainerContainerNameDeleteGet } from '../../../lib/hey-api/client'
 
 export const DangerConfirmation = (props: any) => {
     const { selectedServer, setSelectedServer } = useSelectedServerContext()

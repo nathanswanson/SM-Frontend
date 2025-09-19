@@ -3,21 +3,21 @@ import { BiUpload } from 'react-icons/bi'
 import { useSelectedServerContext } from '../../providers/selected-server-context'
 import { useState } from 'react'
 import { uploadFileApiContainerContainerNameFsUploadPost } from '../../../lib/hey-api/client'
-
-function upload_file(containerName: string, path: string, file: File) {
-    // looks like a bug in relativePath, if file is in folder the first directory
-
-    uploadFileApiContainerContainerNameFsUploadPost({
-        path: { container_name: containerName },
-        query: { path: path },
-        body: { file: file }
-    })
-}
+import { useLoginProvider } from '../../providers/login-provider-context'
 
 export const UploadPathPrompt = () => {
     const { selectedServer } = useSelectedServerContext()
     const [selectedPath, setSelectedPath] = useState<string>('')
     const [pendingFiles, setPendingFiles] = useState<File>()
+    const { cookie } = useLoginProvider()
+    function upload_file(containerName: string, path: string, file: File) {
+        uploadFileApiContainerContainerNameFsUploadPost({
+            auth: cookie['token'],
+            path: { container_name: containerName },
+            query: { path: path },
+            body: { file: file }
+        })
+    }
     return (
         <Dialog.Root role="alertdialog">
             <Dialog.Trigger asChild>
@@ -42,7 +42,7 @@ export const UploadPathPrompt = () => {
                         <Dialog.Content>
                             <FileUpload.Root
                                 onFileAccept={e => setPendingFiles(e.files[0])}
-                                onFileChange={e => console.log(e)}
+                                // onFileChange={e => console.log(e)}
                             >
                                 <FileUpload.Dropzone w="100%">
                                     <FileUpload.DropzoneContent>

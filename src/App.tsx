@@ -1,4 +1,4 @@
-import { VStack, Text, Flex, HStack } from '@chakra-ui/react'
+import { VStack } from '@chakra-ui/react'
 import { MainContent } from './app/components/server-manager'
 import { NavBar } from './app/components/nav-bar'
 
@@ -16,7 +16,6 @@ export default function Page() {
         >
             {/* nav bar */}
             <NavBar width="100%" justifyContent="flex-end"></NavBar>
-
             <MainContent></MainContent>
         </VStack>
     )

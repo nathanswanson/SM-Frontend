@@ -1,7 +1,5 @@
 import {
     Button,
-    Container,
-    Flex,
     Grid,
     GridItem,
     Group,
@@ -19,10 +17,9 @@ import {
 import { useState } from 'react'
 import { useAsync } from 'react-use'
 import { convertToGB, roundToNearest4GB } from '../../../utils/util'
-import { FaPlus } from 'react-icons/fa'
 import { TemplateCreateDialog } from '../dialogs/template-create-modal'
-import { ServerCreationDialog } from '../dialogs/server-create-modal'
 import { FaLinkSlash } from 'react-icons/fa6'
+import { useLoginProvider } from '../../providers/login-provider-context'
 
 export const NodeOverview = () => {
     return (
@@ -112,7 +109,10 @@ const NodeControls = ({ ...props }) => {
 const HardwareInfo = ({ ...props }) => {
     const hardwareInfo = useState<HardwareInfoResponse | undefined>(undefined)
     const state = useAsync(async () => {
-        const hardware_info = await hardwareApiSystemHardwareGet()
+        const { cookie } = useLoginProvider()
+        const hardware_info = await hardwareApiSystemHardwareGet({
+            auth: cookie['token']
+        })
         hardwareInfo[1](hardware_info.data)
     }, [])
 

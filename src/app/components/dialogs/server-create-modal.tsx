@@ -18,7 +18,7 @@ import {
     createContainerApiContainerCreateTemplateNamePost,
     listTemplatesApiTemplateListGet
 } from '../../../lib/hey-api/client'
-import { FaServer } from 'react-icons/fa6'
+import { useLoginProvider } from '../../providers/login-provider-context'
 
 function parsedPort(
     serverPort: string
@@ -59,9 +59,12 @@ export const ServerCreationDialog = () => {
         useListCollection<string>({
             initialItems: ['']
         })
+    const { cookie } = useLoginProvider()
 
     const state = useAsync(async () => {
-        const template_list = await listTemplatesApiTemplateListGet()
+        const template_list = await listTemplatesApiTemplateListGet({
+            auth: cookie['token']
+        })
         setTemplateList(template_list.data?.values ?? [''])
     }, [selectedTemplate, setTemplateList])
 
@@ -196,7 +199,8 @@ export const ServerCreationDialog = () => {
                                                 server_name: serverName,
                                                 port: parsedPort(serverPort),
                                                 env: parsedEnv(serverEnv)
-                                            }
+                                            },
+                                            auth: cookie['token']
                                         }
                                     )
                                 }}
