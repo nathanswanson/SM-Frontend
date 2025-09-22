@@ -1,5 +1,5 @@
 import { Button, Grid, GridItem, Group, Menu, Portal, SimpleGrid, Skeleton, Stat, VStack } from '@chakra-ui/react'
-import { hardwareApiSystemHardwareGet, HardwareInfoResponse } from '../../../lib/hey-api/client'
+import { hardwareApiSystemHardwareGet, Nodes } from '../../../lib/hey-api/client'
 import { useState } from 'react'
 import { useAsync } from 'react-use'
 import { convertToGB, roundToNearest4GB } from '../../../utils/util'
@@ -81,7 +81,7 @@ const NodeControls = ({ ...props }) => {
 }
 
 const HardwareInfo = ({ ...props }) => {
-    const hardwareInfo = useState<HardwareInfoResponse | undefined>(undefined)
+    const hardwareInfo = useState<Nodes | undefined>(undefined)
     const state = useAsync(async () => {
         const hardware_info = await hardwareApiSystemHardwareGet({ credentials: 'include' })
         hardwareInfo[1](hardware_info.data)
@@ -95,14 +95,14 @@ const HardwareInfo = ({ ...props }) => {
                 <GridItem colSpan={2}>
                     <Stat.Root p="2">
                         <Stat.Label>CPU Architecture</Stat.Label>
-                        <Stat.ValueText>{hardwareInfo[0]?.cpu.architecture}</Stat.ValueText>
+                        <Stat.ValueText>{hardwareInfo[0]?.cpu_name}</Stat.ValueText>
                     </Stat.Root>
                 </GridItem>
 
                 <GridItem>
                     <Stat.Root p="2">
                         <Stat.Label>Arch</Stat.Label>
-                        <Stat.ValueText>{hardwareInfo[0]?.cpu.model_name}</Stat.ValueText>
+                        <Stat.ValueText>{hardwareInfo[0]?.arch}</Stat.ValueText>
                     </Stat.Root>
                 </GridItem>
 
@@ -141,7 +141,7 @@ const HardwareInfo = ({ ...props }) => {
                     <Stat.Root p="2">
                         <Stat.Label>Memory</Stat.Label>
                         <Stat.ValueText>
-                            24.34 / {roundToNearest4GB(convertToGB(hardwareInfo[0]?.mem ?? 0))}
+                            24.34 / {roundToNearest4GB(convertToGB(hardwareInfo[0]?.memory ?? 0))}
                         </Stat.ValueText>
                         <Stat.ValueUnit>GB / GB</Stat.ValueUnit>
                     </Stat.Root>
