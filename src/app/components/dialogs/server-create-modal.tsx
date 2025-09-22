@@ -18,6 +18,7 @@ import {
     createContainerApiContainerCreateTemplateNamePost,
     listTemplatesApiTemplateListGet
 } from '../../../lib/hey-api/client'
+import { useSelectedServerContext } from '../../providers/selected-server-context'
 
 function parsedPort(serverPort: string): { [key: string]: number | null } | null {
     const entries: Record<string, number | null> = {}
@@ -52,6 +53,7 @@ export const ServerCreationDialog = () => {
     const [serverName, setServerName] = useState<string>('')
     const [selectedTemplate, setSelectedTemplate] = useState<string>('')
     const [createServerLoading, setCreateServerLoading] = useState<boolean>(false)
+    const { setSelectedServer } = useSelectedServerContext()
     const { collection: templateList, set: setTemplateList } = useListCollection<string>({
         initialItems: ['']
     })
@@ -80,6 +82,7 @@ export const ServerCreationDialog = () => {
             .then(() => {
                 // Created successfully
                 setOpen(false)
+                setSelectedServer(serverName)
             })
     }
     return (

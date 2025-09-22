@@ -9,9 +9,11 @@ import { VscDebugRestart, VscDebugStart, VscDebugStop, VscTrash } from 'react-ic
 import { useSelectedServerContext } from '../../providers/selected-server-context'
 import { UploadPathPrompt } from '../dialogs/upload-path-prompt'
 import { ServerCreationDialog } from '../dialogs/server-create-modal'
+import { DangerConfirmation } from '../dialogs/danger-confirmation'
 
 export const ServerOverview = ({ ...props }) => {
     const { selectedServer } = useSelectedServerContext()
+    const [isOpenDeleteDialog, setIsOpenDeleteDialog] = useState<boolean>(false)
     return (
         <HStack justifyContent={'space-between'} {...props}>
             <Button size="lg" variant="surface" disabled={selectedServer == undefined || selectedServer == ''}>
@@ -20,6 +22,9 @@ export const ServerOverview = ({ ...props }) => {
             <UploadPathPrompt />
             <CommandButtons />
             <Button
+                onClick={() => {
+                    setIsOpenDeleteDialog(true)
+                }}
                 disabled={selectedServer == undefined || selectedServer == ''}
                 size="lg"
                 bg={selectedServer ? 'red.700' : ''}
@@ -29,6 +34,7 @@ export const ServerOverview = ({ ...props }) => {
                 <VscTrash />
                 Delete Server
             </Button>
+            <DangerConfirmation open={isOpenDeleteDialog} setOpen={setIsOpenDeleteDialog} />
             <ServerCreationDialog />
         </HStack>
     )
