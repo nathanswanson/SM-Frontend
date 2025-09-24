@@ -16,13 +16,13 @@ import {
 } from '@chakra-ui/react'
 import { PasswordInput } from '../../lib/chakra/password-input'
 import { VscArrowRight } from 'react-icons/vsc'
-import { loginUserTokenPost, pingApiSystemPingGet } from '../../lib/hey-api/client'
+import { loginUserTokenPost, pingApiNodesPingGet } from '../../lib/hey-api/client'
 import { useState, useEffect } from 'react'
 import { Toaster, toaster } from '../../lib/chakra/toaster'
 
 export async function checkLoginStatus() {
     try {
-        const response = await pingApiSystemPingGet({
+        const response = await pingApiNodesPingGet({
             credentials: 'include'
         })
         return response.response.status === 200

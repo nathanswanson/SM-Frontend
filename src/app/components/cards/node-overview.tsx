@@ -1,5 +1,5 @@
 import { Button, Grid, GridItem, Group, Menu, Portal, SimpleGrid, Skeleton, Stat, VStack } from '@chakra-ui/react'
-import { hardwareApiSystemHardwareGet, Nodes } from '../../../lib/hey-api/client'
+import { hardwareApiNodesHardwareGet, Nodes } from '../../../lib/hey-api/client'
 import { useState } from 'react'
 import { useAsync } from 'react-use'
 import { convertToGB, roundToNearest4GB } from '../../../utils/util'
@@ -83,7 +83,7 @@ const NodeControls = ({ ...props }) => {
 const HardwareInfo = ({ ...props }) => {
     const hardwareInfo = useState<Nodes | undefined>(undefined)
     const state = useAsync(async () => {
-        const hardware_info = await hardwareApiSystemHardwareGet({ credentials: 'include' })
+        const hardware_info = await hardwareApiNodesHardwareGet({ credentials: 'include' })
         hardwareInfo[1](hardware_info.data)
     }, [])
 

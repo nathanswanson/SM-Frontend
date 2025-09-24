@@ -102,7 +102,7 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
                 query: { line_count: 50 }
             }).then(logs => {
                 if (logs?.data) {
-                    setLogMessages(logs.data)
+                    setLogMessages(logs.data.items)
                     sendMessage(WSPacketCmdType.SUBSCRIBE, `01+${selectedServer}`)
                 }
             })

@@ -69,7 +69,7 @@ const FileTree = () => {
             query: { path: path }
         })
         if (!strings.data) return []
-        return strings.data.map(filePath => {
+        return strings.data.items.map(filePath => {
             return {
                 id: filePath,
                 full_path: path + filePath,

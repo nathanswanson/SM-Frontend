@@ -61,7 +61,7 @@ export const ServerCreationDialog = () => {
 
     const state = useAsync(async () => {
         const template_list = await listTemplatesApiTemplateListGet({ credentials: 'include' })
-        setTemplateList(template_list.data?.values ?? [''])
+        setTemplateList(template_list.data?.items ?? [''])
     }, [selectedTemplate, setTemplateList])
 
     const createServer = async () => {

@@ -12,8 +12,7 @@ export const UploadPathPrompt = () => {
     function upload_file(containerName: string, path: string, file: File) {
         uploadFileApiContainerContainerNameFsUploadPost({
             path: { container_name: containerName },
-            query: { path: path },
-            body: { file: file }
+            body: { file: file, path: path }
         })
     }
     return (
