@@ -1,5 +1,12 @@
 import { Button, Grid, GridItem, Group, Menu, Portal, SimpleGrid, Skeleton, Stat, VStack } from '@chakra-ui/react'
-import { hardwareApiNodesHardwareGet, Nodes } from '../../../lib/hey-api/client'
+import {
+    diskUsageApiNodesDiskUsageGet,
+    DiskUsageApiNodesDiskUsageGetData,
+    hardwareApiNodesHardwareGet,
+    NodeDiskUsageResponse,
+    Nodes,
+    runtimeApiNodesRuntimeGet
+} from '../../../lib/hey-api/client'
 import { useState } from 'react'
 import { useAsync } from 'react-use'
 import { convertToGB, roundToNearest4GB } from '../../../utils/util'
@@ -81,10 +88,22 @@ const NodeControls = ({ ...props }) => {
 }
 
 const HardwareInfo = ({ ...props }) => {
-    const hardwareInfo = useState<Nodes | undefined>(undefined)
+    const [hardwareInfo, setHardwareInfo] = useState<Nodes | undefined>(undefined)
+    const [runtimeHours, setRuntimeHours] = useState<number | undefined>(undefined)
+    const [diskUsage, setDiskUsage] = useState<NodeDiskUsageResponse | undefined>(undefined)
     const state = useAsync(async () => {
         const hardware_info = await hardwareApiNodesHardwareGet({ credentials: 'include' })
-        hardwareInfo[1](hardware_info.data)
+        setHardwareInfo(hardware_info.data)
+    }, [])
+
+    const runtimeState = useAsync(async () => {
+        const runtime_hours = await runtimeApiNodesRuntimeGet({ credentials: 'include' })
+        setRuntimeHours(runtime_hours.data?.uptime_hours)
+    }, [])
+
+    const diskUsageState = useAsync(async () => {
+        const disk_usage = await diskUsageApiNodesDiskUsageGet({ credentials: 'include' })
+        setDiskUsage(disk_usage.data)
     }, [])
 
     return state.loading ? (
@@ -95,21 +114,21 @@ const HardwareInfo = ({ ...props }) => {
                 <GridItem colSpan={2}>
                     <Stat.Root p="2">
                         <Stat.Label>CPU Architecture</Stat.Label>
-                        <Stat.ValueText>{hardwareInfo[0]?.cpu_name}</Stat.ValueText>
+                        <Stat.ValueText>{hardwareInfo?.cpu_name}</Stat.ValueText>
                     </Stat.Root>
                 </GridItem>
 
                 <GridItem>
                     <Stat.Root p="2">
                         <Stat.Label>Arch</Stat.Label>
-                        <Stat.ValueText>{hardwareInfo[0]?.arch}</Stat.ValueText>
+                        <Stat.ValueText>{hardwareInfo?.arch}</Stat.ValueText>
                     </Stat.Root>
                 </GridItem>
 
                 <GridItem>
                     <Stat.Root p="2">
                         <Stat.Label>RunTime</Stat.Label>
-                        <Stat.ValueText>{64}</Stat.ValueText>
+                        <Stat.ValueText>{runtimeHours}</Stat.ValueText>
                         <Stat.ValueUnit>hours</Stat.ValueUnit>
                     </Stat.Root>
                 </GridItem>
@@ -117,7 +136,7 @@ const HardwareInfo = ({ ...props }) => {
                 <GridItem>
                     <Stat.Root p="2">
                         <Stat.Label>Core Usage</Stat.Label>
-                        <Stat.ValueText>38 / 64</Stat.ValueText>
+                        <Stat.ValueText>38 / {hardwareInfo?.cpus}</Stat.ValueText>
                         <Stat.ValueUnit>CPU / CPU</Stat.ValueUnit>
                     </Stat.Root>
                 </GridItem>
@@ -125,15 +144,17 @@ const HardwareInfo = ({ ...props }) => {
                 <GridItem>
                     <Stat.Root p="2">
                         <Stat.Label>Disk</Stat.Label>
-                        <Stat.ValueText>23.45%</Stat.ValueText>
+                        <Stat.ValueText>
+                            {diskUsage ? ((diskUsage.used / diskUsage.total) * 100).toPrecision(3) : -1} %
+                        </Stat.ValueText>
                         <Stat.ValueUnit>Usage</Stat.ValueUnit>
                     </Stat.Root>
                 </GridItem>
                 <GridItem>
                     <Stat.Root p="2">
                         <Stat.Label>Disk Size</Stat.Label>
-                        <Stat.ValueText>1.03</Stat.ValueText>
-                        <Stat.ValueUnit>TB</Stat.ValueUnit>
+                        <Stat.ValueText>{hardwareInfo?.disk}</Stat.ValueText>
+                        <Stat.ValueUnit>GB</Stat.ValueUnit>
                     </Stat.Root>
                 </GridItem>
 
@@ -141,7 +162,7 @@ const HardwareInfo = ({ ...props }) => {
                     <Stat.Root p="2">
                         <Stat.Label>Memory</Stat.Label>
                         <Stat.ValueText>
-                            24.34 / {roundToNearest4GB(convertToGB(hardwareInfo[0]?.memory ?? 0))}
+                            24.34 / {roundToNearest4GB(convertToGB(hardwareInfo?.memory ?? 0))}
                         </Stat.ValueText>
                         <Stat.ValueUnit>GB / GB</Stat.ValueUnit>
                     </Stat.Root>

@@ -1,13 +1,16 @@
 import {
+    Box,
     Button,
     CloseButton,
     Dialog,
     DialogCloseTrigger,
     DialogHeader,
+    IconButton,
     Portal
 } from '@chakra-ui/react'
 import { useEffect, useRef, useState } from 'react'
 import { Editor } from '@monaco-editor/react'
+import { FaDownload } from 'react-icons/fa6'
 
 export const TextEditorDialog = ({
     isOpen,
@@ -29,7 +32,6 @@ export const TextEditorDialog = ({
         if (!inputStream) return
         const reader = inputStream.getReader()
         const decoder = new TextDecoder('utf-8')
-        let unsaved_file = ''
         let cancelled = false
         async function pump() {
             try {
@@ -50,6 +52,7 @@ export const TextEditorDialog = ({
         pump()
         return () => {
             reader.releaseLock?.()
+            setValue('')
         }
     }, [inputStream])
 
@@ -67,34 +70,42 @@ export const TextEditorDialog = ({
         setIsOpen(false)
     }
 
+    const handleDownload = async () => {
+        window.location.href = `${import.meta.env.VITE_BACKEND_HOST}/fs/}`
+    }
+
     return (
-        <Dialog.Root
-            lazyMount
-            open={isOpen}
-            onOpenChange={e => setIsOpen(e.open)}
-            size="lg"
-            {...props}
-        >
+        <Dialog.Root lazyMount open={isOpen} onOpenChange={e => setIsOpen(e.open)} size="xl" {...props}>
             <Portal>
                 <Dialog.Backdrop />
-                <Dialog.Positioner height="90vh">
-                    <Dialog.Content height="100%">
-                        <DialogHeader>
-                            Text Editor - (Unsaved Changes)
-                        </DialogHeader>
+                <Dialog.Positioner>
+                    <Dialog.Content>
+                        <DialogHeader>Text Editor - (Unsaved Changes)</DialogHeader>
                         <DialogCloseTrigger />
 
                         <Dialog.Body>
-                            <Editor
-                                height="100%"
-                                defaultLanguage="json"
-                                theme="vs-dark"
-                                value={value}
-                                onChange={v => setValue(v ?? '')}
-                                onMount={editor => {
-                                    editorRef.current = editor
-                                }}
-                            />
+                            <Box position={'relative'}>
+                                <Editor
+                                    height="60vh"
+                                    defaultLanguage="json"
+                                    theme="vs-dark"
+                                    value={value}
+                                    onChange={v => setValue(v ?? '')}
+                                    onMount={editor => {
+                                        editorRef.current = editor
+                                    }}
+                                />
+                                <IconButton
+                                    variant="subtle"
+                                    zIndex={1}
+                                    position={'absolute'}
+                                    bottom={2}
+                                    left={2}
+                                    aria-label="Download"
+                                >
+                                    <FaDownload />
+                                </IconButton>
+                            </Box>
                         </Dialog.Body>
                         <Dialog.Footer>
                             <Button
@@ -110,7 +121,7 @@ export const TextEditorDialog = ({
                                 <Button variant="outline">Cancel</Button>
                             </Dialog.ActionTrigger>
                         </Dialog.Footer>
-                        <Dialog.CloseTrigger asChild>
+                        <Dialog.CloseTrigger onClick={() => setValue('')} asChild>
                             <CloseButton size="sm" />
                         </Dialog.CloseTrigger>
                     </Dialog.Content>

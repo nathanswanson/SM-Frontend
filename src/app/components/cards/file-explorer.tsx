@@ -5,10 +5,13 @@ import { useEffect, useState } from 'react'
 import { LuFile, LuFolder, LuLoaderCircle } from 'react-icons/lu'
 import {
     getDirectoryFilenamesApiContainerContainerNameFsListGet,
-    readFileApiContainerContainerNameFsGet
+    readFileApiContainerContainerNameFsGet,
+    uploadFileApiContainerContainerNameFsUploadPost
 } from '../../../lib/hey-api/client'
 import { useSelectedServerContext } from '../../providers/selected-server-context'
 import { TextEditorDialog } from '../dialogs/text-editor'
+
+const TEXT_EDITOR_FILE_SIZE_LIMIT = 1024 * 1024 * 5 // 5 MB
 
 interface Node {
     id: string
@@ -74,7 +77,7 @@ const FileTree = () => {
                 id: filePath,
                 full_path: path + filePath,
                 name: filePath,
-                ...(filePath.includes('.') ? {} : { childrenCount: 1 })
+                ...(filePath.endsWith('/') ? { childrenCount: 1 } : {})
             }
         })
     }
@@ -119,7 +122,11 @@ const FileTree = () => {
         if (!outStream) return
         const res = new Response(outStream)
         const blob = await res.blob()
-        // TODO: send `blob` back
+        if (!selectedServer) return
+        uploadFileApiContainerContainerNameFsUploadPost({
+            body: { file: blob, path: '/tmp' },
+            path: { container_name: selectedServer }
+        })
     }
 
     return (

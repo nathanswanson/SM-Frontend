@@ -28,10 +28,11 @@ export const UploadPathPrompt = () => {
                     <Dialog.Content>
                         <Dialog.Header>Upload File - {selectedServer}</Dialog.Header>
                         <Dialog.CloseTrigger />
-                        <Dialog.Content>
+                        <Dialog.Body>
                             <FileUpload.Root
                                 onFileAccept={e => setPendingFiles(e.files[0])}
                                 // onFileChange={e => console.log(e)}
+                                accept={'.zip'}
                             >
                                 <FileUpload.Dropzone w="100%">
                                     <FileUpload.DropzoneContent>
@@ -49,7 +50,7 @@ export const UploadPathPrompt = () => {
                                     }}
                                 ></Button>
                             </Dialog.CloseTrigger>
-                        </Dialog.Content>
+                        </Dialog.Body>
                     </Dialog.Content>
                 </Dialog.Positioner>
             </Portal>
