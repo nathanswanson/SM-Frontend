@@ -182,9 +182,7 @@ const HardwareInfo = ({ hardwareState, hardwareInfo, ...props }: IHardwareInfoPr
                 <GridItem>
                     <Stat.Root p="2">
                         <Stat.Label>Memory</Stat.Label>
-                        <Stat.ValueText>
-                            -- / {roundToNearest4GB(convertToGB(hardwareInfo?.memory ?? 0))}
-                        </Stat.ValueText>
+                        <Stat.ValueText>-- / {hardwareInfo?.memory ?? 0}</Stat.ValueText>
                         <Stat.ValueUnit>GB / GB</Stat.ValueUnit>
                     </Stat.Root>
                 </GridItem>
