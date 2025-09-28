@@ -7,20 +7,44 @@ import {
     Nodes,
     runtimeApiNodesRuntimeGet
 } from '../../../lib/hey-api/client'
-import { useState } from 'react'
+import { useState, ComponentProps } from 'react'
 import { useAsync } from 'react-use'
 import { convertToGB, roundToNearest4GB } from '../../../utils/util'
 import { TemplateCreateDialog } from '../dialogs/template-create-modal'
 import { FaLinkSlash } from 'react-icons/fa6'
+import { AsyncState } from 'react-use/lib/useAsync'
+
+interface IHardwareInfoProps extends ComponentProps<typeof Group> {
+    hardwareState: AsyncState<void>
+    hardwareInfo: Nodes
+}
 
 export const NodeOverview = () => {
+    const [hardwareInfo, setHardwareInfo] = useState<Nodes | undefined>(undefined)
+    const hardwareState = useAsync(async () => {
+        const hardwareInfo = await hardwareApiNodesHardwareGet({ credentials: 'include' })
+        setHardwareInfo(hardwareInfo.data)
+    }, [])
     return (
         <Grid width="100%" height="100%">
             <GridItem w="100%" h="100%">
-                <NodeHeaderInfo w="100%" justifyContent={'space-between'} />
+                {hardwareInfo == undefined || hardwareState.loading ? (
+                    <Skeleton h="100%" w="100%"></Skeleton>
+                ) : (
+                    <NodeHeaderInfo
+                        hardwareInfo={hardwareInfo}
+                        hardwareState={hardwareState}
+                        width="100%"
+                        justifyContent={'space-between'}
+                    />
+                )}
             </GridItem>
             <GridItem h="100%">
-                <HardwareInfo />
+                {hardwareInfo == undefined || hardwareState.loading ? (
+                    <Skeleton h="100%" w="100%"></Skeleton>
+                ) : (
+                    <HardwareInfo hardwareInfo={hardwareInfo} hardwareState={hardwareState} />
+                )}
             </GridItem>
             <GridItem width="100%" minH={0} h="100%" alignSelf="stretch" overflow="auto">
                 <NodeControls alignItems="flex-end" height="100%" width="100%" alignContent={'flex-end'} />
@@ -29,20 +53,22 @@ export const NodeOverview = () => {
     )
 }
 
-const NodeHeaderInfo = ({ ...props }) => {
+const NodeHeaderInfo = ({ hardwareState, hardwareInfo, ...props }: IHardwareInfoProps) => {
     return (
         <Group {...props} alignContent={'space-between'}>
             <GridItem>
                 <Stat.Root size="lg" p="2">
                     <Stat.Label>Node ID</Stat.Label>
-                    <Stat.ValueText>01</Stat.ValueText>
+                    <Stat.ValueText>{hardwareInfo?.id}</Stat.ValueText>
                 </Stat.Root>
             </GridItem>
 
             <GridItem>
                 <Stat.Root p="2" width="100%">
                     <Stat.Label>Containers</Stat.Label>
-                    <Stat.ValueText>4</Stat.ValueText>
+                    <Stat.ValueText width="100%" justifyContent={'flex-end'}>
+                        --
+                    </Stat.ValueText>
                     <Stat.ValueUnit></Stat.ValueUnit>
                 </Stat.Root>
             </GridItem>
@@ -87,14 +113,9 @@ const NodeControls = ({ ...props }) => {
     )
 }
 
-const HardwareInfo = ({ ...props }) => {
-    const [hardwareInfo, setHardwareInfo] = useState<Nodes | undefined>(undefined)
+const HardwareInfo = ({ hardwareState, hardwareInfo, ...props }: IHardwareInfoProps) => {
     const [runtimeHours, setRuntimeHours] = useState<number | undefined>(undefined)
     const [diskUsage, setDiskUsage] = useState<NodeDiskUsageResponse | undefined>(undefined)
-    const state = useAsync(async () => {
-        const hardware_info = await hardwareApiNodesHardwareGet({ credentials: 'include' })
-        setHardwareInfo(hardware_info.data)
-    }, [])
 
     const runtimeState = useAsync(async () => {
         const runtime_hours = await runtimeApiNodesRuntimeGet({ credentials: 'include' })
@@ -106,7 +127,7 @@ const HardwareInfo = ({ ...props }) => {
         setDiskUsage(disk_usage.data)
     }, [])
 
-    return state.loading ? (
+    return hardwareState.loading ? (
         <Skeleton h="100%" w="100%"></Skeleton>
     ) : (
         <VStack w="100%" height="100%">
@@ -136,7 +157,7 @@ const HardwareInfo = ({ ...props }) => {
                 <GridItem>
                     <Stat.Root p="2">
                         <Stat.Label>Core Usage</Stat.Label>
-                        <Stat.ValueText>38 / {hardwareInfo?.cpus}</Stat.ValueText>
+                        <Stat.ValueText>-- / {hardwareInfo?.cpus}</Stat.ValueText>
                         <Stat.ValueUnit>CPU / CPU</Stat.ValueUnit>
                     </Stat.Root>
                 </GridItem>
@@ -162,7 +183,7 @@ const HardwareInfo = ({ ...props }) => {
                     <Stat.Root p="2">
                         <Stat.Label>Memory</Stat.Label>
                         <Stat.ValueText>
-                            24.34 / {roundToNearest4GB(convertToGB(hardwareInfo?.memory ?? 0))}
+                            -- / {roundToNearest4GB(convertToGB(hardwareInfo?.memory ?? 0))}
                         </Stat.ValueText>
                         <Stat.ValueUnit>GB / GB</Stat.ValueUnit>
                     </Stat.Root>

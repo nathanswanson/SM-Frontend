@@ -33,6 +33,7 @@ export const SearchComboBox = () => {
     return (
         <Combobox.Root
             width="30%"
+            minWidth="300px"
             size="lg"
             collection={serverList}
             placeholder="Search characters..."

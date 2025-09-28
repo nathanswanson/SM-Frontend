@@ -10,8 +10,31 @@ import {
 } from '../../../lib/hey-api/client'
 import { useSelectedServerContext } from '../../providers/selected-server-context'
 import { TextEditorDialog } from '../dialogs/text-editor'
+import { client } from '../../../lib/hey-api/client/client.gen'
+import { toaster } from '../../../lib/chakra/toaster'
 
 const TEXT_EDITOR_FILE_SIZE_LIMIT = 1024 * 1024 * 5 // 5 MB
+const ALLOWED_TEXT_FILE_EXTENSIONS = [
+    '.txt',
+    '.md',
+    '.json',
+    '.js',
+    '.ts',
+    '.jsx',
+    '.tsx',
+    '.html',
+    '.css',
+    '.py',
+    '.java',
+    '.c',
+    '.cpp',
+    '.rb',
+    '.go',
+    '.rs',
+    '.log',
+    '.sh',
+    '.properties'
+]
 
 interface Node {
     id: string
@@ -63,7 +86,7 @@ const FileTree = () => {
     const { selectedServer } = useSelectedServerContext()
     const [editorInputStream, setEditorInputStream] = useState<ReadableStream<Uint8Array> | null>(null)
     const [isEditorOpen, setIsEditorOpen] = useState(false)
-
+    const [selectedValue, setSelectedValue] = useState<string[]>([])
     async function getPathFiles(path: string, selectedServer: string): Promise<Node[]> {
         if (!selectedServer) return []
         const strings = await getDirectoryFilenamesApiContainerContainerNameFsListGet({
@@ -88,26 +111,46 @@ const FileTree = () => {
     }
 
     async function handleFileSelect(e: TreeView.SelectionChangeDetails<Node>) {
+        if (e.selectedNodes.length === 0) return
         if (e.focusedValue?.endsWith('/')) return
         if (!selectedServer) return
         const path = e.selectedNodes[0]['full_path']
+
         const dl = await readFileApiContainerContainerNameFsGet({
             credentials: 'include',
             path: { container_name: selectedServer },
             query: { path: path }
         })
+        if (!dl?.data) return
+        const data = dl.data as Blob
+        const stream = typeof data.stream === 'function' ? data.stream() : new Response(data).body
 
-        if (dl?.data && typeof (dl.data as Blob).stream === 'function') {
-            setEditorInputStream((dl.data as Blob).stream() as ReadableStream<Uint8Array>)
-            setIsEditorOpen(true)
-        } else if (dl?.data) {
-            // fallback: convert blob to stream using Response
-            const stream = new Response(dl.data as Blob).body as ReadableStream<Uint8Array> | null
-            if (stream) {
+        if (stream) {
+            if (
+                data.size > TEXT_EDITOR_FILE_SIZE_LIMIT ||
+                !ALLOWED_TEXT_FILE_EXTENSIONS.some(ext => path.endsWith(ext))
+            ) {
+                toaster.info({
+                    id: 'file-download',
+                    title: 'Downloading file...',
+                    description: `Downloading ${path}`
+                })
+                // download file instead of opening in editor
+                const url = URL.createObjectURL(data)
+                const a = document.createElement('a')
+                a.href = url
+                a.download = path.split('/').pop() || 'download'
+                document.body.appendChild(a)
+                a.click()
+                document.body.removeChild(a)
+                URL.revokeObjectURL(url)
+                return
+            } else {
                 setEditorInputStream(stream)
                 setIsEditorOpen(true)
             }
         }
+        setSelectedValue([''])
     }
 
     useEffect(() => {
@@ -138,6 +181,7 @@ const FileTree = () => {
                 loadChildren={loadChildren}
                 onLoadChildrenComplete={e => setCollection(e.collection)}
                 onSelectionChange={handleFileSelect}
+                selectedValue={selectedValue}
             >
                 <TreeView.Label>Tree</TreeView.Label>
                 <TreeView.Tree height="95%">
