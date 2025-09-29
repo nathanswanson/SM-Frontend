@@ -111,43 +111,40 @@ const FileTree = () => {
     }
 
     async function handleFileSelect(e: TreeView.SelectionChangeDetails<Node>) {
-        if (e.selectedNodes.length === 0) return
-        if (e.focusedValue?.endsWith('/')) return
-        if (!selectedServer) return
-        const path = e.selectedNodes[0]['full_path']
-
-        const dl = await readFileApiContainerContainerNameFsGet({
-            credentials: 'include',
-            path: { container_name: selectedServer },
-            query: { path: path }
-        })
-        if (!dl?.data) return
-        const data = dl.data as Blob
-        const stream = typeof data.stream === 'function' ? data.stream() : new Response(data).body
-
-        if (stream) {
-            if (
-                data.size > TEXT_EDITOR_FILE_SIZE_LIMIT ||
-                !ALLOWED_TEXT_FILE_EXTENSIONS.some(ext => path.endsWith(ext))
-            ) {
-                toaster.info({
-                    id: 'file-download',
-                    title: 'Downloading file...',
-                    description: `Downloading ${path}`
+        if (e.selectedNodes.length > 0) {
+            if (!e.focusedValue?.endsWith('/')) {
+                if (!selectedServer) return
+                const path = e.selectedNodes[0]['full_path']
+                const dl = await readFileApiContainerContainerNameFsGet({
+                    credentials: 'include',
+                    path: { container_name: selectedServer },
+                    query: { path: path }
                 })
-                // download file instead of opening in editor
-                const url = URL.createObjectURL(data)
-                const a = document.createElement('a')
-                a.href = url
-                a.download = path.split('/').pop() || 'download'
-                document.body.appendChild(a)
-                a.click()
-                document.body.removeChild(a)
-                URL.revokeObjectURL(url)
-                return
-            } else {
-                setEditorInputStream(stream)
-                setIsEditorOpen(true)
+                if (dl?.data) {
+                    const data = dl.data as Blob
+                    const stream = typeof data.stream === 'function' ? data.stream() : new Response(data).body
+
+                    if (stream) {
+                        if (
+                            data.size > TEXT_EDITOR_FILE_SIZE_LIMIT ||
+                            !ALLOWED_TEXT_FILE_EXTENSIONS.some(ext => path.endsWith(ext))
+                        ) {
+                            // download file instead of opening in editor
+                            const url = URL.createObjectURL(data)
+                            const a = document.createElement('a')
+                            a.href = url
+                            a.download = path.split('/').pop() || 'download'
+                            document.body.appendChild(a)
+                            a.click()
+                            document.body.removeChild(a)
+                            URL.revokeObjectURL(url)
+                            return
+                        } else {
+                            setEditorInputStream(stream)
+                            setIsEditorOpen(true)
+                        }
+                    }
+                }
             }
         }
         setSelectedValue([''])

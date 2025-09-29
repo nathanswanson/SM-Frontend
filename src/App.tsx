@@ -2,6 +2,7 @@ import { VStack } from '@chakra-ui/react'
 import { MainContent } from './app/components/server-manager'
 import { NavBar } from './app/components/nav-bar'
 import { Login } from './app/components/login'
+import { Toaster } from './lib/chakra/toaster'
 
 export default function Page() {
     return (
@@ -19,6 +20,7 @@ export default function Page() {
                 {/* nav bar */}
                 <NavBar width="100%" justifyContent="flex-end"></NavBar>
                 <MainContent></MainContent>
+                <Toaster />
             </VStack>
         </Login>
     )
