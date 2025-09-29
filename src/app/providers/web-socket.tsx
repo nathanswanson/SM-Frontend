@@ -2,6 +2,7 @@ import { createContext, ReactNode, useCallback, useContext, useEffect, useRef, u
 import { io, Socket } from 'socket.io-client'
 import { useSelectedServerContext } from './selected-server-context'
 import { getLogMessageApiContainerContainerNameLogsGet } from '../../lib/hey-api/client'
+import { getBaseUrl } from '../../utils/urlIntercept'
 
 const METRICS_SIZE = 50
 const LOG_SIZE = 50
@@ -41,27 +42,23 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
     const [logMessages, setLogMessages] = useState<string[]>([])
     const [metricMessages, setMetricMessages] = useState<number[][]>([[0, 0, 0, 0, 0, 0]])
     useEffect(() => {
-        const socket = io(import.meta.env.VITE_BACKEND_WEBSOCKET || 'ws://localhost:8000', {
+        const socket = io(getBaseUrl(), {
             autoConnect: true
         })
         socketRef.current = socket
 
         socket.on('connect', () => {
-            console.debug(`in: connect`)
             setConnectionStatus(ConnectionState.connected)
         })
 
         socket.on('disconnect', () => {
-            console.debug(`in: disconnect`)
             setConnectionStatus(ConnectionState.disconnected)
         })
 
         socket.on(WSPacketCmdType.LOGS, msg => {
-            console.debug(`in: log: ${msg}`)
             setLogMessages(prev => prev.concat(msg).slice(-LOG_SIZE))
         })
         socket.on(WSPacketCmdType.METRICS, msg => {
-            console.debug(`in: metrics: ${msg}`)
             setMetricMessages(prev => {
                 let parsed: number[] = []
                 if (Array.isArray(msg)) {
@@ -88,10 +85,7 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
     const { selectedServer } = useSelectedServerContext()
 
     useEffect(() => {
-        console.debug(`out: updating container: ${selectedServer}`)
         if (!selectedServer) {
-            console.debug(`purge active logs and metrics`)
-
             setLogMessages([])
             setMetricMessages([[]])
             sendMessage(WSPacketCmdType.UNSUBCRIBE, `01+${selectedServer}`)
@@ -111,7 +105,6 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
 
     const sendMessage = useCallback((command: WSPacketCmdType, msg: string) => {
         if (command == WSPacketCmdType.SUBSCRIBE) {
-            console.debug(`out: sending ${command}: ${msg}`)
             socketRef.current?.emit(command, msg)
         }
     }, [])

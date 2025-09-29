@@ -1,7 +1,8 @@
 import { http, HttpResponse } from 'msw'
+import { getBaseUrl } from '../utils/urlIntercept'
 
 export const handlers = [
-  http.get(`http://${import.meta.env.VITE_BACKEND_HOST}/vapi/container/list`, () => {
+  http.get(`${getBaseUrl()}/vapi/container/list`, () => {
     return HttpResponse.json({
       containers: [
         'Ruthless-Ogres',

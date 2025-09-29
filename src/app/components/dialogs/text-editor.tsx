@@ -70,10 +70,6 @@ export const TextEditorDialog = ({
         setIsOpen(false)
     }
 
-    const handleDownload = async () => {
-        window.location.href = `${import.meta.env.VITE_BACKEND_HOST}/fs/}`
-    }
-
     return (
         <Dialog.Root lazyMount open={isOpen} onOpenChange={e => setIsOpen(e.open)} size="xl" {...props}>
             <Portal>
