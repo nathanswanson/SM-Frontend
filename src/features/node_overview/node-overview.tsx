@@ -1,18 +1,16 @@
 import { Button, Grid, GridItem, Group, Menu, Portal, SimpleGrid, Skeleton, Stat, VStack } from '@chakra-ui/react'
 import {
     diskUsageApiNodesDiskUsageGet,
-    DiskUsageApiNodesDiskUsageGetData,
     hardwareApiNodesHardwareGet,
     NodeDiskUsageResponse,
     Nodes,
     runtimeApiNodesRuntimeGet
-} from '../../../lib/hey-api/client'
+} from '../../lib/hey-api/client'
 import { useState, ComponentProps } from 'react'
 import { useAsync } from 'react-use'
-import { convertToGB, roundToNearest4GB } from '../../../utils/util'
-import { TemplateCreateDialog } from '../dialogs/template-create-modal'
 import { FaLinkSlash } from 'react-icons/fa6'
 import { AsyncState } from 'react-use/lib/useAsync'
+import { TemplateCreateDialog } from '../gutter/components/template-create-modal'
 
 interface IHardwareInfoProps extends ComponentProps<typeof Group> {
     hardwareState: AsyncState<void>

@@ -1,12 +1,12 @@
 import { Box, Card, GridItem, SimpleGrid, BoxProps } from '@chakra-ui/react'
-import { FileManager } from './cards/file-explorer'
-import { NodeOverview } from './cards/node-overview'
-import { LogManager } from './cards/log-viewer'
-import { ChartDisplay } from './cards/chart-display'
+import { LogManager } from '../features/logger/log-viewer'
+import { ChartDisplay } from '../features/chart_viewer/chart-display'
 import React, { useEffect, useState } from 'react'
 import { useSelectedServerContext } from '../providers/selected-server-context'
-import { ServerOverview } from './cards/server-overview'
+import { ServerOverview } from '../features/server_overview/server-overview'
 import { useWebSocketProvider } from '../providers/web-socket'
+import { NodeOverview } from '../features/node_overview/node-overview'
+import { FileManager } from '../features/file_manager/file-explorer'
 
 const graph_size = 25
 

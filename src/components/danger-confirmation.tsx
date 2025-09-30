@@ -1,7 +1,7 @@
-import { useSelectedServerContext } from '../../providers/selected-server-context'
 import { Button, Dialog, Group, Input, Portal, Text } from '@chakra-ui/react'
 import React, { useState } from 'react'
-import { deleteContainerApiContainerContainerNameDeleteGet } from '../../../lib/hey-api/client'
+import { deleteContainerApiContainerContainerNameDeleteGet } from '../lib/hey-api/client/sdk.gen'
+import { useSelectedServerContext } from '../providers/selected-server-context'
 
 export const DangerConfirmation = ({
     open,

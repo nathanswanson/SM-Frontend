@@ -7,11 +7,11 @@ import {
     getDirectoryFilenamesApiContainerContainerNameFsListGet,
     readFileApiContainerContainerNameFsGet,
     uploadFileApiContainerContainerNameFsUploadPost
-} from '../../../lib/hey-api/client'
+} from '../../lib/hey-api/client'
 import { useSelectedServerContext } from '../../providers/selected-server-context'
-import { TextEditorDialog } from '../dialogs/text-editor'
-import { client } from '../../../lib/hey-api/client/client.gen'
-import { toaster } from '../../../lib/chakra/toaster'
+import { client } from '../../lib/hey-api/client/client.gen'
+import { toaster } from '../../lib/chakra/toaster'
+import { TextEditorDialog } from './components/text-editor'
 
 const TEXT_EDITOR_FILE_SIZE_LIMIT = 1024 * 1024 * 5 // 5 MB
 const ALLOWED_TEXT_FILE_EXTENSIONS = [

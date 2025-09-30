@@ -3,9 +3,9 @@ import { ThemeProvider } from 'next-themes'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
-import { SelectedServerProvider } from './app/providers/selected-server-context'
+import { SelectedServerProvider } from './providers/selected-server-context'
 import { system } from './theme'
-import { WebSocketProvider } from './app/providers/web-socket'
+import { WebSocketProvider } from './providers/web-socket'
 import { ColorModeProvider, DarkMode } from './lib/chakra/color-mode'
 
 const DISABLE_MOCK = true
@@ -30,13 +30,13 @@ preLoad().then(() => {
         <React.StrictMode>
             <ChakraProvider value={system}>
                 <ThemeProvider attribute="class">
-                    {/* <ColorModeProvider> */}
-                    <SelectedServerProvider>
-                        <WebSocketProvider>
-                            <App />
-                        </WebSocketProvider>
-                    </SelectedServerProvider>
-                    {/* </ColorModeProvider> */}
+                    <ColorModeProvider>
+                        <SelectedServerProvider>
+                            <WebSocketProvider>
+                                <App />
+                            </WebSocketProvider>
+                        </SelectedServerProvider>
+                    </ColorModeProvider>
                 </ThemeProvider>
             </ChakraProvider>
         </React.StrictMode>

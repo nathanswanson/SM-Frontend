@@ -11,11 +11,11 @@ import {
     Spinner,
     VStack
 } from '@chakra-ui/react'
-import { PasswordInput } from '../../lib/chakra/password-input'
+import { PasswordInput } from '../lib/chakra/password-input'
 import { VscArrowRight } from 'react-icons/vsc'
-import { loginUserTokenPost, pingApiNodesPingGet } from '../../lib/hey-api/client'
+import { loginUserTokenPost, pingApiNodesPingGet } from '../lib/hey-api/client'
 import { useState, useEffect } from 'react'
-import { Toaster, toaster } from '../../lib/chakra/toaster'
+import { Toaster, toaster } from '../lib/chakra/toaster'
 
 export async function checkLoginStatus() {
     try {

@@ -1,7 +1,7 @@
 import { createContext, useEffect, useState } from 'react'
 import { useContext } from 'react'
 import { ReactNode } from 'react'
-import { getContainerStatusApiContainerContainerNameStatusGet } from '../../lib/hey-api/client'
+import { getContainerStatusApiContainerContainerNameStatusGet } from '../lib/hey-api/client'
 
 interface ISelectedServerContext {
     selectedServer: string | undefined

@@ -1,7 +1,6 @@
 import { createContext, ReactNode, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { useSelectedServerContext } from './selected-server-context'
-import { getLogMessageApiContainerContainerNameLogsGet } from '../../lib/hey-api/client'
-import { getBaseUrl } from '../../utils/urlIntercept'
+import { getBaseUrl } from '../utils/urlIntercept'
 
 const METRICS_SIZE = 50
 const LOG_SIZE = 50

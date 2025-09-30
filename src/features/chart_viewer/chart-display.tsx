@@ -1,9 +1,8 @@
 import { Box, SimpleGrid } from '@chakra-ui/react'
-import { StatChart } from '../charts/stat-chart'
 import { useSelectedServerContext } from '../../providers/selected-server-context'
 import React from 'react'
 
-const LazyStatChart = React.lazy(() => import('../charts/stat-chart'))
+const LazyStatChart = React.lazy(() => import('./components/stat-chart'))
 
 export const ChartDisplay = ({ metricState }: { metricState: number[][] }) => {
     const { selectedServer, serverOnline } = useSelectedServerContext()

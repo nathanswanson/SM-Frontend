@@ -1,15 +1,11 @@
 import { Button, ButtonGroup, HStack, IconButton } from '@chakra-ui/react'
-import {
-    getContainerStatusApiContainerContainerNameStatusGet,
-    startContainerApiContainerNameStartGet,
-    stopContainerApiContainerNameStopGet
-} from '../../../lib/hey-api/client'
-import { useState, useEffect } from 'react'
+import { startContainerApiContainerNameStartGet, stopContainerApiContainerNameStopGet } from '../../lib/hey-api/client'
+import { useState } from 'react'
 import { VscDebugRestart, VscDebugStart, VscDebugStop, VscTrash } from 'react-icons/vsc'
 import { useSelectedServerContext } from '../../providers/selected-server-context'
-import { UploadPathPrompt } from '../dialogs/upload-path-prompt'
-import { ServerCreationDialog } from '../dialogs/server-create-modal'
-import { DangerConfirmation } from '../dialogs/danger-confirmation'
+import { DangerConfirmation } from '../../components/danger-confirmation'
+import { UploadPathPrompt } from './components/upload-path-prompt'
+import { ServerCreationDialog } from './components/server-create-modal'
 
 export const ServerOverview = ({ ...props }) => {
     const { selectedServer } = useSelectedServerContext()

@@ -1,12 +1,12 @@
 import { ScrollArea, Container } from '@chakra-ui/react'
 import { createHighlighterCore, createJavaScriptRegexEngine } from 'shiki'
-import { purify } from '../../utils/dom'
-import { useWebSocketProvider } from '../providers/web-socket'
 import useAsync from 'react-use/lib/useAsync'
 import { useState } from 'react'
 
 // theme
 import githubLight from '@shikijs/themes/github-light'
+import { useWebSocketProvider } from '../../../providers/web-socket'
+import { purify } from '../../../utils/dom'
 
 const LogView = () => {
     const { logMessages } = useWebSocketProvider()

@@ -2,10 +2,10 @@
 
 import { Combobox, HStack, Portal, Span, Spinner, Status, useListCollection } from '@chakra-ui/react'
 import { useAsync } from 'react-use'
-import { listContainersApiContainerListGet } from '../../lib/hey-api/client'
-import { useSelectedServerContext } from '../../app/providers/selected-server-context'
 
 import { useState } from 'react'
+import { useSelectedServerContext } from '../../providers/selected-server-context'
+import { listContainersApiContainerListGet } from '../../lib/hey-api/client/sdk.gen'
 
 export const NavBar = ({ ...props }) => {
     return (

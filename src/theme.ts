@@ -1,5 +1,5 @@
 import { createSystem, defaultConfig, defineConfig, defineSemanticTokens, defineTokens, Heading } from '@chakra-ui/react'
-import { buttonRecipe } from './app/recipes/button'
+import { buttonRecipe } from './recipes/button'
 import { subtle } from 'crypto'
 
 const tokens = defineTokens({

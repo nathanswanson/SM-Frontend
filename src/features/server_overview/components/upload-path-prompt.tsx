@@ -1,8 +1,8 @@
 import { Button, Dialog, FileUpload, Input, Portal } from '@chakra-ui/react'
 import { BiUpload } from 'react-icons/bi'
-import { useSelectedServerContext } from '../../providers/selected-server-context'
 import { useState } from 'react'
-import { uploadFileApiContainerContainerNameFsUploadPost } from '../../../lib/hey-api/client'
+import { uploadFileApiContainerContainerNameFsUploadPost } from '../../../lib/hey-api/client/sdk.gen'
+import { useSelectedServerContext } from '../../../providers/selected-server-context'
 
 export const UploadPathPrompt = () => {
     const { selectedServer } = useSelectedServerContext()

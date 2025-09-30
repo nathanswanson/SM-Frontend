@@ -17,8 +17,8 @@ import { useAsync } from 'react-use'
 import {
     createContainerApiContainerCreateTemplateNamePost,
     listTemplatesApiTemplateListGet
-} from '../../../lib/hey-api/client'
-import { useSelectedServerContext } from '../../providers/selected-server-context'
+} from '../../../lib/hey-api/client/sdk.gen'
+import { useSelectedServerContext } from '../../../providers/selected-server-context'
 
 function parsedPort(serverPort: string): { [key: string]: number | null } | null {
     const entries: Record<string, number | null> = {}

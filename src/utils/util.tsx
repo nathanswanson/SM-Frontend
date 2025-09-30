@@ -11,17 +11,9 @@ export const FormField = (
         <Field.Root>
             <Field.Label>
                 {label}
-                {optional && (
-                    <Field.RequiredIndicator
-                        fallback={<Badge>(Optional)</Badge>}
-                    ></Field.RequiredIndicator>
-                )}
+                {optional && <Field.RequiredIndicator fallback={<Badge>(Optional)</Badge>}></Field.RequiredIndicator>}
             </Field.Label>
-            <Input
-                placeholder={placeholder}
-                value={state[0]}
-                onChange={e => state[1](e.target.value)}
-            />
+            <Input placeholder={placeholder} value={state[0]} onChange={e => state[1](e.target.value)} />
 
             {helperText && <Field.HelperText>{helperText}</Field.HelperText>}
         </Field.Root>

@@ -1,9 +1,9 @@
 import { Box, HStack, VStack } from '@chakra-ui/react'
-import { MainContent } from './app/components/server-manager'
-import { NavBar } from './app/components/nav-bar'
-import { Login } from './app/components/login'
+import { MainContent } from './pages/server-manager'
+import { Login } from './pages/login'
 import { Toaster } from './lib/chakra/toaster'
-import { Gutter } from './app/components/gutter'
+import { Gutter } from './features/gutter/gutter'
+import { NavBar } from './features/nav_bar/nav-bar'
 
 export default function Page() {
     return (
