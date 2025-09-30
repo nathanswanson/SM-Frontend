@@ -6,6 +6,7 @@ import App from './App'
 import { SelectedServerProvider } from './app/providers/selected-server-context'
 import { system } from './theme'
 import { WebSocketProvider } from './app/providers/web-socket'
+import { ColorModeProvider, DarkMode } from './lib/chakra/color-mode'
 
 const DISABLE_MOCK = true
 async function preLoad() {
@@ -28,13 +29,15 @@ preLoad().then(() => {
     ReactDOM.createRoot(document.getElementById('root')!).render(
         <React.StrictMode>
             <ChakraProvider value={system}>
-                <SelectedServerProvider>
-                    <WebSocketProvider>
-                        <ThemeProvider attribute="class" disableTransitionOnChange>
+                <ThemeProvider attribute="class">
+                    {/* <ColorModeProvider> */}
+                    <SelectedServerProvider>
+                        <WebSocketProvider>
                             <App />
-                        </ThemeProvider>
-                    </WebSocketProvider>
-                </SelectedServerProvider>
+                        </WebSocketProvider>
+                    </SelectedServerProvider>
+                    {/* </ColorModeProvider> */}
+                </ThemeProvider>
             </ChakraProvider>
         </React.StrictMode>
     )

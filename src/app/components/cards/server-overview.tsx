@@ -27,8 +27,6 @@ export const ServerOverview = ({ ...props }) => {
                 }}
                 disabled={selectedServer == undefined || selectedServer == ''}
                 size="lg"
-                bg={selectedServer ? 'red.700' : ''}
-                color="white"
                 variant="surface"
             >
                 <VscTrash />
@@ -41,24 +39,9 @@ export const ServerOverview = ({ ...props }) => {
 }
 
 const CommandButtons = ({ ...props }) => {
-    const { selectedServer } = useSelectedServerContext()
-    const [serverRunning, setServerRunning] = useState<boolean | null>(null)
-    const [loading, setLoading] = useState(true)
+    const { selectedServer, serverOnline, setServerOnline } = useSelectedServerContext()
 
-    useEffect(() => {
-        async function fetchStatus() {
-            if (selectedServer) {
-                const serverStatus = await getContainerStatusApiContainerContainerNameStatusGet({
-                    credentials: 'include',
-                    path: { container_name: selectedServer }
-                })
-                const status = (serverStatus.data as { running?: boolean } | undefined)?.running
-                setServerRunning(status ?? false)
-                setLoading(false)
-            }
-        }
-        fetchStatus()
-    }, [selectedServer])
+    const [loading, setLoading] = useState(false)
 
     async function stop_server() {
         setLoading(true)
@@ -68,7 +51,7 @@ const CommandButtons = ({ ...props }) => {
                     credentials: 'include',
                     path: { name: selectedServer }
                 })
-                setServerRunning(false)
+                setServerOnline(false)
             } finally {
                 setLoading(false)
             }
@@ -83,7 +66,7 @@ const CommandButtons = ({ ...props }) => {
                     credentials: 'include',
                     path: { name: selectedServer }
                 })
-                setServerRunning(true)
+                setServerOnline(true)
             } finally {
                 setLoading(false)
             }
@@ -91,17 +74,15 @@ const CommandButtons = ({ ...props }) => {
     }
 
     return (
-        <ButtonGroup size="lg" variant="surface" attached>
+        <ButtonGroup size="lg" variant="surface" attached {...props}>
             <IconButton
-                loading={loading && serverRunning != null}
+                loading={loading}
                 disabled={selectedServer == undefined || selectedServer == ''}
-                bg={selectedServer != undefined && selectedServer != '' ? (serverRunning ? 'green' : 'red') : ''}
-                color="white"
-                onClick={serverRunning ? stop_server : start_server}
+                onClick={serverOnline ? stop_server : start_server}
             >
-                {serverRunning === null ? <VscDebugStart /> : serverRunning ? <VscDebugStop /> : <VscDebugStart />}
+                {serverOnline === null ? <VscDebugStart /> : serverOnline ? <VscDebugStop /> : <VscDebugStart />}
             </IconButton>
-            <IconButton disabled={!serverRunning}>
+            <IconButton disabled={!serverOnline}>
                 <VscDebugRestart />
             </IconButton>
         </ButtonGroup>

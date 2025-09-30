@@ -10,7 +10,7 @@ import { useWebSocketProvider } from '../providers/web-socket'
 
 const graph_size = 25
 
-export const MainContent = () => {
+export const MainContent = ({ ...props }) => {
     const { metricMessages } = useWebSocketProvider()
 
     return (
@@ -21,8 +21,9 @@ export const MainContent = () => {
             minChildWidth="320px"
             alignContent="flex-start"
             columns={{ base: 1, md: 3 }}
+            {...props}
         >
-            <GridItemHelper header="Node Management" rowSize={2}>
+            <GridItemHelper header="Node Management" colSize={2} rowSize={2}>
                 <NodeOverview />
             </GridItemHelper>
 
@@ -69,27 +70,26 @@ const GridItemHelper = ({
     ...rest
 }: GridItemHelperProps) => {
     return (
-        <GridItem
-            h="100%"
-            overflow={'hidden'}
-            rowSpan={rowSize}
-            colSpan={colSize}
-        >
+        <GridItem h="100%" rowSpan={rowSize} colSpan={colSize}>
             <Card.Root
+                borderRadius={'sm'}
+                bg="bg.subtle"
+                overflow={'hidden'}
                 height="100%"
+                shadow="sm"
                 width="100%"
                 padding={0}
-                boxShadow="md"
-                borderRadius="lg"
                 display="flex"
                 flexDirection="column"
+                borderWidth={0}
             >
                 {/* Header */}
                 {label ? (
                     <Card.Header
                         px={4}
                         py={3}
-                        borderBottomWidth="1px"
+                        borderBottomWidth="2px"
+                        borderBottomColor="gray.200"
                         bg="bg.panel"
                         fontWeight="semibold"
                     >
@@ -99,6 +99,7 @@ const GridItemHelper = ({
 
                 <Card.Body
                     p={cardContentPadding ?? cardContentPadding}
+                    bg="bg.panel"
                     height="100%"
                     width="100%"
                     {...rest}

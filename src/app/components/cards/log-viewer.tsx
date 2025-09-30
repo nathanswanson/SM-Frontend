@@ -1,56 +1,11 @@
-import { Button, Container, HStack, Input, ScrollArea, VStack } from '@chakra-ui/react'
+import { Box, Button, HStack, Input, VStack } from '@chakra-ui/react'
 
-import { useEffect, useState } from 'react'
 import { useSelectedServerContext } from '../../providers/selected-server-context'
-import { createHighlighter } from 'shiki'
-import { purify } from '../../../utils/dom'
 import { sendCommandApiContainerContainerNameCommandGet } from '../../../lib/hey-api/client'
 import { VscChevronRight } from 'react-icons/vsc'
-import { useWebSocketProvider } from '../../providers/web-socket'
+import React, { useState } from 'react'
 
-export const LogView = () => {
-    const { logMessages } = useWebSocketProvider()
-    const [highlighter, setHighlighter] = useState<any>(null)
-
-    // Initialize Shiki highlighter
-    useEffect(() => {
-        createHighlighter({
-            themes: ['github-dark-high-contrast'], // or any theme you prefer
-            langs: ['log', 'shell', 'bash', 'text']
-        }).then(setHighlighter)
-    }, [])
-
-    // Listen for log messages from the server
-
-    return (
-        <ScrollArea.Root height="100%" background="#0a0c10">
-            <ScrollArea.Viewport height="100%">
-                <ScrollArea.Content height="100px" textStyle="sm">
-                    {logMessages.map((log, idx) => (
-                        <Container
-                            p="0"
-                            width="auto"
-                            key={idx}
-                            dangerouslySetInnerHTML={{
-                                __html: highlighter
-                                    ? highlighter.codeToHtml(log, {
-                                          lang: 'log',
-                                          theme: 'github-dark-high-contrast'
-                                      })
-                                    : purify(log) // fallback, make sure to sanitize
-                            }}
-                        />
-                    ))}
-                </ScrollArea.Content>
-            </ScrollArea.Viewport>
-            <ScrollArea.Scrollbar>
-                <ScrollArea.Thumb />
-            </ScrollArea.Scrollbar>
-
-            <ScrollArea.Corner />
-        </ScrollArea.Root>
-    )
-}
+const LazyLogView = React.lazy(() => import('../log-terminal'))
 
 export const LogManager = () => {
     const [commandText, setCommandText] = useState('')
@@ -72,7 +27,13 @@ export const LogManager = () => {
 
     return (
         <VStack h="100%">
-            {LogView()}
+            {!selectedServer ? (
+                <Box width="100%" bg="bg.muted">
+                    Select online server to view logs
+                </Box>
+            ) : (
+                <LazyLogView></LazyLogView>
+            )}
             <HStack width="100%">
                 <Input
                     width="100%"
@@ -89,8 +50,7 @@ export const LogManager = () => {
                 ></Input>
                 <Button
                     size="sm"
-                    color="white"
-                    bg="blue.700"
+                    colorPalette={'brand'}
                     onClick={() => {
                         submit_command(selectedServer, commandText)
                         setCommandText('')

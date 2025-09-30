@@ -80,9 +80,7 @@ const CreateNewMenu = () => {
     return (
         <Menu.Root>
             <Menu.Trigger asChild>
-                <Button color="white" bg="blue.700">
-                    Create New
-                </Button>
+                <Button>Create New</Button>
             </Menu.Trigger>
             <Portal>
                 <Menu.Positioner>
@@ -105,7 +103,7 @@ const NodeControls = ({ ...props }) => {
         <Group {...props}>
             <CreateNewMenu />
 
-            <Button color="white" bg="red.700">
+            <Button>
                 <FaLinkSlash />
                 Unlink
             </Button>
@@ -131,7 +129,7 @@ const HardwareInfo = ({ hardwareState, hardwareInfo, ...props }: IHardwareInfoPr
         <Skeleton h="100%" w="100%"></Skeleton>
     ) : (
         <VStack w="100%" height="100%">
-            <SimpleGrid height="100%" templateColumns={'1fr 1fr'} templateRows={'1fr 1fr 1fr'} width={'100%'}>
+            {/* <SimpleGrid height="100%" templateColumns={'1fr 1fr'} templateRows={'1fr 1fr 1fr'} width={'100%'}>
                 <GridItem colSpan={2}>
                     <Stat.Root p="2">
                         <Stat.Label>CPU Architecture</Stat.Label>
@@ -186,7 +184,7 @@ const HardwareInfo = ({ hardwareState, hardwareInfo, ...props }: IHardwareInfoPr
                         <Stat.ValueUnit>GB / GB</Stat.ValueUnit>
                     </Stat.Root>
                 </GridItem>
-            </SimpleGrid>
+            </SimpleGrid> */}
         </VStack>
     )
 }

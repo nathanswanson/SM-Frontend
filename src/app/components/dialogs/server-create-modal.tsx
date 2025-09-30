@@ -88,9 +88,7 @@ export const ServerCreationDialog = () => {
     return (
         <Dialog.Root open={open} onOpenChange={e => setOpen(e.open)}>
             <Dialog.Trigger asChild>
-                <Button size="lg" color="white" variant={'surface'}>
-                    New Server
-                </Button>
+                <Button size="lg">New Server</Button>
             </Dialog.Trigger>
             <Portal>
                 <Dialog.Backdrop />

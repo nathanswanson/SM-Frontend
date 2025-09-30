@@ -1,5 +1,4 @@
 import { createContext, ReactNode, useCallback, useContext, useEffect, useRef, useState } from 'react'
-import { io, Socket } from 'socket.io-client'
 import { useSelectedServerContext } from './selected-server-context'
 import { getLogMessageApiContainerContainerNameLogsGet } from '../../lib/hey-api/client'
 import { getBaseUrl } from '../../utils/urlIntercept'
@@ -37,75 +36,82 @@ export const useWebSocketProvider = () => {
 }
 
 export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
-    const socketRef = useRef<Socket | null>(null)
+    const socketRef = useRef<any>(null)
     const [connectionStatus, setConnectionStatus] = useState<ConnectionState>(ConnectionState.disconnected)
     const [logMessages, setLogMessages] = useState<string[]>([])
     const [metricMessages, setMetricMessages] = useState<number[][]>([[0, 0, 0, 0, 0, 0]])
-    useEffect(() => {
-        const socket = io(getBaseUrl(), {
-            autoConnect: true
-        })
-        socketRef.current = socket
-
-        socket.on('connect', () => {
-            setConnectionStatus(ConnectionState.connected)
-        })
-
-        socket.on('disconnect', () => {
-            setConnectionStatus(ConnectionState.disconnected)
-        })
-
-        socket.on(WSPacketCmdType.LOGS, msg => {
-            setLogMessages(prev => prev.concat(msg).slice(-LOG_SIZE))
-        })
-        socket.on(WSPacketCmdType.METRICS, msg => {
-            setMetricMessages(prev => {
-                let parsed: number[] = []
-                if (Array.isArray(msg)) {
-                    parsed = msg.map((v: any) => Number(v))
-                } else if (typeof msg === 'string') {
-                    try {
-                        const maybe = JSON.parse(msg)
-                        if (Array.isArray(maybe)) {
-                            parsed = maybe.map((v: any) => Number(v))
-                        } else {
-                            // not an array after parsing, attempt comma-separated fallback
-                            parsed = msg.split(',').map(s => Number(s.trim()))
-                        }
-                    } catch {
-                        // fallback for plain comma-separated string
-                        parsed = msg.split(',').map(s => Number(s.trim()))
-                    }
-                }
-                return [...prev, parsed].slice(-METRICS_SIZE)
-            })
-        })
-    }, [])
-
     const { selectedServer } = useSelectedServerContext()
 
     useEffect(() => {
         if (!selectedServer) {
+            // Clear state and disconnect socket if selectedServer is empty
             setLogMessages([])
             setMetricMessages([[]])
-            sendMessage(WSPacketCmdType.UNSUBCRIBE, `01+${selectedServer}`)
-        } else {
-            getLogMessageApiContainerContainerNameLogsGet({
-                credentials: 'include',
-                path: { container_name: selectedServer },
-                query: { line_count: 50 }
-            }).then(logs => {
-                if (logs?.data) {
-                    setLogMessages(logs.data.items)
-                    sendMessage(WSPacketCmdType.SUBSCRIBE, `01+${selectedServer}`)
-                }
+            if (socketRef.current) {
+                socketRef.current.disconnect()
+                socketRef.current = null
+            }
+            return
+        }
+
+        // Dynamically import socket.io-client and initialize the socket
+        let isMounted = true
+        import('socket.io-client').then(({ io }) => {
+            if (!isMounted) return
+
+            const socket = io(getBaseUrl(), {
+                autoConnect: true
             })
+            socketRef.current = socket
+
+            socket.on('connect', () => {
+                setConnectionStatus(ConnectionState.connected)
+            })
+
+            socket.on('disconnect', () => {
+                setConnectionStatus(ConnectionState.disconnected)
+            })
+
+            socket.on(WSPacketCmdType.LOGS, msg => {
+                setLogMessages(prev => prev.concat(msg).slice(-LOG_SIZE))
+            })
+
+            socket.on(WSPacketCmdType.METRICS, msg => {
+                setMetricMessages(prev => {
+                    let parsed: number[] = []
+                    if (Array.isArray(msg)) {
+                        parsed = msg.map((v: any) => Number(v))
+                    } else if (typeof msg === 'string') {
+                        try {
+                            const maybe = JSON.parse(msg)
+                            if (Array.isArray(maybe)) {
+                                parsed = maybe.map((v: any) => Number(v))
+                            } else {
+                                // not an array after parsing, attempt comma-separated fallback
+                                parsed = msg.split(',').map(s => Number(s.trim()))
+                            }
+                        } catch {
+                            // fallback for plain comma-separated string
+                            parsed = msg.split(',').map(s => Number(s.trim()))
+                        }
+                    }
+                    return [...prev, parsed].slice(-METRICS_SIZE)
+                })
+            })
+        })
+
+        return () => {
+            isMounted = false
+            if (socketRef.current) {
+                socketRef.current.disconnect()
+                socketRef.current = null
+            }
         }
     }, [selectedServer])
 
     const sendMessage = useCallback((command: WSPacketCmdType, msg: string) => {
-        if (command == WSPacketCmdType.SUBSCRIBE) {
-            socketRef.current?.emit(command, msg)
+        if (socketRef.current && command === WSPacketCmdType.SUBSCRIBE) {
+            socketRef.current.emit(command, msg)
         }
     }, [])
 

@@ -6,11 +6,13 @@ import {
     DialogCloseTrigger,
     DialogHeader,
     IconButton,
-    Portal
+    Portal,
+    Spinner
 } from '@chakra-ui/react'
-import { useEffect, useRef, useState } from 'react'
-import { Editor } from '@monaco-editor/react'
+import React, { useEffect, useRef, useState } from 'react'
 import { FaDownload } from 'react-icons/fa6'
+
+const EditorLazy = React.lazy(() => import('@monaco-editor/react'))
 
 export const TextEditorDialog = ({
     isOpen,
@@ -81,16 +83,21 @@ export const TextEditorDialog = ({
 
                         <Dialog.Body>
                             <Box position={'relative'}>
-                                <Editor
-                                    height="60vh"
-                                    defaultLanguage="json"
-                                    theme="vs-dark"
-                                    value={value}
-                                    onChange={v => setValue(v ?? '')}
-                                    onMount={editor => {
-                                        editorRef.current = editor
-                                    }}
-                                />
+                                {!isOpen ? (
+                                    <Spinner />
+                                ) : (
+                                    <EditorLazy
+                                        height="60vh"
+                                        defaultLanguage="json"
+                                        theme="vs-dark"
+                                        value={value}
+                                        onChange={v => setValue(v ?? '')}
+                                        onMount={editor => {
+                                            editorRef.current = editor
+                                        }}
+                                    />
+                                )}
+
                                 <IconButton
                                     variant="subtle"
                                     zIndex={1}

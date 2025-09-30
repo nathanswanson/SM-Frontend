@@ -58,3 +58,5 @@ export const StatChart = ({ metricState, id, label, color, ...rest }: ChartDispl
         </ResponsiveContainer>
     </HStack>
 )
+
+export default StatChart

@@ -57,8 +57,6 @@ export const DangerConfirmation = ({
                                         loading={pendingDeletion}
                                         onClick={deleteServer}
                                         disabled={confirmText !== selectedServer}
-                                        color="white"
-                                        bg="red.500"
                                     >
                                         Confirm
                                     </Button>

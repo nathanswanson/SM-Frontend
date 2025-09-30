@@ -12,12 +12,11 @@ export const NavBar = ({ ...props }) => {
         <HStack width="100%" {...props} as="nav" paddingY="3">
             {/* search-bar center */}
             <SearchComboBox />
-            {/* create new button right */}
         </HStack>
     )
 }
 
-export const SearchComboBox = () => {
+const SearchComboBox = () => {
     const { selectedServer, setSelectedServer } = useSelectedServerContext()
 
     const [openState, setOpenState] = useState<Boolean>(false)
@@ -32,9 +31,12 @@ export const SearchComboBox = () => {
 
     return (
         <Combobox.Root
-            width="30%"
+            borderWidth={0}
+            width="50%"
             minWidth="300px"
             size="lg"
+            shadow="sm"
+            borderRadius={'sm'}
             collection={serverList}
             placeholder="Search characters..."
             onInputValueChange={e => setSelectedServer(e.inputValue)}
@@ -42,9 +44,10 @@ export const SearchComboBox = () => {
             onOpenChange={value => {
                 if (value.open) setOpenState(prev => !prev)
             }}
+            bg="bg.panel"
         >
             <Combobox.Control>
-                <Combobox.Input placeholder="Type to search" />
+                <Combobox.Input borderWidth={0} placeholder="Type to search" />
                 <Combobox.IndicatorGroup>
                     <Combobox.ClearTrigger />
                     <Combobox.Trigger />
@@ -56,7 +59,7 @@ export const SearchComboBox = () => {
                     <Combobox.Content minW="sm">
                         {state.loading ? (
                             <HStack p="4">
-                                <Spinner size="xs" borderWidth="1px" />
+                                <Spinner size="xs" />
                                 <Span>Loading...</Span>
                             </HStack>
                         ) : state.error ? (
