@@ -1,4 +1,4 @@
-import { HStack, Stat } from '@chakra-ui/react'
+import { Flex, Stat } from '@chakra-ui/react'
 import { Area, AreaChart, ResponsiveContainer, Tooltip } from 'recharts'
 import { convertToGB } from '../../../utils/util'
 
@@ -17,15 +17,7 @@ function dataToRecharts(data: number[][], id: number, expr: (n: number) => numbe
 }
 
 export const StatChart = ({ metricState, id, label, color, ...rest }: ChartDisplayProps) => (
-    <HStack
-        marginLeft={4}
-        justifyItems={'flex-end'}
-        aspectRatio={2 / 1}
-        alignItems="center"
-        height="100%"
-        width="100%"
-        {...rest}
-    >
+    <Flex aspectRatio={1} justifyItems={'flex-end'} alignItems="center" height="100%" width="100%" {...rest}>
         <Stat.Root>
             <Stat.Label>{label}</Stat.Label>
             <Stat.ValueText>{convertToGB(metricState[metricState.length - 1][id])}</Stat.ValueText>
@@ -56,7 +48,7 @@ export const StatChart = ({ metricState, id, label, color, ...rest }: ChartDispl
                 <Tooltip />
             </AreaChart>
         </ResponsiveContainer>
-    </HStack>
+    </Flex>
 )
 
 export default StatChart

@@ -9,9 +9,8 @@ import {
     uploadFileApiContainerContainerNameFsUploadPost
 } from '../../lib/hey-api/client'
 import { useSelectedServerContext } from '../../providers/selected-server-context'
-import { client } from '../../lib/hey-api/client/client.gen'
-import { toaster } from '../../lib/chakra/toaster'
 import { TextEditorDialog } from './components/text-editor'
+import { DisabledModule } from '../../components/disabled-module'
 
 const TEXT_EDITOR_FILE_SIZE_LIMIT = 1024 * 1024 * 5 // 5 MB
 const ALLOWED_TEXT_FILE_EXTENSIONS = [
@@ -67,17 +66,25 @@ const initialCollection = createTreeCollection<Node>({
 })
 
 export const FileManager = ({ ...props }) => {
+    const { selectedServer } = useSelectedServerContext()
+
     return (
-        <ScrollArea.Root {...props}>
-            <ScrollArea.Viewport h="95%">
-                <ScrollArea.Content h="95%">
-                    <FileTree />
-                </ScrollArea.Content>
-                <ScrollArea.Scrollbar>
-                    <ScrollArea.Thumb />
-                </ScrollArea.Scrollbar>
-            </ScrollArea.Viewport>
-        </ScrollArea.Root>
+        <>
+            {!selectedServer ? (
+                <DisabledModule requester="files" />
+            ) : (
+                <ScrollArea.Root {...props}>
+                    <ScrollArea.Viewport>
+                        <ScrollArea.Content>
+                            <FileTree />
+                        </ScrollArea.Content>
+                        <ScrollArea.Scrollbar>
+                            <ScrollArea.Thumb />
+                        </ScrollArea.Scrollbar>
+                    </ScrollArea.Viewport>
+                </ScrollArea.Root>
+            )}
+        </>
     )
 }
 
@@ -172,7 +179,7 @@ const FileTree = () => {
     return (
         <>
             <TreeView.Root
-                aspectRatio={1 / 1.5}
+                height="1px"
                 size="md"
                 collection={collection}
                 loadChildren={loadChildren}
@@ -180,8 +187,7 @@ const FileTree = () => {
                 onSelectionChange={handleFileSelect}
                 selectedValue={selectedValue}
             >
-                <TreeView.Label>Tree</TreeView.Label>
-                <TreeView.Tree height="95%">
+                <TreeView.Tree>
                     <TreeView.Node<Node>
                         indentGuide={<TreeView.BranchIndentGuide />}
                         render={({ node, nodeState }) =>

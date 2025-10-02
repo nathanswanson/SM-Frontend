@@ -4,10 +4,11 @@ import { useSelectedServerContext } from '../../providers/selected-server-contex
 import { sendCommandApiContainerContainerNameCommandGet } from '../../lib/hey-api/client'
 import { VscChevronRight } from 'react-icons/vsc'
 import React, { useState } from 'react'
+import { DisabledModule } from '../../components/disabled-module'
 
 const LazyLogView = React.lazy(() => import('./components/log-terminal'))
 
-export const LogManager = () => {
+export const LogManager = ({ ...props }) => {
     const [commandText, setCommandText] = useState('')
     const { selectedServer } = useSelectedServerContext()
 
@@ -26,14 +27,8 @@ export const LogManager = () => {
     }
 
     return (
-        <VStack h="100%">
-            {!selectedServer ? (
-                <Box width="100%" bg="bg.muted">
-                    Select online server to view logs
-                </Box>
-            ) : (
-                <LazyLogView></LazyLogView>
-            )}
+        <VStack h="100%" {...props}>
+            {!selectedServer ? <DisabledModule requester="logs" /> : <LazyLogView></LazyLogView>}
             <HStack width="100%">
                 <Input
                     width="100%"

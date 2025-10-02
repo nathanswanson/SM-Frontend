@@ -1,112 +1,53 @@
-import { Box, Card, GridItem, SimpleGrid, BoxProps } from '@chakra-ui/react'
-import { LogManager } from '../features/logger/log-viewer'
-import { ChartDisplay } from '../features/chart_viewer/chart-display'
-import React, { useEffect, useState } from 'react'
-import { useSelectedServerContext } from '../providers/selected-server-context'
-import { ServerOverview } from '../features/server_overview/server-overview'
-import { useWebSocketProvider } from '../providers/web-socket'
+import { ServerOverview } from '../features/control/server-control'
 import { NodeOverview } from '../features/node_overview/node-overview'
 import { FileManager } from '../features/file_manager/file-explorer'
-
-const graph_size = 25
+import CardModule from '../components/card'
+import { Grid } from '@chakra-ui/react/grid'
+import { LogManager } from '../features/logger/log-viewer'
+import { SkeletonCircle } from '@chakra-ui/react'
 
 export const MainContent = ({ ...props }) => {
-    const { metricMessages } = useWebSocketProvider()
-
+    // const { metricMessages } = useWebSocketProvider()
     return (
-        <SimpleGrid
-            flex="1"
-            gap="4"
-            width="100%"
-            minChildWidth="320px"
-            alignContent="flex-start"
-            columns={{ base: 1, md: 3 }}
+        <Grid
+            alignSelf="flex-start"
+            gap="1.5em"
+            // minW={'1400px'}
+            templateColumns={[
+                'repeat(3, 1fr);',
+                'repeat(3, 1fr);',
+                'repeat(6, 1fr);',
+                'repeat(9, 1fr);',
+                'repeat(12, 1fr);'
+            ]}
+            autoRows={'minmax(400px, max-content);'}
+            flexWrap={'wrap'}
             {...props}
         >
-            <GridItemHelper header="Node Management" colSize={2} rowSize={2}>
+            <CardModule header="Node" colSize={3}>
                 <NodeOverview />
-            </GridItemHelper>
+            </CardModule>
+            {/* 
+            <CardModule header="Template Manager" colSize={6}>
+                <TemplateViewer />
+            </CardModule> */}
 
-            <GridItemHelper header="File Manager" rowSize={2}>
+            <CardModule header="Server" colSize={3}>
+                <NodeOverview />
+            </CardModule>
+            <CardModule header="Files" rowSize={1} colSize={3}>
                 <FileManager height="100%" />
-            </GridItemHelper>
-
-            <GridItemHelper header="Server" colSize={2}>
+            </CardModule>
+            <CardModule header="Manage" colSize={3}>
                 <ServerOverview />
-            </GridItemHelper>
-
-            <GridItemHelper header="Logs" colSize={2} rowSize={2}>
+            </CardModule>
+            <CardModule header="console" colSize={6}>
                 <LogManager />
-            </GridItemHelper>
-
-            <GridItemHelper
-                header="Metrics"
-                colSize={2}
-                rowSize={1}
-                marginRight={0}
-                marginBottom={0}
-                cardContentPadding={0}
-            >
-                <ChartDisplay metricState={metricMessages} />
-            </GridItemHelper>
-        </SimpleGrid>
-    )
-}
-
-interface GridItemHelperProps extends BoxProps {
-    rowSize?: number
-    colSize?: number
-    children?: React.ReactNode
-    header?: string
-    cardContentPadding?: string | number
-}
-
-const GridItemHelper = ({
-    rowSize = 1,
-    colSize = 1,
-    children,
-    header: label,
-    cardContentPadding,
-    ...rest
-}: GridItemHelperProps) => {
-    return (
-        <GridItem h="100%" rowSpan={rowSize} colSpan={colSize}>
-            <Card.Root
-                borderRadius={'sm'}
-                bg="bg.subtle"
-                overflow={'hidden'}
-                height="100%"
-                shadow="sm"
-                width="100%"
-                padding={0}
-                display="flex"
-                flexDirection="column"
-                borderWidth={0}
-            >
-                {/* Header */}
-                {label ? (
-                    <Card.Header
-                        px={4}
-                        py={3}
-                        borderBottomWidth="2px"
-                        borderBottomColor="gray.200"
-                        bg="bg.panel"
-                        fontWeight="semibold"
-                    >
-                        {label}
-                    </Card.Header>
-                ) : null}
-
-                <Card.Body
-                    p={cardContentPadding ?? cardContentPadding}
-                    bg="bg.panel"
-                    height="100%"
-                    width="100%"
-                    {...rest}
-                >
-                    {children}
-                </Card.Body>
-            </Card.Root>
-        </GridItem>
+            </CardModule>
+            <CardModule header="cpu" colSize={3}>
+                <SkeletonCircle height="100%" />
+            </CardModule>
+            <CardModule header="memory" colSize={3}></CardModule>
+        </Grid>
     )
 }

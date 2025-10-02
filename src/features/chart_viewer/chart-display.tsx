@@ -1,19 +1,18 @@
-import { Box, SimpleGrid } from '@chakra-ui/react'
 import { useSelectedServerContext } from '../../providers/selected-server-context'
 import React from 'react'
+import { Flex } from '@chakra-ui/react/flex'
+import { DisabledModule } from '../../components/disabled-module'
 
 const LazyStatChart = React.lazy(() => import('./components/stat-chart'))
 
 export const ChartDisplay = ({ metricState }: { metricState: number[][] }) => {
     const { selectedServer, serverOnline } = useSelectedServerContext()
     return selectedServer == undefined || selectedServer == '' || !serverOnline ? (
-        <Box textAlign="center" color="fg.muted" p="20">
-            Select an online server to view stats
-        </Box>
+        <DisabledModule requester="charts" />
     ) : (
-        <SimpleGrid gap="4" templateColumns="1fr 1fr" width="100%" height="100%" alignItems="end">
+        <Flex gap="4" width="100%" height="100%">
             <LazyStatChart metricState={metricState} id={0} label="CPU" color="#FFBA49" />
             <LazyStatChart metricState={metricState} id={1} label="Mem" color="#5386E4" />
-        </SimpleGrid>
+        </Flex>
     )
 }

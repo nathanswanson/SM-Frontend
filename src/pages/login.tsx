@@ -13,11 +13,18 @@ import {
 } from '@chakra-ui/react'
 import { PasswordInput } from '../lib/chakra/password-input'
 import { VscArrowRight } from 'react-icons/vsc'
-import { loginUserTokenPost, pingApiNodesPingGet } from '../lib/hey-api/client'
+import {
+    getUserMePost,
+    GetUserMePostResponse,
+    loginUserTokenPost,
+    pingApiNodesPingGet,
+    UserPublic
+} from '../lib/hey-api/client'
 import { useState, useEffect } from 'react'
 import { Toaster, toaster } from '../lib/chakra/toaster'
+import { useUserDataContext } from '../providers/user-data'
 
-export async function checkLoginStatus() {
+async function checkLoginStatus() {
     try {
         const response = await pingApiNodesPingGet({
             credentials: 'include'
@@ -34,6 +41,8 @@ export const Login = ({ children }: { children: React.ReactNode }) => {
     const [loginLoading, setLoginLoading] = useState<boolean>(false)
     const [checkingStatus, setCheckingStatus] = useState<boolean>(true)
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false)
+    const { setUserData } = useUserDataContext()
+
     useEffect(() => {
         // Check login status on mount
         checkLoginStatus().then(loggedIn => {
@@ -49,6 +58,15 @@ export const Login = ({ children }: { children: React.ReactNode }) => {
         })
         setLoginLoading(false)
     }
+
+    useEffect(() => {
+        if (isLoggedIn) {
+            // Fetch user data
+            getUserMePost({ credentials: 'include' }).then(response => {
+                setUserData(response.data)
+            })
+        }
+    }, [isLoggedIn])
 
     const login = async () => {
         setLoginLoading(true)
@@ -68,7 +86,6 @@ export const Login = ({ children }: { children: React.ReactNode }) => {
                     })
                 }
             })
-            setUsername('')
         } finally {
             setPassword('')
             setLoginLoading(false)
@@ -119,6 +136,7 @@ export const Login = ({ children }: { children: React.ReactNode }) => {
                                                 onChange={e => setPassword(e.target.value)}
                                                 value={password}
                                                 required
+                                                roundedRight={0}
                                             />
                                             <IconButton type="submit" loading={loginLoading} onClick={login}>
                                                 <VscArrowRight />

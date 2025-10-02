@@ -366,10 +366,11 @@ export type Templates = {
 };
 
 /**
- * Users
+ * UserPublic
  */
-export type Users = {
+export type UserPublic = {
     /**
+     * Username
      * Username
      */
     username: string;
@@ -381,10 +382,6 @@ export type Users = {
      * Admin
      */
     admin?: boolean | null;
-    /**
-     * Hashed Password
-     */
-    hashed_password: string;
 };
 
 /**
@@ -1160,10 +1157,24 @@ export type CreateUserAccountCreatePostResponses = {
     /**
      * Successful Response
      */
-    200: Users;
+    200: UserPublic;
 };
 
 export type CreateUserAccountCreatePostResponse = CreateUserAccountCreatePostResponses[keyof CreateUserAccountCreatePostResponses];
+
+export type LogoutUserLogoutPostData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/logout';
+};
+
+export type LogoutUserLogoutPostResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
 
 export type GetUserMePostData = {
     body?: never;
@@ -1191,5 +1202,7 @@ export type GetUserMePostResponses = {
     /**
      * Successful Response
      */
-    200: unknown;
+    200: UserPublic;
 };
+
+export type GetUserMePostResponse = GetUserMePostResponses[keyof GetUserMePostResponses];

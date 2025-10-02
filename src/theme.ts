@@ -41,6 +41,10 @@ const tokens = defineTokens({
     warning: {
         50: { value: '#FEF3E1' },
         500: { value: '#F49402' },
+    },
+    danger: {
+        50: { value: '#FFE3E3' },
+        500: { value: '#FF4C4C' },
     }
   }
 })
@@ -60,22 +64,9 @@ const semanticTokens = {
       },
       border: {
         subtle: { value: 'gray.100' },
-      }
-      // 'bg.page': { value: 'gray.50' },
-      // 'bg.surface': { value: 'white' },
-      // // Text
-      // 'text.primary': { value: 'gray.800' },
-      // 'text.secondary': { value: 'gray.500' },
-      // // Borders
-      // 'border.subtle': { value: 'gray.100' },
-      // // Brand
-      // 'brand.primary': { value: 'brand.500' },
-      // 'brand.hover': { value: 'brand.600' },
-      // // Statuses
-      // 'status.success.text': { value: 'success.500' },
-      // 'status.success.bg': { value: 'success.50' },
-      // 'status.warning.text': { value: 'warning.500' },
-      // 'status.warning.bg': { value: 'warning.50' },
+      },
+     
+      
   }
 }
 
@@ -84,7 +75,8 @@ const config = defineConfig({
     tokens,
     semanticTokens,
     recipes: {
-      button: buttonRecipe
+      button: buttonRecipe,
+      datalist: buttonRecipe
     },
   },
   globalCss: {

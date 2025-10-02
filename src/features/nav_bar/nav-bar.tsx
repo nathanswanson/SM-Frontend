@@ -1,15 +1,16 @@
 'use client'
 
 import { Combobox, HStack, Portal, Span, Spinner, Status, useListCollection } from '@chakra-ui/react'
-import { useAsync } from 'react-use'
+import { useAsync, useEffectOnce } from 'react-use'
 
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useSelectedServerContext } from '../../providers/selected-server-context'
 import { listContainersApiContainerListGet } from '../../lib/hey-api/client/sdk.gen'
+import { useWindowContext } from '../../providers/window-context'
 
 export const NavBar = ({ ...props }) => {
     return (
-        <HStack width="100%" {...props} as="nav" paddingY="3">
+        <HStack zIndex={'sticky'} position="sticky" top="0" {...props} paddingY="3">
             {/* search-bar center */}
             <SearchComboBox />
         </HStack>
@@ -18,7 +19,7 @@ export const NavBar = ({ ...props }) => {
 
 const SearchComboBox = () => {
     const { selectedServer, setSelectedServer } = useSelectedServerContext()
-
+    const { scrollPosition } = useWindowContext()
     const [openState, setOpenState] = useState<Boolean>(false)
     const { collection: serverList, set: setServerList } = useListCollection<string>({
         initialItems: []
@@ -31,11 +32,12 @@ const SearchComboBox = () => {
 
     return (
         <Combobox.Root
-            borderWidth={0}
             width="50%"
             minWidth="300px"
             size="lg"
             shadow="sm"
+            bg={scrollPosition.y == 0 ? 'bg.panel' : 'bg.panel'}
+            transitionDuration={'0.3ms'}
             borderRadius={'sm'}
             collection={serverList}
             placeholder="Search characters..."
@@ -44,10 +46,9 @@ const SearchComboBox = () => {
             onOpenChange={value => {
                 if (value.open) setOpenState(prev => !prev)
             }}
-            bg="bg.panel"
         >
             <Combobox.Control>
-                <Combobox.Input borderWidth={0} placeholder="Type to search" />
+                <Combobox.Input borderWidth={0} placeholder="Select Server..." />
                 <Combobox.IndicatorGroup>
                     <Combobox.ClearTrigger />
                     <Combobox.Trigger />

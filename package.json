@@ -9,8 +9,8 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@chakra-ui/charts": "^3.25.0",
-    "@chakra-ui/react": "^3.25.0",
+    "@chakra-ui/charts": "^3.27.0",
+    "@chakra-ui/react": "^3.27.0",
     "@emotion/react": "^11.14.0",
     "@monaco-editor/react": "^4.7.0-rc.0",
     "@types/react-cookies": "^0.1.4",
