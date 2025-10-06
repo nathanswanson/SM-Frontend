@@ -13,13 +13,7 @@ import {
 } from '@chakra-ui/react'
 import { PasswordInput } from '../lib/chakra/password-input'
 import { VscArrowRight } from 'react-icons/vsc'
-import {
-    getUserMePost,
-    GetUserMePostResponse,
-    loginUserTokenPost,
-    pingApiNodesPingGet,
-    UserPublic
-} from '../lib/hey-api/client'
+import { getUserMePost, loginUserTokenPost, pingApiNodesPingGet } from '../lib/hey-api/client'
 import { useState, useEffect } from 'react'
 import { Toaster, toaster } from '../lib/chakra/toaster'
 import { useUserDataContext } from '../providers/user-data'
@@ -107,8 +101,8 @@ export const Login = ({ children }: { children: React.ReactNode }) => {
     return (
         <>
             <VStack height="100vh" width="100vw">
-                <Box height="5%" width="100vw"></Box>
-                <AbsoluteCenter width="100vw" height="95%" zIndex={1}>
+                <Box width="100vw"></Box>
+                <AbsoluteCenter width="100vw" zIndex={1}>
                     <Card.Root>
                         <Card.Header>
                             <Card.Title paddingLeft={0}>Login</Card.Title>

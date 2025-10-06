@@ -71,9 +71,6 @@ const SearchComboBox = () => {
                             serverList.items?.map(container => (
                                 <Combobox.Item key={container} item={container}>
                                     <HStack display="flex" justify="space-between" textStyle="sm">
-                                        <Status.Root>
-                                            <Status.Indicator />
-                                        </Status.Root>
                                         <Span fontWeight="medium" truncate>
                                             {container}
                                         </Span>

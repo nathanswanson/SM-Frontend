@@ -4,12 +4,14 @@ import { GridItem } from '@chakra-ui/react/grid'
 
 const BASE_COL_SPAN = 3
 
-interface GridItemHelperProps extends BoxProps {
+interface CardModuleProps extends CardModuleRawProps {
     rowSize?: number
     colSize?: number
+}
+
+interface CardModuleRawProps extends BoxProps {
     children?: React.ReactNode
     header?: string
-    cardContentPadding?: string | number
 }
 
 export const CardModule = ({
@@ -17,39 +19,46 @@ export const CardModule = ({
     colSize = BASE_COL_SPAN,
     children,
     header: label,
-    cardContentPadding,
     ...rest
-}: GridItemHelperProps) => {
+}: CardModuleProps) => {
     return (
-        <GridItem colSpan={{ base: colSize > BASE_COL_SPAN ? BASE_COL_SPAN : colSize, md: colSize }} rowSpan={rowSize}>
-            <Card.Root
-                borderRadius={'sm'}
-                bg="bg.subtle"
-                overflow={'hidden'}
-                height="100%"
-                shadow="sm"
-                padding={0}
-                borderWidth={0}
-            >
-                {/* Header */}
-                {label ? (
-                    <Card.Header
-                        px={4}
-                        py={3}
-                        borderBottomWidth="2px"
-                        borderBottomColor="gray.200"
-                        bg="bg.panel"
-                        fontWeight="semibold"
-                    >
-                        {label}
-                    </Card.Header>
-                ) : null}
-
-                <Card.Body p={cardContentPadding ?? cardContentPadding} bg="bg.panel" {...rest}>
-                    {children}
-                </Card.Body>
-            </Card.Root>
+        <GridItem
+            flexDirection="column"
+            height="100%"
+            display="flex"
+            width="100%"
+            colSpan={{ smOnly: BASE_COL_SPAN, base: colSize }}
+            rowSpan={rowSize}
+        >
+            <CardModuleRaw header={label} {...rest}>
+                {children}
+            </CardModuleRaw>
         </GridItem>
+    )
+}
+
+export const CardModuleRaw = ({ children, header, ...rest }: CardModuleRawProps) => {
+    return (
+        <Card.Root
+            display="flex"
+            flexDirection="column"
+            flexGrow={1}
+            borderRadius={'sm'}
+            overflow={'hidden'}
+            shadow="sm"
+            borderWidth={0}
+        >
+            {/* Header */}
+            {header ? (
+                <Card.Header px={4} py={3} borderBottomWidth="2px" borderBottomColor="bg.muted" fontWeight="semibold">
+                    {header}
+                </Card.Header>
+            ) : null}
+
+            <Card.Body display="flex" flexGrow={1} width="100%" {...rest}>
+                {children}
+            </Card.Body>
+        </Card.Root>
     )
 }
 

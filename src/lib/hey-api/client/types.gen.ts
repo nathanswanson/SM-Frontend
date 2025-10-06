@@ -1164,10 +1164,25 @@ export type CreateUserAccountCreatePostResponse = CreateUserAccountCreatePostRes
 
 export type LogoutUserLogoutPostData = {
     body?: never;
+    headers?: {
+        /**
+         * Authorization
+         */
+        authorization?: string | null;
+    };
     path?: never;
     query?: never;
     url: '/logout';
 };
+
+export type LogoutUserLogoutPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type LogoutUserLogoutPostError = LogoutUserLogoutPostErrors[keyof LogoutUserLogoutPostErrors];
 
 export type LogoutUserLogoutPostResponses = {
     /**

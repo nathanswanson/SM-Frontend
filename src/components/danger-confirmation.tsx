@@ -5,6 +5,7 @@ import { Text } from '@chakra-ui/react/text'
 import { Input } from '@chakra-ui/react/input'
 import { Group } from '@chakra-ui/react/group'
 import { Button } from '@chakra-ui/react/button'
+import { FaDeleteLeft, FaTrash, FaTrashCan } from 'react-icons/fa6'
 
 export const DangerConfirmation = ({
     open,
@@ -21,7 +22,9 @@ export const DangerConfirmation = ({
     return (
         <Dialog.Root role="alertdialog" open={open} onOpenChange={e => setOpen(e.open)}>
             <Dialog.Trigger>
-                <Button color="danger.500" size="md"></Button>
+                <Button bg="danger.500" size="md">
+                    <FaTrashCan />
+                </Button>
             </Dialog.Trigger>
             <Portal>
                 <Dialog.Backdrop>

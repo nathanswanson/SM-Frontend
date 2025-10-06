@@ -3,15 +3,34 @@ import { createHighlighterCore, createJavaScriptRegexEngine } from 'shiki'
 import useAsync from 'react-use/lib/useAsync'
 import { useState } from 'react'
 
+const temp_logs = `[00:24:29] [Server thread/INFO]: /weather (clear|rain|thunder)
+[00:24:29] [Server thread/INFO]: /worldborder (add|set|center|damage|get|warning)
+[00:24:29] [Server thread/INFO]: /jfr (start|stop)
+[00:24:29] [Server thread/INFO]: /ban-ip <target> [<reason>]
+[00:24:29] [Server thread/INFO]: /banlist [ips|players]
+[00:24:29] [Server thread/INFO]: /ban <targets> [<reason>]
+[00:24:29] [Server thread/INFO]: /deop <targets>
+[00:24:29] [Server thread/INFO]: /op <targets>
+[00:24:29] [Server thread/INFO]: /pardon <targets>
+[00:24:29] [Server thread/INFO]: /pardon-ip <target>
+[00:24:29] [Server thread/INFO]: /perf (start|stop)
+[00:24:29] [Server thread/INFO]: /save-all [flush]
+[00:24:29] [Server thread/INFO]: /save-off
+[00:24:29] [Server thread/INFO]: /save-on
+[00:24:29] [Server thread/INFO]: /setidletimeout <minutes>
+[00:24:29] [Server thread/INFO]: /stop
+[00:24:29] [Server thread/INFO]: /transfer <hostname> [<port>]
+[00:24:29] [Server thread/INFO]: /whitelist (on|off|list|add|remove|reload)`.split('\n')
+
 // theme
 import githubLight from '@shikijs/themes/github-light'
 import { useWebSocketProvider } from '../../../providers/web-socket'
 import { purify } from '../../../utils/dom'
 
 const LogView = () => {
-    const { logMessages } = useWebSocketProvider()
+    // const { logMessages } = useWebSocketProvider()
     const [highlighter, setHighlighter] = useState<any>(null)
-
+    const logMessages = temp_logs
     // Initialize Shiki highlighter
     useAsync(async () => {
         createHighlighterCore({
@@ -24,8 +43,8 @@ const LogView = () => {
     // Listen for log messages from the server
 
     return (
-        <ScrollArea.Root height="100%" background="#0a0c10">
-            <ScrollArea.Viewport height="100%">
+        <ScrollArea.Root>
+            <ScrollArea.Viewport>
                 <ScrollArea.Content height="100px" textStyle="sm">
                     {logMessages.map((log, idx) => (
                         <Container

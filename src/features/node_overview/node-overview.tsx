@@ -35,5 +35,5 @@ export const NodeOverview = () => {
         { id: 'max_hz', value: hardwareInfo?.max_hz ? `${(hardwareInfo.max_hz ?? 0) / 1000.0} GHz` : 'N/A' }
     ]
 
-    return <InfoList header="Information" items={items} height="100%" width="100%" />
+    return <InfoList header="Information" items={items} width="100%" />
 }

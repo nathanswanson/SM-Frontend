@@ -6,7 +6,7 @@ import App from './App'
 import { SelectedServerProvider } from './providers/selected-server-context'
 import { system } from './theme'
 import { WebSocketProvider } from './providers/web-socket'
-import { ColorModeProvider, DarkMode } from './lib/chakra/color-mode'
+import { ColorModeProvider, DarkMode, LightMode } from './lib/chakra/color-mode'
 import { WindowProvider } from './providers/window-context'
 import { UserDataProvider } from './providers/user-data'
 

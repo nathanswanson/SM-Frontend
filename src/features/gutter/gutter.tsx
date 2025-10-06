@@ -1,9 +1,21 @@
-import { Avatar, Text, HStack, Stack, VStack, Spacer } from '@chakra-ui/react'
-import { FaBarsProgress, FaDatabase, FaGear, FaSwatchbook, FaUserLock, FaUserMinus } from 'react-icons/fa6'
+import {
+    Avatar,
+    Text,
+    HStack,
+    Stack,
+    VStack,
+    useBreakpointValue,
+    Drawer,
+    Portal,
+    CloseButton,
+    IconButton
+} from '@chakra-ui/react'
+import { FaBars, FaBarsProgress, FaDatabase, FaGear, FaSwatchbook, FaUserLock } from 'react-icons/fa6'
 import { MenuSelectButton } from './components/menu-select-button'
-import { getUserMePost, logoutUserLogoutPost } from '../../lib/hey-api/client'
-import { useEffect, useState } from 'react'
+
 import { useUserDataContext } from '../../providers/user-data'
+import { logoutUserLogoutPost } from '../../lib/hey-api/client/sdk.gen'
+import { ColorModeButton } from '../../lib/chakra/color-mode.js'
 
 const UserProfile = ({ ...props }) => {
     const { userData } = useUserDataContext()
@@ -21,6 +33,33 @@ const UserProfile = ({ ...props }) => {
                 </Text>
             </Stack>
         </HStack>
+    )
+}
+
+const CollapseWrapper = ({ children, ...props }: { children: React.ReactNode }) => {
+    const isPermanent = useBreakpointValue({ smOnly: false, md: true })
+    if (isPermanent) return children
+
+    return (
+        <Drawer.Root placement={'start'}>
+            <Drawer.Trigger asChild>
+                <IconButton variant="outline" size="sm">
+                    <FaBars />
+                </IconButton>
+            </Drawer.Trigger>
+            <Portal>
+                <Drawer.Backdrop />
+                <Drawer.Positioner>
+                    <Drawer.Content>
+                        <Drawer.Body>{children}</Drawer.Body>
+
+                        <Drawer.CloseTrigger asChild>
+                            <CloseButton size="lg" />
+                        </Drawer.CloseTrigger>
+                    </Drawer.Content>
+                </Drawer.Positioner>
+            </Portal>
+        </Drawer.Root>
     )
 }
 
@@ -44,8 +83,8 @@ const MenuOptions = ({ ...props }) => {
             </MenuSelectButton>
             <MenuSelectButton
                 onClick={async () => {
-                    await logoutUserLogoutPost().then(() => {
-                        // window.location.reload()
+                    await logoutUserLogoutPost({ credentials: 'include' }).then(() => {
+                        window.location.reload()
                     })
                 }}
                 color="danger.500"
@@ -53,15 +92,18 @@ const MenuOptions = ({ ...props }) => {
                 <FaUserLock />
                 Sign Out
             </MenuSelectButton>
+            <ColorModeButton width="100%" justifyContent={'left'} paddingLeft="2em" />
         </VStack>
     )
 }
 
 export const Gutter = ({ ...props }) => {
     return (
-        <VStack as="nav" alignSelf={'flex-start'} p="12px" {...props}>
-            <UserProfile width="100%" />
-            <MenuOptions />
-        </VStack>
+        <CollapseWrapper>
+            <VStack as="nav" alignSelf={'flex-start'} p="12px" {...props}>
+                <UserProfile width="100%" />
+                <MenuOptions />
+            </VStack>
+        </CollapseWrapper>
     )
 }

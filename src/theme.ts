@@ -1,6 +1,5 @@
 import { createSystem, defaultConfig, defineConfig, defineSemanticTokens, defineTokens, Heading } from '@chakra-ui/react'
 import { buttonRecipe } from './recipes/button'
-import { subtle } from 'crypto'
 
 const tokens = defineTokens({
   fonts: {
@@ -8,7 +7,6 @@ const tokens = defineTokens({
     body: { value: 'Roboto, Arial' },
   },
    colors: {
-    // Primary brand color based on the blue from the image
     brand: {
       50: { value: '#E8EAFC' },
       100: { value: '#C2C9F3' },
@@ -50,25 +48,7 @@ const tokens = defineTokens({
 })
 
 const semanticTokens = {
-  colors: {
-   // Backgrounds
-      bg: {
-        page: { value: 'gray.50' },
-        panel: { value: 'white' },
-        subtle: { value: 'gray.100' },
-      },
-      fg: {
-        DEFAULT: { value: '{colors.gray.800}' },
-        primary: { value: '{colors.gray.800}' },
-        secondary: { value: '{colors.gray.500}' },
-      },
-      border: {
-        subtle: { value: 'gray.100' },
-      },
-     
-      
-  }
-}
+ }
 
 const config = defineConfig({
   theme: {
@@ -76,12 +56,12 @@ const config = defineConfig({
     semanticTokens,
     recipes: {
       button: buttonRecipe,
-      datalist: buttonRecipe
     },
   },
   globalCss: {
     body: {
-      bg: 'gray.200',
+      _dark: { bg: 'gray.900' },
+      base: {bg: 'gray.200' },
       color: 'text.primary',
     },
     a: {

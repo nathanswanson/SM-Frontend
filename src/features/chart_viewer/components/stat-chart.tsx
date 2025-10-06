@@ -17,7 +17,7 @@ function dataToRecharts(data: number[][], id: number, expr: (n: number) => numbe
 }
 
 export const StatChart = ({ metricState, id, label, color, ...rest }: ChartDisplayProps) => (
-    <Flex aspectRatio={1} justifyItems={'flex-end'} alignItems="center" height="100%" width="100%" {...rest}>
+    <Flex aspectRatio={1} justifyItems={'flex-end'} alignItems="center" width="100%" {...rest}>
         <Stat.Root>
             <Stat.Label>{label}</Stat.Label>
             <Stat.ValueText>{convertToGB(metricState[metricState.length - 1][id])}</Stat.ValueText>

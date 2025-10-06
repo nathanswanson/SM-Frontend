@@ -1,6 +1,6 @@
 'use client'
 
-import { ScrollArea, TreeView, createTreeCollection } from '@chakra-ui/react'
+import { Box, Button, IconButton, ScrollArea, TreeView, VStack, createTreeCollection } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { LuFile, LuFolder, LuLoaderCircle } from 'react-icons/lu'
 import {
@@ -11,6 +11,8 @@ import {
 import { useSelectedServerContext } from '../../providers/selected-server-context'
 import { TextEditorDialog } from './components/text-editor'
 import { DisabledModule } from '../../components/disabled-module'
+import { relative } from 'path'
+import { FaDownload, FaFileExport, FaUpload } from 'react-icons/fa6'
 
 const TEXT_EDITOR_FILE_SIZE_LIMIT = 1024 * 1024 * 5 // 5 MB
 const ALLOWED_TEXT_FILE_EXTENSIONS = [
@@ -73,7 +75,7 @@ export const FileManager = ({ ...props }) => {
             {!selectedServer ? (
                 <DisabledModule requester="files" />
             ) : (
-                <ScrollArea.Root {...props}>
+                <ScrollArea.Root height="30em" {...props}>
                     <ScrollArea.Viewport>
                         <ScrollArea.Content>
                             <FileTree />
@@ -177,9 +179,8 @@ const FileTree = () => {
     }
 
     return (
-        <>
+        <Box flexGrow={1}>
             <TreeView.Root
-                height="1px"
                 size="md"
                 collection={collection}
                 loadChildren={loadChildren}
@@ -220,6 +221,6 @@ const FileTree = () => {
                 inputStream={editorInputStream as any}
                 onSave={handleEditorOutputStream}
             />
-        </>
+        </Box>
     )
 }

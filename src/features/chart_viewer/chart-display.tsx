@@ -10,7 +10,7 @@ export const ChartDisplay = ({ metricState }: { metricState: number[][] }) => {
     return selectedServer == undefined || selectedServer == '' || !serverOnline ? (
         <DisabledModule requester="charts" />
     ) : (
-        <Flex gap="4" width="100%" height="100%">
+        <Flex gap="4" width="100%">
             <LazyStatChart metricState={metricState} id={0} label="CPU" color="#FFBA49" />
             <LazyStatChart metricState={metricState} id={1} label="Mem" color="#5386E4" />
         </Flex>

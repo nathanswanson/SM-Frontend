@@ -1,4 +1,4 @@
-import { Button, ButtonGroup, Flex, HStack, IconButton } from '@chakra-ui/react'
+import { Button, ButtonGroup, Flex, Text, IconButton, Status } from '@chakra-ui/react'
 import {
     deleteContainerApiContainerContainerNameDeleteGet,
     startContainerApiContainerNameStartGet,
@@ -8,12 +8,13 @@ import { useState } from 'react'
 import { VscDebugRestart, VscDebugStart, VscDebugStop, VscTrash } from 'react-icons/vsc'
 import { useSelectedServerContext } from '../../providers/selected-server-context'
 import { DangerConfirmation } from '../../components/danger-confirmation'
-import { UploadPathPrompt } from './components/upload-path-prompt'
-import { ServerCreationDialog } from './components/server-create-modal'
+import { UploadPathPrompt } from '../file_manager/components/upload-path-prompt'
+import { ServerCreationDialog } from '../gutter/components/server-create-modal'
 import { InfoList } from '../../components/info-list'
+import { FaFileExport } from 'react-icons/fa6'
 
-export const ServerOverview = ({ ...props }) => {
-    const { selectedServer, setSelectedServer } = useSelectedServerContext()
+export const ServerControl = ({ ...props }) => {
+    const { selectedServer, setSelectedServer, serverOnline } = useSelectedServerContext()
     const [isOpenDeleteDialog, setIsOpenDeleteDialog] = useState<boolean>(false)
     function deleteServer(serverName: string) {
         if (serverName) {
@@ -31,22 +32,17 @@ export const ServerOverview = ({ ...props }) => {
     }
     return (
         <Flex gap="8px" wrap="wrap" justifyContent={'space-between'} {...props}>
+            <Text color={serverOnline ? 'green.500' : 'red.500'} width="100%" textAlign={'end'}>
+                Server {serverOnline ? 'online' : 'offline'}{' '}
+                <Status.Root>
+                    <Status.Indicator background={!serverOnline ? 'danger.500' : 'green.500'} />
+                </Status.Root>
+            </Text>
             <Button size="lg" variant="surface" disabled={selectedServer == undefined || selectedServer == ''}>
+                <FaFileExport />
                 Export Server
             </Button>
-            <UploadPathPrompt />
             <CommandButtons />
-            <Button
-                onClick={() => {
-                    setIsOpenDeleteDialog(true)
-                }}
-                disabled={selectedServer == undefined || selectedServer == ''}
-                size="lg"
-                variant="surface"
-            >
-                <VscTrash />
-                Delete Server
-            </Button>
             <DangerConfirmation
                 resourceName={selectedServer ? selectedServer : ''}
                 onConfirm={e => {
@@ -55,7 +51,6 @@ export const ServerOverview = ({ ...props }) => {
                 open={isOpenDeleteDialog}
                 setOpen={setIsOpenDeleteDialog}
             />
-            <ServerCreationDialog />
         </Flex>
     )
 }

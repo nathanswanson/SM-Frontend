@@ -12,13 +12,18 @@ export const InfoList = ({ items, header, ...props }: AllocatedResourceListProps
             <Heading size="sm" alignSelf={'flex-start'} marginBottom="0.5em">
                 {header}
             </Heading>
-            <DataList.Root gap="0.50em" orientation="horizontal" width="100%">
+            <DataList.Root gap="0.50em" orientation={{ base: 'horizontal', mdDown: 'vertical' }} width="100%">
                 {items.map(item => (
                     <DataList.Item key={item.id}>
-                        <DataList.ItemLabel fontWeight={'medium'} maxLines={1}>
+                        <DataList.ItemLabel alignSelf={'flex-start'} fontWeight={'medium'} maxLines={1}>
                             {item.id}
                         </DataList.ItemLabel>
-                        <DataList.ItemValue fontWeight={'light'} maxLines={2} flexWrap={'wrap'}>
+                        <DataList.ItemValue
+                            alignSelf={'flex-start'}
+                            fontWeight={'light'}
+                            maxLines={2}
+                            flexWrap={'wrap'}
+                        >
                             {item.value}
                         </DataList.ItemValue>
                     </DataList.Item>
