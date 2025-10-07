@@ -2,14 +2,15 @@ import { NodeOverview } from '../node_overview/node-overview'
 import CardModule from '../../components/card'
 import { Grid } from '@chakra-ui/react/grid'
 import { LogManager } from '../console/console'
-import { ButtonGroup, Flex, HStack, Status, VStack } from '@chakra-ui/react'
+import { Flex } from '@chakra-ui/react/flex'
+import { VStack } from '@chakra-ui/react/stack'
 import { ServerOverview } from '../server_overview/server-overview'
 import { LightCard } from '../../components/light-card'
 import { ActionHalo } from '../../components/action-halo'
-import { RiDeleteBin7Fill, RiPlayLargeFill, RiResetLeftFill, RiStopLargeFill } from 'react-icons/ri'
-import { Tooltip } from '../../components/tooltip'
 import { FileManagerHalo } from '../file_manager/file-manager'
-import CommandButton from '../../components/command-button'
+import { ConsoleCommands } from '../server_overview/components/command-bar'
+import { useWebSocketProvider } from '../../providers/web-socket'
+import { SimpleGrid } from '@chakra-ui/react'
 
 // make graph data spuratic
 const tempRandomData = () => {
@@ -17,48 +18,26 @@ const tempRandomData = () => {
 }
 
 export const MainContent = ({ ...props }) => {
+    const { metricMessages } = useWebSocketProvider()
     return (
         <VStack {...props}>
-            <Flex margin="8" justifyContent={'space-evenly'} width="100%" mb="1.5em">
-                <LightCard color="red" unit="Cores" label="Cpu" data={tempRandomData()} />
-                <LightCard color="blue" unit="GB" label="Memory" data={tempRandomData()} />
-                <LightCard color="green" unit="Mbps" label="Network" data={tempRandomData()} />
-                <LightCard color="orange" unit="GB" label="Disk" data={tempRandomData()} />
-            </Flex>
+            <SimpleGrid
+                gridTemplateColumns="repeat(auto-fit, minmax(250px, 1fr))"
+                margin="8"
+                gap={'4em'}
+                justifyContent={'space-evenly'}
+                width="100%"
+                mb="1.5em"
+                // flexFlow={'row wrap'}
+            >
+                <LightCard color="red" unit="Cores" label="Cpu" data={metricMessages[0]} />
+                <LightCard color="blue" unit="GB" label="Memory" data={metricMessages[1]} />
+                <LightCard color="green" unit="Mbps" label="Network" data={metricMessages[2]} />
+                <LightCard color="orange" unit="GB" label="Disk" data={metricMessages[3]} />
+            </SimpleGrid>
             <Cards />
         </VStack>
     )
-}
-
-const ConsoleCommands = ({ ...props }) => {
-    return (
-        <HStack justifyContent={'space-between'} width="100%">
-            <ButtonGroup width="100%">
-                <CommandButton label="Start" aria-label="start">
-                    <RiPlayLargeFill />
-                </CommandButton>
-                <CommandButton label="Restart" aria-label="restart">
-                    <RiResetLeftFill />
-                </CommandButton>
-                <CommandButton label="Stop" aria-label="stop">
-                    <RiStopLargeFill />
-                </CommandButton>
-                <CommandButton label="Delete" aria-label="delete">
-                    <RiDeleteBin7Fill />
-                </CommandButton>
-            </ButtonGroup>
-            <Tooltip content={`Status ${false}`}>
-                <Status.Root size="lg" p="1rem" colorPalette={'green'}>
-                    <Status.Indicator />
-                </Status.Root>
-            </Tooltip>
-        </HStack>
-    )
-}
-
-interface CommandButtonProps {
-    label: string
-    children: React.ReactNode
 }
 
 const Cards = ({ ...props }) => {

@@ -29,12 +29,20 @@ export const SelectedServerProvider = ({ children }: { children: ReactNode }) =>
             setServerOnline(undefined)
             return
         }
+
+        const abortController = new AbortController()
+
         getContainerStatusApiContainerContainerNameStatusGet({
             credentials: 'include',
-            path: { container_name: selectedServer }
+            path: { container_name: selectedServer },
+            signal: abortController.signal
         }).then(res => {
             setServerOnline(res.data?.running)
         })
+
+        return () => {
+            abortController.abort()
+        }
     }, [selectedServer])
 
     return (

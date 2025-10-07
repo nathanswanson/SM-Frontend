@@ -1,7 +1,7 @@
-import { IconButton } from '@chakra-ui/react/button'
+import { IconButton, IconButtonProps } from '@chakra-ui/react/button'
 import { Tooltip } from './tooltip'
 
-interface CommandButtonProps {
+interface CommandButtonProps extends IconButtonProps {
     label: string
     children: React.ReactNode
 }

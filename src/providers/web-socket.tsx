@@ -1,7 +1,8 @@
 import { createContext, ReactNode, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { useSelectedServerContext } from './selected-server-context'
+import { io } from 'socket.io-client'
 import { getBaseUrl } from '../utils/urlIntercept'
-
+import bytes from 'bytes'
 const METRICS_SIZE = 50
 const LOG_SIZE = 50
 
@@ -17,11 +18,38 @@ enum WSPacketCmdType {
     METRICS = 'push_metric'
 }
 
+export interface UnitValue {
+    value: number
+    unit: string
+    timestamp: number
+}
+
 interface IWebSocketContext {
     logMessages: string[]
-    metricMessages: number[][]
+    metricMessages: UnitValue[][]
     connectionStatus: ConnectionState
     sendMessage: (command: WSPacketCmdType, data: string) => void
+}
+
+function metricFilters(data: number[]): UnitValue[] {
+    // cpu, mem, net_in, net_out, disk_read, disk_write
+
+    const bytesConvert = (...index: number[]): UnitValue => {
+        //sum of all data[index]
+        const total = index.reduce((acc, curr) => acc + (data[curr] || 0), 0)
+        if (total === 0) return { value: 0, unit: '', timestamp: Date.now() }
+
+        const [value, unit] = bytes.format(total, { unitSeparator: ' ' })?.split(' ') || ['0', '']
+        return { value: parseFloat(value), unit: unit, timestamp: Date.now() }
+    }
+    const values: UnitValue[] = [
+        { value: parseFloat((data[0] * 100).toFixed(2)), unit: '% 1-core', timestamp: Date.now() },
+        { value: parseFloat((data[1] * 100).toFixed(2)), unit: '%', timestamp: Date.now() },
+        bytesConvert(2, 3),
+        bytesConvert(4, 5)
+    ]
+
+    return values
 }
 
 const webSocketContext = createContext<IWebSocketContext | undefined>(undefined)
@@ -34,93 +62,68 @@ export const useWebSocketProvider = () => {
     return context
 }
 
+const socket = io(getBaseUrl(), { autoConnect: false, transports: ['websocket'] })
 export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
-    const socketRef = useRef<any>(null)
+    const { selectedServer } = useSelectedServerContext()
     const [connectionStatus, setConnectionStatus] = useState<ConnectionState>(ConnectionState.disconnected)
     const [logMessages, setLogMessages] = useState<string[]>([])
-    const [metricMessages, setMetricMessages] = useState<number[][]>([[0, 0, 0, 0, 0, 0]])
-    const { selectedServer } = useSelectedServerContext()
+    const [metricMessages, setMetricMessages] = useState<UnitValue[][]>([[], [], [], []])
 
     useEffect(() => {
-        if (!selectedServer) {
-            // Clear state and disconnect socket if selectedServer is empty
-            setLogMessages([])
-            setMetricMessages([[]])
-            if (socketRef.current) {
-                socketRef.current.disconnect()
-                socketRef.current = null
-            }
-            return
-        }
+        socket.connect()
+        socket.on('connect', () => {
+            setConnectionStatus(ConnectionState.connected)
+        })
 
-        // Dynamically import socket.io-client and initialize the socket
-        let isMounted = true
-        import('socket.io-client').then(({ io }) => {
-            if (!isMounted) return
+        socket.on('disconnect', () => {
+            setConnectionStatus(ConnectionState.disconnected)
+        })
 
-            const socket = io(getBaseUrl(), {
-                autoConnect: true
-            })
-            socketRef.current = socket
+        socket.on(WSPacketCmdType.LOGS, (msg: string) => {
+            setLogMessages(prev => [...prev, msg].slice(-LOG_SIZE))
+        })
 
-            socket.on('connect', () => {
-                setConnectionStatus(ConnectionState.connected)
-            })
-
-            socket.on('disconnect', () => {
-                setConnectionStatus(ConnectionState.disconnected)
-            })
-
-            socket.on(WSPacketCmdType.LOGS, msg => {
-                setLogMessages(prev => prev.concat(msg).slice(-LOG_SIZE))
-            })
-
-            socket.on(WSPacketCmdType.METRICS, msg => {
-                setMetricMessages(prev => {
-                    let parsed: number[] = []
-                    if (Array.isArray(msg)) {
-                        parsed = msg.map((v: any) => Number(v))
-                    } else if (typeof msg === 'string') {
-                        try {
-                            const maybe = JSON.parse(msg)
-                            if (Array.isArray(maybe)) {
-                                parsed = maybe.map((v: any) => Number(v))
-                            } else {
-                                // not an array after parsing, attempt comma-separated fallback
-                                parsed = msg.split(',').map(s => Number(s.trim()))
-                            }
-                        } catch {
-                            // fallback for plain comma-separated string
-                            parsed = msg.split(',').map(s => Number(s.trim()))
-                        }
-                    }
-                    return [...prev, parsed].slice(-METRICS_SIZE)
-                })
+        socket.on(WSPacketCmdType.METRICS, (data: string) => {
+            setMetricMessages(prev => {
+                // prev is string of "[n,n,n,n]"
+                let parsedData = JSON.parse(data) as number[]
+                let parsedDataUnits = metricFilters(parsedData)
+                const newMetrics = prev.map((arr, idx) => [...arr, parsedDataUnits[idx]].slice(-METRICS_SIZE))
+                return newMetrics
             })
         })
 
         return () => {
-            isMounted = false
-            if (socketRef.current) {
-                socketRef.current.disconnect()
-                socketRef.current = null
+            socket.disconnect()
+            socket.off('connect')
+            socket.off('disconnect')
+            socket.off(WSPacketCmdType.LOGS)
+            socket.off(WSPacketCmdType.METRICS)
+        }
+    }, [])
+
+    useEffect(() => {
+        if (selectedServer) {
+            sendMessage(WSPacketCmdType.SUBSCRIBE, `01+${selectedServer}`)
+        }
+        return () => {
+            if (selectedServer) {
+                sendMessage(WSPacketCmdType.UNSUBCRIBE, `01+${selectedServer}`)
             }
         }
     }, [selectedServer])
 
-    const sendMessage = useCallback((command: WSPacketCmdType, msg: string) => {
-        if (socketRef.current && command === WSPacketCmdType.SUBSCRIBE) {
-            socketRef.current.emit(command, msg)
-        }
+    const sendMessage = useCallback((command: WSPacketCmdType, data: string) => {
+        socket.emit(command, data)
     }, [])
 
     return (
         <webSocketContext.Provider
             value={{
-                connectionStatus,
-                sendMessage,
                 logMessages,
-                metricMessages
+                metricMessages,
+                connectionStatus,
+                sendMessage
             }}
         >
             {children}

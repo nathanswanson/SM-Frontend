@@ -1,18 +1,25 @@
 'use client'
 
-import { Box, Button, IconButton, ScrollArea, TreeView, VStack, createTreeCollection } from '@chakra-ui/react'
+import { Box, Text, ScrollArea, TreeView, createTreeCollection } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { LuFile, LuFolder, LuLoaderCircle } from 'react-icons/lu'
 import {
     getDirectoryFilenamesApiContainerContainerNameFsListGet,
-    readFileApiContainerContainerNameFsGet,
-    uploadFileApiContainerContainerNameFsUploadPost
+    readFileApiContainerContainerNameFsGet
 } from '../../lib/hey-api/client'
 import { useSelectedServerContext } from '../../providers/selected-server-context'
 import { TextEditorDialog } from './components/text-editor'
 import { DisabledModule } from '../../components/disabled-module'
-import { relative } from 'path'
-import { FaDownload, FaFileExport, FaUpload } from 'react-icons/fa6'
+
+function getRelativePath(from: string, to: string): string {
+    if (from !== '/') {
+        throw new Error('Only supporting relative from root path')
+    }
+    if (to.startsWith(from)) {
+        return to.substring(from.length)
+    }
+    return to
+}
 
 const TEXT_EDITOR_FILE_SIZE_LIMIT = 1024 * 1024 * 5 // 5 MB
 const ALLOWED_TEXT_FILE_EXTENSIONS = [
@@ -95,7 +102,9 @@ const FileTree = () => {
     const { selectedServer } = useSelectedServerContext()
     const [editorInputStream, setEditorInputStream] = useState<ReadableStream<Uint8Array> | null>(null)
     const [isEditorOpen, setIsEditorOpen] = useState(false)
+    const [editorFileExtension, setEditorFileExtension] = useState<string>('.txt')
     const [selectedValue, setSelectedValue] = useState<string[]>([])
+
     async function getPathFiles(path: string, selectedServer: string): Promise<Node[]> {
         if (!selectedServer) return []
         const strings = await getDirectoryFilenamesApiContainerContainerNameFsListGet({
@@ -151,6 +160,7 @@ const FileTree = () => {
                         } else {
                             setEditorInputStream(stream)
                             setIsEditorOpen(true)
+                            setEditorFileExtension(path.split('.')[1])
                         }
                     }
                 }
@@ -169,13 +179,14 @@ const FileTree = () => {
 
     async function handleEditorOutputStream(outStream: ReadableStream<Uint8Array> | undefined) {
         if (!outStream) return
-        const res = new Response(outStream)
-        const blob = await res.blob()
         if (!selectedServer) return
-        uploadFileApiContainerContainerNameFsUploadPost({
-            body: { file: blob, path: '/tmp' },
-            path: { container_name: selectedServer }
-        })
+        if (selectedValue.length === 0) return
+        const path = selectedValue[0]
+        const filename = path.split('/').pop() || 'upload.txt'
+        const relativePath = getRelativePath('/', path)
+        const formData = new FormData()
+        formData.append('file', new Blob([], { type: 'application/octet-stream' }), filename)
+        formData.append('path', relativePath)
     }
 
     return (
@@ -214,12 +225,14 @@ const FileTree = () => {
                         }
                     />
                 </TreeView.Tree>
+                <Text>{selectedValue}</Text>
             </TreeView.Root>
             <TextEditorDialog
                 isOpen={isEditorOpen}
                 setIsOpen={setIsEditorOpen}
                 inputStream={editorInputStream as any}
                 onSave={handleEditorOutputStream}
+                fileExtension={editorFileExtension}
             />
         </Box>
     )

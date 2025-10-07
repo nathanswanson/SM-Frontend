@@ -5,14 +5,23 @@ import {
     Dialog,
     DialogCloseTrigger,
     DialogHeader,
+    DialogRootProps,
     IconButton,
     Portal,
     Spinner
 } from '@chakra-ui/react'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { Suspense, useEffect, useRef, useState } from 'react'
 import { FaDownload } from 'react-icons/fa6'
 
 const EditorLazy = React.lazy(() => import('@monaco-editor/react'))
+
+export interface TextEditorProps {
+    isOpen: boolean
+    setIsOpen: (open: boolean) => void
+    inputStream: ReadableStream<Uint8Array>
+    onSave: (stream: ReadableStream<Uint8Array>) => void
+    fileExtension: string
+}
 
 export const TextEditorDialog = ({
     isOpen,
@@ -20,13 +29,9 @@ export const TextEditorDialog = ({
 
     inputStream,
     onSave,
+    fileExtension,
     ...props
-}: {
-    isOpen: boolean
-    setIsOpen: (open: boolean) => void
-    inputStream: ReadableStream<Uint8Array>
-    onSave: (stream: ReadableStream<Uint8Array>) => void
-}) => {
+}: TextEditorProps) => {
     const [value, setValue] = useState('')
     const editorRef = useRef<any>(null)
 
@@ -72,13 +77,24 @@ export const TextEditorDialog = ({
         setIsOpen(false)
     }
 
+    // Wrapper to adapt Dialog's OpenChangeDetails => boolean for setIsOpen
+    const handleDialogOpenChange = (details: any) => {
+        // Radix/Chakra may pass an object like { open: boolean } or just a boolean.
+        // Normalize both cases to a boolean and forward to setIsOpen.
+        if (typeof details === 'boolean') {
+            setIsOpen(details)
+        } else {
+            setIsOpen(Boolean(details?.open))
+        }
+    }
+
     return (
-        <Dialog.Root lazyMount open={isOpen} onOpenChange={e => setIsOpen(e.open)} size="xl" {...props}>
+        <Dialog.Root lazyMount open={isOpen} onOpenChange={handleDialogOpenChange} size="xl" {...props}>
             <Portal>
                 <Dialog.Backdrop />
                 <Dialog.Positioner>
                     <Dialog.Content>
-                        <DialogHeader>Text Editor - (Unsaved Changes)</DialogHeader>
+                        <DialogHeader>{fileExtension}</DialogHeader>
                         <DialogCloseTrigger />
 
                         <Dialog.Body>
@@ -86,16 +102,18 @@ export const TextEditorDialog = ({
                                 {!isOpen ? (
                                     <Spinner />
                                 ) : (
-                                    <EditorLazy
-                                        height="60vh"
-                                        defaultLanguage="json"
-                                        theme="vs-dark"
-                                        value={value}
-                                        onChange={v => setValue(v ?? '')}
-                                        onMount={editor => {
-                                            editorRef.current = editor
-                                        }}
-                                    />
+                                    <Suspense fallback={<Spinner />}>
+                                        <EditorLazy
+                                            height="60vh"
+                                            language={fileExtension}
+                                            theme="vs-dark"
+                                            value={value}
+                                            onChange={v => setValue(v ?? '')}
+                                            onMount={editor => {
+                                                editorRef.current = editor
+                                            }}
+                                        />
+                                    </Suspense>
                                 )}
 
                                 <IconButton
@@ -114,7 +132,6 @@ export const TextEditorDialog = ({
                             <Button
                                 onClick={() => {
                                     handleSave()
-                                    isOpen = false
                                 }}
                                 variant="surface"
                             >

@@ -26,13 +26,8 @@ export const ServerOverview = () => {
     }
 
     const items = [
-        { id: 'node_id', value: hardwareInfo?.id ?? 'N/A' },
-        { id: 'cpu', value: hardwareInfo?.cpu_name ?? 'N/A' },
-        { id: 'memory', value: hardwareInfo?.memory ? `${hardwareInfo.memory} GB` : 'N/A' },
-        { id: 'disk', value: hardwareInfo?.disk ? `${hardwareInfo.disk} GB` : 'N/A' },
-        { id: 'arch', value: hardwareInfo?.arch ?? 'N/A' },
-        { id: 'cpus', value: hardwareInfo?.cpus ? `${hardwareInfo.cpus}` : 'N/A' },
-        { id: 'max_hz', value: hardwareInfo?.max_hz ? `${(hardwareInfo.max_hz ?? 0) / 1000.0} GHz` : 'N/A' }
+        { id: 'template', value: 'N/A' },
+        { id: 'status', value: 'Offline' }
     ]
 
     return <InfoList header="Information" items={items} width="100%" />

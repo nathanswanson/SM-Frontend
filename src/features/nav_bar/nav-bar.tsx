@@ -1,9 +1,9 @@
 'use client'
 
-import { Combobox, HStack, Portal, Span, Spinner, Status, useListCollection } from '@chakra-ui/react'
-import { useAsync, useEffectOnce } from 'react-use'
+import { Combobox, HStack, Portal, Span, Spinner, useListCollection } from '@chakra-ui/react'
+import { useAsync } from 'react-use'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useSelectedServerContext } from '../../providers/selected-server-context'
 import { listContainersApiContainerListGet } from '../../lib/hey-api/client/sdk.gen'
 import { useWindowContext } from '../../providers/window-context'

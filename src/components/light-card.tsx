@@ -1,61 +1,49 @@
-import { Card, Stat } from '@chakra-ui/react'
-import { Chart, useChart } from '@chakra-ui/charts'
-import { AreaChart, Area } from 'recharts'
+import { Card, HStack, Stat } from '@chakra-ui/react'
 import { Text } from '@chakra-ui/react/text'
+import React, { useState } from 'react'
+import { UnitValue } from '../providers/web-socket'
 
-const SparkLine = ({ data, color }: { data: { value: number }[]; color: string }) => {
-    const chart = useChart({
-        data: data,
-        series: [{ color: color }]
-    })
-
-    return (
-        <Chart.Root width="300px" height="10" chart={chart}>
-            <AreaChart data={chart.data} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
-                <Area
-                    key={chart.series[0].name}
-                    isAnimationActive={false}
-                    dataKey={chart.key(chart.series[0].name)}
-                    fill={chart.color(chart.series[0].color)}
-                    fillOpacity={0.2}
-                    stroke={chart.color(chart.series[0].color)}
-                    strokeWidth={2}
-                    // width="200px"
-                />
-            </AreaChart>
-        </Chart.Root>
-    )
-}
+const SparkLineLazy = React.lazy(() => import('./spark-card').then(module => ({ default: module.SparkLine })))
 
 interface LightCardProps {
     label: string
     color: string
     unit?: string
-    data: number[]
+    data: UnitValue[]
 }
 
 export const LightCard = ({ label, color, unit, data }: LightCardProps) => {
-    // random data temp
-
+    const [highlightedIndex, setHighlightedIndex] = useState<number | null>(null)
     return (
         <>
-            <Card.Root bg={`${color}.50`} shadow="sm" maxW="lg" size="sm" overflow="hidden">
+            <Card.Root bg={`${color}.50`} shadow="sm" minH={'150px'} minW="xs" size="sm" overflow="hidden">
                 <Card.Body>
-                    {data == undefined || data.length < 5 ? (
-                        <Text>Gathering Data...</Text>
-                    ) : (
-                        <Stat.Root>
-                            <Stat.Label>{label}</Stat.Label>
-                            <Stat.ValueText>{data[data.length - 1].toPrecision(3)}</Stat.ValueText>
-                            {unit && <Stat.HelpText>{unit}</Stat.HelpText>}
-                        </Stat.Root>
-                    )}
+                    <Stat.Root>
+                        <Stat.Label>{label}</Stat.Label>
+
+                        <HStack gap="0.5em">
+                            <Stat.ValueText>
+                                {highlightedIndex !== null && data && data[highlightedIndex]
+                                    ? data[highlightedIndex].value
+                                    : data && data.length > 0
+                                      ? data[data.length - 1].value
+                                      : '--'}
+                            </Stat.ValueText>
+
+                            {unit && <Stat.HelpText>{data ? data[data.length - 1]?.unit : '--'}</Stat.HelpText>}
+                        </HStack>
+                    </Stat.Root>
                 </Card.Body>
-                {data == undefined || data.length < 5 ? (
-                    <></>
-                ) : (
-                    <SparkLine color={`${color}.500`} data={data.map(item => ({ value: item }))} />
-                )}
+                <React.Suspense fallback={<div>Loading...</div>}>
+                    {data && data.length > 0 && (
+                        <SparkLineLazy
+                            color={`${color}.500`}
+                            data={data.map(item => ({ value: item.value }))}
+                            highlightedIndex={highlightedIndex}
+                            onHighlightIndex={setHighlightedIndex}
+                        />
+                    )}
+                </React.Suspense>
             </Card.Root>
         </>
     )
