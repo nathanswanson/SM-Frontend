@@ -9,8 +9,7 @@ import { GhostNav } from './components/ghost-nav'
 export default function Page() {
     return (
         <Login>
-            <Box width="100%" bg="bg.subtle">
-                {}
+            <Box height={'svh'} width={'svw'} bg="bg.subtle">
                 <GhostNav />
                 <HStack p="1em" alignItems={'flex-start'} justifySelf={'center'} maxWidth={1980}>
                     <Gutter top="100px" width="20%" />

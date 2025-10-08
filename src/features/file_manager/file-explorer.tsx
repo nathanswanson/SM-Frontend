@@ -5,11 +5,13 @@ import { useEffect, useState } from 'react'
 import { LuFile, LuFolder, LuLoaderCircle } from 'react-icons/lu'
 import {
     getDirectoryFilenamesApiContainerContainerNameFsListGet,
-    readFileApiContainerContainerNameFsGet
+    readFileApiContainerContainerNameFsGet,
+    uploadFileApiContainerContainerNameFsUploadPost
 } from '../../lib/hey-api/client'
 import { useSelectedServerContext } from '../../providers/selected-server-context'
 import { TextEditorDialog } from './components/text-editor'
 import { DisabledModule } from '../../components/disabled-module'
+import { blob } from 'stream/consumers'
 
 function getRelativePath(from: string, to: string): string {
     if (from !== '/') {
@@ -102,7 +104,7 @@ const FileTree = () => {
     const { selectedServer } = useSelectedServerContext()
     const [editorInputStream, setEditorInputStream] = useState<ReadableStream<Uint8Array> | null>(null)
     const [isEditorOpen, setIsEditorOpen] = useState(false)
-    const [editorFileExtension, setEditorFileExtension] = useState<string>('.txt')
+    const [editorFilePath, setEditorFilePath] = useState<string>('.txt')
     const [selectedValue, setSelectedValue] = useState<string[]>([])
 
     async function getPathFiles(path: string, selectedServer: string): Promise<Node[]> {
@@ -155,12 +157,12 @@ const FileTree = () => {
                             document.body.appendChild(a)
                             a.click()
                             document.body.removeChild(a)
-                            URL.revokeObjectURL(url)
+                            setTimeout(() => URL.revokeObjectURL(url), 5000)
                             return
                         } else {
                             setEditorInputStream(stream)
                             setIsEditorOpen(true)
-                            setEditorFileExtension(path.split('.')[1])
+                            setEditorFilePath(path)
                         }
                     }
                 }
@@ -177,16 +179,36 @@ const FileTree = () => {
         }
     }, [selectedServer])
 
-    async function handleEditorOutputStream(outStream: ReadableStream<Uint8Array> | undefined) {
+    async function handleEditorOutputStream(path: string, outStream: ReadableStream<Uint8Array> | undefined) {
         if (!outStream) return
-        if (!selectedServer) return
-        if (selectedValue.length === 0) return
-        const path = selectedValue[0]
-        const filename = path.split('/').pop() || 'upload.txt'
-        const relativePath = getRelativePath('/', path)
-        const formData = new FormData()
-        formData.append('file', new Blob([], { type: 'application/octet-stream' }), filename)
-        formData.append('path', relativePath)
+        if (!selectedServer) return // temp print stream2
+        const reader = outStream.getReader()
+        const blob = await new Response(
+            new ReadableStream({
+                start(controller) {
+                    function push() {
+                        reader.read().then(({ done, value }) => {
+                            if (done) {
+                                controller.close()
+                                return
+                            }
+                            controller.enqueue(value)
+                            push()
+                        })
+                    }
+                    push()
+                }
+            })
+        )
+            .blob()
+            .then(async blob => {
+                console.log(blob)
+                await uploadFileApiContainerContainerNameFsUploadPost({
+                    credentials: 'include',
+                    path: { container_name: selectedServer },
+                    body: { file: blob, path: path }
+                })
+            })
     }
 
     return (
@@ -232,7 +254,7 @@ const FileTree = () => {
                 setIsOpen={setIsEditorOpen}
                 inputStream={editorInputStream as any}
                 onSave={handleEditorOutputStream}
-                fileExtension={editorFileExtension}
+                fullPath={editorFilePath}
             />
         </Box>
     )

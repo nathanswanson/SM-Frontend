@@ -1,7 +1,7 @@
 'use client'
 
 import { Combobox, HStack, Portal, Span, Spinner, useListCollection } from '@chakra-ui/react'
-import { useAsync } from 'react-use'
+import { useAsync, useEffectOnce } from 'react-use'
 
 import { useState } from 'react'
 import { useSelectedServerContext } from '../../providers/selected-server-context'
@@ -23,6 +23,14 @@ const SearchComboBox = () => {
     const [openState, setOpenState] = useState<Boolean>(false)
     const { collection: serverList, set: setServerList } = useListCollection<string>({
         initialItems: []
+    })
+
+    useEffectOnce(() => {
+        // check if local storage has a selected server
+        const storedServer = localStorage.getItem('selectedServer')
+        if (storedServer) {
+            setSelectedServer(storedServer)
+        }
     })
 
     const state = useAsync(async () => {
@@ -48,7 +56,11 @@ const SearchComboBox = () => {
             }}
         >
             <Combobox.Control>
-                <Combobox.Input borderWidth={0} placeholder="Select Server..." />
+                <Combobox.Input
+                    borderWidth={0}
+                    defaultValue={localStorage.getItem('selectedServer') || ''}
+                    placeholder="Select Server..."
+                />
                 <Combobox.IndicatorGroup>
                     <Combobox.ClearTrigger />
                     <Combobox.Trigger />

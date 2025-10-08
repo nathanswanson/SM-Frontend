@@ -1,5 +1,6 @@
 import { Box, BoxProps, Heading } from '@chakra-ui/react'
 import { DataList } from '@chakra-ui/react/data-list'
+import { CopyField } from './copy-field'
 
 interface AllocatedResourceListProps extends BoxProps {
     items: { id: string; value: string }[]
@@ -24,7 +25,7 @@ export const InfoList = ({ items, header, ...props }: AllocatedResourceListProps
                             maxLines={2}
                             flexWrap={'wrap'}
                         >
-                            {item.value}
+                            <CopyField>{item.value}</CopyField>
                         </DataList.ItemValue>
                     </DataList.Item>
                 ))}

@@ -2,6 +2,7 @@ import { createContext, useEffect, useState } from 'react'
 import { useContext } from 'react'
 import { ReactNode } from 'react'
 import { getContainerStatusApiContainerContainerNameStatusGet } from '../lib/hey-api/client'
+import { useEffectOnce } from 'react-use'
 
 interface ISelectedServerContext {
     selectedServer: string | undefined
@@ -24,9 +25,17 @@ export const SelectedServerProvider = ({ children }: { children: ReactNode }) =>
     const [selectedServer, setSelectedServer] = useState<string | undefined>(undefined)
     const [serverOnline, setServerOnline] = useState<boolean | undefined>(undefined)
 
+    useEffectOnce(() => {
+        const saved = localStorage.getItem('selectedServer')
+        if (saved) {
+            setSelectedServer(saved)
+        }
+    })
+
     useEffect(() => {
         if (selectedServer == undefined || selectedServer == '') {
             setServerOnline(undefined)
+            localStorage.removeItem('selectedServer')
             return
         }
 
@@ -38,6 +47,7 @@ export const SelectedServerProvider = ({ children }: { children: ReactNode }) =>
             signal: abortController.signal
         }).then(res => {
             setServerOnline(res.data?.running)
+            localStorage.setItem('selectedServer', selectedServer)
         })
 
         return () => {

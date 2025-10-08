@@ -1,10 +1,6 @@
 import { Box } from '@chakra-ui/react/box'
-import { VStack } from '@chakra-ui/react/stack'
-import CardModule from './card.js'
 import { GridItem } from '@chakra-ui/react/grid'
 import React from 'react'
-import { assert } from 'console'
-import { Card } from '@chakra-ui/react'
 
 interface ActionHaloProps {
     rowSpan?: number
@@ -35,7 +31,7 @@ export const ActionHalo = ({ children, rowSpan, colSpan }: ActionHaloProps) => {
             gap="1em"
             display="flex"
             flexDirection={'column'}
-            colSpan={colSpan}
+            colSpan={{ base: colSpan, smDown: 3 }}
             rowSpan={rowSpan}
             className="actionhalo-root"
         >

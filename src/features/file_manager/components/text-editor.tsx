@@ -19,8 +19,8 @@ export interface TextEditorProps {
     isOpen: boolean
     setIsOpen: (open: boolean) => void
     inputStream: ReadableStream<Uint8Array>
-    onSave: (stream: ReadableStream<Uint8Array>) => void
-    fileExtension: string
+    onSave: (path: string, stream: ReadableStream<Uint8Array>) => void
+    fullPath: string
 }
 
 export const TextEditorDialog = ({
@@ -29,7 +29,7 @@ export const TextEditorDialog = ({
 
     inputStream,
     onSave,
-    fileExtension,
+    fullPath,
     ...props
 }: TextEditorProps) => {
     const [value, setValue] = useState('')
@@ -73,7 +73,7 @@ export const TextEditorDialog = ({
                 controller.close()
             }
         })
-        onSave?.(outStream)
+        onSave?.(fullPath, outStream)
         setIsOpen(false)
     }
 
@@ -94,7 +94,7 @@ export const TextEditorDialog = ({
                 <Dialog.Backdrop />
                 <Dialog.Positioner>
                     <Dialog.Content>
-                        <DialogHeader>{fileExtension}</DialogHeader>
+                        <DialogHeader>{fullPath}</DialogHeader>
                         <DialogCloseTrigger />
 
                         <Dialog.Body>
@@ -105,7 +105,7 @@ export const TextEditorDialog = ({
                                     <Suspense fallback={<Spinner />}>
                                         <EditorLazy
                                             height="60vh"
-                                            language={fileExtension}
+                                            language={fullPath.split('.').pop()}
                                             theme="vs-dark"
                                             value={value}
                                             onChange={v => setValue(v ?? '')}

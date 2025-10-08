@@ -10,3 +10,4 @@
 !tsconfig.json
 !tsconfig.node.json
 !vite.config.ts
+!openapi-ts.config.ts

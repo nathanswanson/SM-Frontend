@@ -17,6 +17,9 @@ async function preLoad() {
 }
 
 async function enableMocking() {
+    const { client } = await import('./lib/api')
+    console.log('hey-api client baseUrl:', client.getConfig().baseUrl)
+
     if (process.env.NODE_ENV !== 'development' || DISABLE_MOCK) {
         return
     }

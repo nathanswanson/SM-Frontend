@@ -35,6 +35,20 @@ export type BodyLoginUserTokenPost = {
 };
 
 /**
+ * Body_upload_file_api_container__container_name__fs_upload__post
+ */
+export type BodyUploadFileApiContainerContainerNameFsUploadPost = {
+    /**
+     * Path
+     */
+    path: string;
+    /**
+     * File
+     */
+    file: Blob | File;
+};
+
+/**
  * ContainerCommandResponse
  */
 export type ContainerCommandResponse = {
@@ -108,20 +122,6 @@ export type ContainerFileListResponse = {
      * Items
      */
     items: Array<string>;
-};
-
-/**
- * ContainerFileUploadRequest
- */
-export type ContainerFileUploadRequest = {
-    /**
-     * Path
-     */
-    path: string;
-    /**
-     * File
-     */
-    file: Blob | File;
 };
 
 /**
@@ -277,6 +277,62 @@ export type Nodes = {
      * Node architecture
      */
     arch: string;
+};
+
+/**
+ * Servers
+ */
+export type Servers = {
+    /**
+     * Id
+     * Server ID
+     */
+    id: string;
+    /**
+     * Name
+     * Server name
+     */
+    name: string;
+    /**
+     * Owner
+     * Owner username
+     */
+    owner: string;
+    /**
+     * Node
+     * Node name where the server is hosted
+     */
+    node: string;
+    /**
+     * Template
+     * Template name used for the server
+     */
+    template: string;
+    /**
+     * Env
+     * JSON string of environment variables for the server
+     */
+    env: string | null;
+    /**
+     * Cpu
+     * CPU resources allocated to the server
+     */
+    cpu: number;
+    /**
+     * Disk
+     * Disk space allocated to the server in GB
+     */
+    disk: number;
+    /**
+     * Memory
+     * Memory allocated to the server in GB
+     */
+    memory: number;
+    /**
+     * Port
+     * Port number assigned to the server
+     */
+    port: number | null;
 };
 
 /**
@@ -708,7 +764,7 @@ export type ReadFileApiContainerContainerNameFsGetResponses = {
 };
 
 export type UploadFileApiContainerContainerNameFsUploadPostData = {
-    body: ContainerFileUploadRequest;
+    body: BodyUploadFileApiContainerContainerNameFsUploadPost;
     headers?: {
         /**
          * Authorization
@@ -1113,6 +1169,105 @@ export type PingApiNodesPingGetResponses = {
 };
 
 export type PingApiNodesPingGetResponse = PingApiNodesPingGetResponses[keyof PingApiNodesPingGetResponses];
+
+export type DeleteServerServerNameDeleteData = {
+    body?: never;
+    headers?: {
+        /**
+         * Authorization
+         */
+        authorization?: string | null;
+    };
+    path: {
+        /**
+         * Server Name
+         */
+        server_name: string;
+    };
+    query?: never;
+    url: '/{server_name}';
+};
+
+export type DeleteServerServerNameDeleteErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type DeleteServerServerNameDeleteError = DeleteServerServerNameDeleteErrors[keyof DeleteServerServerNameDeleteErrors];
+
+export type DeleteServerServerNameDeleteResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
+
+export type GetServerInfoServerNameGetData = {
+    body?: never;
+    headers?: {
+        /**
+         * Authorization
+         */
+        authorization?: string | null;
+    };
+    path: {
+        /**
+         * Server Name
+         */
+        server_name: string;
+    };
+    query?: never;
+    url: '/{server_name}';
+};
+
+export type GetServerInfoServerNameGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GetServerInfoServerNameGetError = GetServerInfoServerNameGetErrors[keyof GetServerInfoServerNameGetErrors];
+
+export type GetServerInfoServerNameGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: Servers;
+};
+
+export type GetServerInfoServerNameGetResponse = GetServerInfoServerNameGetResponses[keyof GetServerInfoServerNameGetResponses];
+
+export type CreateServerPostData = {
+    body: Servers;
+    headers?: {
+        /**
+         * Authorization
+         */
+        authorization?: string | null;
+    };
+    path?: never;
+    query?: never;
+    url: '/';
+};
+
+export type CreateServerPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CreateServerPostError = CreateServerPostErrors[keyof CreateServerPostErrors];
+
+export type CreateServerPostResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
 
 export type LoginUserTokenPostData = {
     body: BodyLoginUserTokenPost;

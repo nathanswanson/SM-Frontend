@@ -19,6 +19,8 @@ import {
     listTemplatesApiTemplateListGet
 } from '../../../lib/hey-api/client/sdk.gen'
 import { useSelectedServerContext } from '../../../providers/selected-server-context'
+import { MenuSelectButton } from './menu-select-button'
+import { FaDatabase } from 'react-icons/fa6'
 
 function parsedPort(serverPort: string): { [key: string]: number | null } | null {
     const entries: Record<string, number | null> = {}
@@ -88,7 +90,10 @@ export const ServerCreationDialog = () => {
     return (
         <Dialog.Root open={open} onOpenChange={e => setOpen(e.open)}>
             <Dialog.Trigger asChild>
-                <Button size="lg">New Server</Button>
+                <MenuSelectButton color="fg.muted">
+                    <FaDatabase />
+                    Create New Server
+                </MenuSelectButton>
             </Dialog.Trigger>
             <Portal>
                 <Dialog.Backdrop />

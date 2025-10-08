@@ -16,6 +16,9 @@ import { MenuSelectButton } from './components/menu-select-button'
 import { useUserDataContext } from '../../providers/user-data'
 import { logoutUserLogoutPost } from '../../lib/hey-api/client/sdk.gen'
 import { ColorModeButton } from '../../lib/chakra/color-mode.js'
+import { TemplateCreateDialog } from './components/template-create-modal'
+import { NodeCreateDialog } from './components/node-create-modal'
+import { ServerCreationDialog } from './components/server-create-modal'
 
 const UserProfile = ({ ...props }) => {
     const { userData } = useUserDataContext()
@@ -64,19 +67,14 @@ const CollapseWrapper = ({ children, ...props }: { children: React.ReactNode }) 
 }
 
 const MenuOptions = ({ ...props }) => {
+    const { userData } = useUserDataContext()
+
     return (
         <VStack paddingTop="1em" width="100%" rowGap={'0.05em'} justifyContent="left" {...props}>
-            <MenuSelectButton color="fg.muted">
-                <FaSwatchbook />
-                Create Template
-            </MenuSelectButton>
-            <MenuSelectButton color="fg.muted">
-                <FaBarsProgress /> Create Node
-            </MenuSelectButton>
-            <MenuSelectButton marginBottom={'2em'} color="fg.muted">
-                <FaDatabase />
-                Create New Server
-            </MenuSelectButton>
+            <TemplateCreateDialog />
+            <NodeCreateDialog />
+            <ServerCreationDialog />
+            <HStack width="100%" borderBottomWidth="0px" paddingTop={'1.5em'} borderColor="border" />
 
             <MenuSelectButton color="fg.muted">
                 <FaGear /> Settings
@@ -92,6 +90,7 @@ const MenuOptions = ({ ...props }) => {
                 <FaUserLock />
                 Sign Out
             </MenuSelectButton>
+            <HStack width="100%" paddingTop={'1.5em'} borderBottomWidth="1px" borderColor="border" />
             <ColorModeButton width="100%" justifyContent={'left'} paddingLeft="2em" />
         </VStack>
     )

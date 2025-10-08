@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { useSelectedServerContext } from '../../../providers/selected-server-context'
 import { FormField } from '../../../utils/util'
 import { addTemplateApiTemplateCreatePost } from '../../../lib/hey-api/client/sdk.gen'
+import { MenuSelectButton } from './menu-select-button'
+import { FaSwatchbook } from 'react-icons/fa6'
 
 export const TemplateCreateDialog = () => {
     const [template_name, setTemplateName] = useState('')
@@ -17,9 +19,10 @@ export const TemplateCreateDialog = () => {
     return (
         <Dialog.Root>
             <Dialog.Trigger asChild>
-                <Button variant="plain" unstyled justifyContent="flex-start" textAlign="left">
-                    New Template...
-                </Button>
+                <MenuSelectButton color="fg.muted">
+                    <FaSwatchbook />
+                    Create Template
+                </MenuSelectButton>
             </Dialog.Trigger>
             <Portal>
                 <Dialog.Backdrop />
@@ -62,6 +65,7 @@ export const TemplateCreateDialog = () => {
                             <Button
                                 onClick={() =>
                                     addTemplateApiTemplateCreatePost({
+                                        credentials: 'include',
                                         body: {
                                             name: template_name,
                                             image: template_image,

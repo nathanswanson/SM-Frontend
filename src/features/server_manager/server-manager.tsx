@@ -22,6 +22,7 @@ export const MainContent = ({ ...props }) => {
     return (
         <VStack {...props}>
             <SimpleGrid
+                hideBelow={'md'}
                 gridTemplateColumns="repeat(auto-fit, minmax(250px, 1fr))"
                 margin="8"
                 gap={'4em'}

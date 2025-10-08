@@ -6,8 +6,13 @@ import { CardModuleRaw } from '../../components/card'
 import { RiExportFill, RiFileDownloadFill } from 'react-icons/ri'
 import CommandButton from '../../components/command-button'
 import { FileManager } from './file-explorer'
+import { useState } from 'react'
 
 export const FileManagerHalo = ({ ...props }) => {
+    const [downloadTotal, setDownloadTotal] = useState(0)
+    const [downloadCurrent, setDownloadCurrent] = useState(0)
+    const [isDownloading, setIsDownloading] = useState(false)
+
     return (
         <ActionHalo {...props}>
             <ActionHalo.Header>
