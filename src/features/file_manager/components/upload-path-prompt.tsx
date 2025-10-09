@@ -1,8 +1,8 @@
 import { Button, Dialog, FileUpload, Input, Portal } from '@chakra-ui/react'
 import { BiUpload } from 'react-icons/bi'
 import { useState } from 'react'
-import { uploadFileApiContainerContainerNameFsUploadPost } from '../../../lib/hey-api/client/sdk.gen'
 import { useSelectedServerContext } from '../../../providers/selected-server-context'
+import { uploadFile } from '../../../lib/hey-api/client'
 
 export const UploadPathPrompt = () => {
     const { selectedServer } = useSelectedServerContext()
@@ -10,9 +10,9 @@ export const UploadPathPrompt = () => {
     const [pendingFiles, setPendingFiles] = useState<File>()
 
     function upload_file(containerName: string, path: string, file: File) {
-        uploadFileApiContainerContainerNameFsUploadPost({
-            path: { container_name: containerName },
-            body: { file: file, path: path }
+        uploadFile({
+            path: { container_name: containerName, path: path },
+            body: { file: file }
         })
     }
     return (
