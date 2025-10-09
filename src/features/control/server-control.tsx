@@ -1,26 +1,21 @@
 import { Button, ButtonGroup, Flex, Text, IconButton, Status } from '@chakra-ui/react'
-import {
-    deleteContainerApiContainerContainerNameDeleteGet,
-    startContainerApiContainerNameStartGet,
-    stopContainerApiContainerNameStopGet
-} from '../../lib/hey-api/client'
+
 import { useState } from 'react'
-import { VscDebugRestart, VscDebugStart, VscDebugStop, VscTrash } from 'react-icons/vsc'
+import { VscDebugRestart, VscDebugStart, VscDebugStop } from 'react-icons/vsc'
 import { useSelectedServerContext } from '../../providers/selected-server-context'
 import { DangerConfirmation } from '../../components/danger-confirmation'
-import { UploadPathPrompt } from '../file_manager/components/upload-path-prompt'
-import { ServerCreationDialog } from '../gutter/components/server-create-modal'
-import { InfoList } from '../../components/info-list'
 import { FaFileExport } from 'react-icons/fa6'
+import { deleteServer, startServer, stopServer } from '../../lib/hey-api/client'
+import { server } from '../../mocks/node'
 
 export const ServerControl = ({ ...props }) => {
-    const { selectedServer, setSelectedServer, serverOnline } = useSelectedServerContext()
+    const { selectedServer, setSelectedServer, serverInfo, serverOnline } = useSelectedServerContext()
     const [isOpenDeleteDialog, setIsOpenDeleteDialog] = useState<boolean>(false)
-    function deleteServer(serverName: string) {
+    function delete_server(serverName: string) {
         if (serverName) {
-            deleteContainerApiContainerContainerNameDeleteGet({
+            deleteServer({
                 credentials: 'include',
-                path: { container_name: serverName }
+                path: { server_id: serverInfo?.id ?? -1 }
             })
                 .then(() => {
                     setSelectedServer('')
@@ -46,7 +41,10 @@ export const ServerControl = ({ ...props }) => {
             <DangerConfirmation
                 resourceName={selectedServer ? selectedServer : ''}
                 onConfirm={e => {
-                    deleteServer(selectedServer ? selectedServer : '')
+                    deleteServer({
+                        credentials: 'include',
+                        path: { server_id: serverInfo?.id ?? -1 }
+                    })
                 }}
                 open={isOpenDeleteDialog}
                 setOpen={setIsOpenDeleteDialog}
@@ -56,7 +54,7 @@ export const ServerControl = ({ ...props }) => {
 }
 
 const CommandButtons = ({ ...props }) => {
-    const { selectedServer, serverOnline, setServerOnline } = useSelectedServerContext()
+    const { selectedServer, serverOnline, serverInfo, setServerOnline } = useSelectedServerContext()
 
     const [loading, setLoading] = useState(false)
 
@@ -64,9 +62,9 @@ const CommandButtons = ({ ...props }) => {
         setLoading(true)
         if (selectedServer) {
             try {
-                await stopContainerApiContainerNameStopGet({
+                await stopServer({
                     credentials: 'include',
-                    path: { name: selectedServer }
+                    path: { server_id: serverInfo?.id ?? -1 }
                 })
                 setServerOnline(false)
             } finally {
@@ -79,9 +77,9 @@ const CommandButtons = ({ ...props }) => {
         setLoading(true)
         if (selectedServer) {
             try {
-                await startContainerApiContainerNameStartGet({
+                await startServer({
                     credentials: 'include',
-                    path: { name: selectedServer }
+                    path: { server_id: serverInfo?.id ?? -1 }
                 })
                 setServerOnline(true)
             } finally {
