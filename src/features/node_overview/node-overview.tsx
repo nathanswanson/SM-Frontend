@@ -1,188 +1,39 @@
-import { Button, Grid, GridItem, Group, Menu, Portal, SimpleGrid, Skeleton, Stat, VStack } from '@chakra-ui/react'
-import {
-    diskUsageApiNodesDiskUsageGet,
-    hardwareApiNodesHardwareGet,
-    NodeDiskUsageResponse,
-    Nodes,
-    runtimeApiNodesRuntimeGet
-} from '../../lib/hey-api/client'
+import { AbsoluteCenter, Group, HStack, Spinner } from '@chakra-ui/react'
 import { useState, ComponentProps } from 'react'
 import { useAsync } from 'react-use'
-import { FaLinkSlash } from 'react-icons/fa6'
 import { AsyncState } from 'react-use/lib/useAsync'
-import { TemplateCreateDialog } from '../gutter/components/template-create-modal'
+import { InfoList } from '../../components/info-list'
+import { getNode, NodesRead } from '../../lib/hey-api/client'
 
 interface IHardwareInfoProps extends ComponentProps<typeof Group> {
     hardwareState: AsyncState<void>
-    hardwareInfo: Nodes
+    hardwareInfo: NodesRead | undefined
 }
 
 export const NodeOverview = () => {
-    const [hardwareInfo, setHardwareInfo] = useState<Nodes | undefined>(undefined)
+    const [hardwareInfo, setHardwareInfo] = useState<NodesRead | undefined>(undefined)
     const hardwareState = useAsync(async () => {
-        const hardwareInfo = await hardwareApiNodesHardwareGet({ credentials: 'include' })
+        const hardwareInfo = await getNode({ credentials: 'include', path: { node_id: 1 } })
         setHardwareInfo(hardwareInfo.data)
     }, [])
-    return (
-        <Grid width="100%" height="100%">
-            <GridItem w="100%" h="100%">
-                {hardwareInfo == undefined || hardwareState.loading ? (
-                    <Skeleton h="100%" w="100%"></Skeleton>
-                ) : (
-                    <NodeHeaderInfo
-                        hardwareInfo={hardwareInfo}
-                        hardwareState={hardwareState}
-                        width="100%"
-                        justifyContent={'space-between'}
-                    />
-                )}
-            </GridItem>
-            <GridItem h="100%">
-                {hardwareInfo == undefined || hardwareState.loading ? (
-                    <Skeleton h="100%" w="100%"></Skeleton>
-                ) : (
-                    <HardwareInfo hardwareInfo={hardwareInfo} hardwareState={hardwareState} />
-                )}
-            </GridItem>
-            <GridItem width="100%" minH={0} h="100%" alignSelf="stretch" overflow="auto">
-                <NodeControls alignItems="flex-end" height="100%" width="100%" alignContent={'flex-end'} />
-            </GridItem>
-        </Grid>
-    )
-}
 
-const NodeHeaderInfo = ({ hardwareState, hardwareInfo, ...props }: IHardwareInfoProps) => {
-    return (
-        <Group {...props} alignContent={'space-between'}>
-            <GridItem>
-                <Stat.Root size="lg" p="2">
-                    <Stat.Label>Node ID</Stat.Label>
-                    <Stat.ValueText>{hardwareInfo?.id}</Stat.ValueText>
-                </Stat.Root>
-            </GridItem>
+    if (hardwareState.loading) {
+        return (
+            <AbsoluteCenter>
+                <Spinner></Spinner>
+            </AbsoluteCenter>
+        )
+    }
 
-            <GridItem>
-                <Stat.Root p="2" width="100%">
-                    <Stat.Label>Containers</Stat.Label>
-                    <Stat.ValueText width="100%" justifyContent={'flex-end'}>
-                        --
-                    </Stat.ValueText>
-                    <Stat.ValueUnit></Stat.ValueUnit>
-                </Stat.Root>
-            </GridItem>
-        </Group>
-    )
-}
+    const items = [
+        { id: 'node_id', value: hardwareInfo?.id ?? 'N/A' },
+        { id: 'cpu', value: hardwareInfo?.cpu_name ?? 'N/A' },
+        { id: 'memory', value: hardwareInfo?.memory ? `${hardwareInfo.memory} GB` : 'N/A' },
+        { id: 'disk', value: hardwareInfo?.disk ? `${hardwareInfo.disk} GB` : 'N/A' },
+        { id: 'arch', value: hardwareInfo?.arch ?? 'N/A' },
+        { id: 'cpus', value: hardwareInfo?.cpus ? `${hardwareInfo.cpus}` : 'N/A' },
+        { id: 'max_hz', value: hardwareInfo?.max_hz ? `${(hardwareInfo.max_hz ?? 0) / 1000.0} GHz` : 'N/A' }
+    ]
 
-const CreateNewMenu = () => {
-    return (
-        <Menu.Root>
-            <Menu.Trigger asChild>
-                <Button>Create New</Button>
-            </Menu.Trigger>
-            <Portal>
-                <Menu.Positioner>
-                    <Menu.Content>
-                        <Menu.Item closeOnSelect={false} value="Node">
-                            New Node...
-                        </Menu.Item>
-                        <Menu.Item closeOnSelect={false} value="Template">
-                            <TemplateCreateDialog />
-                        </Menu.Item>
-                    </Menu.Content>
-                </Menu.Positioner>
-            </Portal>
-        </Menu.Root>
-    )
-}
-
-const NodeControls = ({ ...props }) => {
-    return (
-        <Group {...props}>
-            <CreateNewMenu />
-
-            <Button>
-                <FaLinkSlash />
-                Unlink
-            </Button>
-        </Group>
-    )
-}
-
-const HardwareInfo = ({ hardwareState, hardwareInfo, ...props }: IHardwareInfoProps) => {
-    const [runtimeHours, setRuntimeHours] = useState<number | undefined>(undefined)
-    const [diskUsage, setDiskUsage] = useState<NodeDiskUsageResponse | undefined>(undefined)
-
-    const runtimeState = useAsync(async () => {
-        const runtime_hours = await runtimeApiNodesRuntimeGet({ credentials: 'include' })
-        setRuntimeHours(runtime_hours.data?.uptime_hours)
-    }, [])
-
-    const diskUsageState = useAsync(async () => {
-        const disk_usage = await diskUsageApiNodesDiskUsageGet({ credentials: 'include' })
-        setDiskUsage(disk_usage.data)
-    }, [])
-
-    return hardwareState.loading ? (
-        <Skeleton h="100%" w="100%"></Skeleton>
-    ) : (
-        <VStack w="100%" height="100%">
-            {/* <SimpleGrid height="100%" templateColumns={'1fr 1fr'} templateRows={'1fr 1fr 1fr'} width={'100%'}>
-                <GridItem colSpan={2}>
-                    <Stat.Root p="2">
-                        <Stat.Label>CPU Architecture</Stat.Label>
-                        <Stat.ValueText>{hardwareInfo?.cpu_name}</Stat.ValueText>
-                    </Stat.Root>
-                </GridItem>
-
-                <GridItem>
-                    <Stat.Root p="2">
-                        <Stat.Label>Arch</Stat.Label>
-                        <Stat.ValueText>{hardwareInfo?.arch}</Stat.ValueText>
-                    </Stat.Root>
-                </GridItem>
-
-                <GridItem>
-                    <Stat.Root p="2">
-                        <Stat.Label>RunTime</Stat.Label>
-                        <Stat.ValueText>{runtimeHours}</Stat.ValueText>
-                        <Stat.ValueUnit>hours</Stat.ValueUnit>
-                    </Stat.Root>
-                </GridItem>
-
-                <GridItem>
-                    <Stat.Root p="2">
-                        <Stat.Label>Core Usage</Stat.Label>
-                        <Stat.ValueText>-- / {hardwareInfo?.cpus}</Stat.ValueText>
-                        <Stat.ValueUnit>CPU / CPU</Stat.ValueUnit>
-                    </Stat.Root>
-                </GridItem>
-
-                <GridItem>
-                    <Stat.Root p="2">
-                        <Stat.Label>Disk</Stat.Label>
-                        <Stat.ValueText>
-                            {diskUsage ? ((diskUsage.used / diskUsage.total) * 100).toPrecision(3) : -1} %
-                        </Stat.ValueText>
-                        <Stat.ValueUnit>Usage</Stat.ValueUnit>
-                    </Stat.Root>
-                </GridItem>
-                <GridItem>
-                    <Stat.Root p="2">
-                        <Stat.Label>Disk Size</Stat.Label>
-                        <Stat.ValueText>{hardwareInfo?.disk}</Stat.ValueText>
-                        <Stat.ValueUnit>GB</Stat.ValueUnit>
-                    </Stat.Root>
-                </GridItem>
-
-                <GridItem>
-                    <Stat.Root p="2">
-                        <Stat.Label>Memory</Stat.Label>
-                        <Stat.ValueText>-- / {hardwareInfo?.memory ?? 0}</Stat.ValueText>
-                        <Stat.ValueUnit>GB / GB</Stat.ValueUnit>
-                    </Stat.Root>
-                </GridItem>
-            </SimpleGrid> */}
-        </VStack>
-    )
+    return <InfoList header="Information" items={items} width="100%" />
 }

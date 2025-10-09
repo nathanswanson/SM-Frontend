@@ -14,11 +14,10 @@ import {
 } from '@chakra-ui/react'
 import { useState } from 'react'
 import { useAsync } from 'react-use'
-import {
-    createContainerApiContainerCreateTemplateNamePost,
-    listTemplatesApiTemplateListGet
-} from '../../../lib/hey-api/client/sdk.gen'
 import { useSelectedServerContext } from '../../../providers/selected-server-context'
+import { MenuSelectButton } from './menu-select-button'
+import { FaDatabase } from 'react-icons/fa6'
+import { createServer, searchTemplates } from '../../../lib/hey-api/client'
 
 function parsedPort(serverPort: string): { [key: string]: number | null } | null {
     const entries: Record<string, number | null> = {}
@@ -60,20 +59,23 @@ export const ServerCreationDialog = () => {
     const [open, setOpen] = useState(false)
 
     const state = useAsync(async () => {
-        const template_list = await listTemplatesApiTemplateListGet({ credentials: 'include' })
-        setTemplateList(template_list.data?.items ?? [''])
+        const template_list = await searchTemplates({ credentials: 'include' })
+        setTemplateList([''])
     }, [selectedTemplate, setTemplateList])
 
-    const createServer = async () => {
+    const create_server = async () => {
         setCreateServerLoading(true)
-        createContainerApiContainerCreateTemplateNamePost({
+        createServer({
             credentials: 'include',
             body: {
-                template: selectedTemplate,
-                server_name: serverName,
+                name: serverName,
                 port: parsedPort(serverPort),
-                env: parsedEnv(serverEnv)
-            }
+                env: serverEnv,
+                cpu: 0,
+                memory: 0,
+                disk: 0
+            },
+            query: { template_id: -1, node_id: 1 } // TODO: Fix template ID
         })
             .finally(() => {
                 // Server Responded
@@ -88,7 +90,10 @@ export const ServerCreationDialog = () => {
     return (
         <Dialog.Root open={open} onOpenChange={e => setOpen(e.open)}>
             <Dialog.Trigger asChild>
-                <Button size="lg">New Server</Button>
+                <MenuSelectButton color="fg.muted">
+                    <FaDatabase />
+                    Create New Server
+                </MenuSelectButton>
             </Dialog.Trigger>
             <Portal>
                 <Dialog.Backdrop />
@@ -181,7 +186,7 @@ export const ServerCreationDialog = () => {
                             <Dialog.ActionTrigger asChild>
                                 <Button variant="outline">Cancel</Button>
                             </Dialog.ActionTrigger>
-                            <Button onClick={createServer} loading={createServerLoading}>
+                            <Button onClick={create_server} loading={createServerLoading}>
                                 Create
                             </Button>
                         </Dialog.Footer>

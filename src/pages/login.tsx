@@ -13,13 +13,14 @@ import {
 } from '@chakra-ui/react'
 import { PasswordInput } from '../lib/chakra/password-input'
 import { VscArrowRight } from 'react-icons/vsc'
-import { loginUserTokenPost, pingApiNodesPingGet } from '../lib/hey-api/client'
 import { useState, useEffect } from 'react'
 import { Toaster, toaster } from '../lib/chakra/toaster'
+import { useUserDataContext } from '../providers/user-data'
+import { getUser, loginUser } from '../lib/hey-api/client'
 
-export async function checkLoginStatus() {
+async function checkLoginStatus() {
     try {
-        const response = await pingApiNodesPingGet({
+        const response = await getUser({
             credentials: 'include'
         })
         return response.response.status === 200
@@ -34,6 +35,8 @@ export const Login = ({ children }: { children: React.ReactNode }) => {
     const [loginLoading, setLoginLoading] = useState<boolean>(false)
     const [checkingStatus, setCheckingStatus] = useState<boolean>(true)
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false)
+    const { setUserData } = useUserDataContext()
+
     useEffect(() => {
         // Check login status on mount
         checkLoginStatus().then(loggedIn => {
@@ -50,10 +53,19 @@ export const Login = ({ children }: { children: React.ReactNode }) => {
         setLoginLoading(false)
     }
 
+    useEffect(() => {
+        if (isLoggedIn) {
+            // Fetch user data
+            getUser({ credentials: 'include' }).then(response => {
+                setUserData(response.data)
+            })
+        }
+    }, [isLoggedIn])
+
     const login = async () => {
         setLoginLoading(true)
         try {
-            await loginUserTokenPost({
+            await loginUser({
                 body: { username, password },
                 credentials: 'include'
             }).then(response => {
@@ -68,7 +80,6 @@ export const Login = ({ children }: { children: React.ReactNode }) => {
                     })
                 }
             })
-            setUsername('')
         } finally {
             setPassword('')
             setLoginLoading(false)
@@ -90,8 +101,8 @@ export const Login = ({ children }: { children: React.ReactNode }) => {
     return (
         <>
             <VStack height="100vh" width="100vw">
-                <Box height="5%" width="100vw"></Box>
-                <AbsoluteCenter width="100vw" height="95%" zIndex={1}>
+                <Box width="100vw"></Box>
+                <AbsoluteCenter width="100vw" zIndex={1}>
                     <Card.Root>
                         <Card.Header>
                             <Card.Title paddingLeft={0}>Login</Card.Title>
@@ -119,6 +130,7 @@ export const Login = ({ children }: { children: React.ReactNode }) => {
                                                 onChange={e => setPassword(e.target.value)}
                                                 value={password}
                                                 required
+                                                roundedRight={0}
                                             />
                                             <IconButton type="submit" loading={loginLoading} onClick={login}>
                                                 <VscArrowRight />

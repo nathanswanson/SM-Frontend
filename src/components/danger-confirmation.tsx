@@ -1,38 +1,31 @@
-import { Button, Dialog, Group, Input, Portal, Text } from '@chakra-ui/react'
 import React, { useState } from 'react'
-import { deleteContainerApiContainerContainerNameDeleteGet } from '../lib/hey-api/client/sdk.gen'
-import { useSelectedServerContext } from '../providers/selected-server-context'
+import { Dialog } from '@chakra-ui/react/dialog'
+import { Portal } from '@chakra-ui/react/portal'
+import { Text } from '@chakra-ui/react/text'
+import { Input } from '@chakra-ui/react/input'
+import { Group } from '@chakra-ui/react/group'
+import { Button } from '@chakra-ui/react/button'
+import { FaDeleteLeft, FaTrash, FaTrashCan } from 'react-icons/fa6'
 
 export const DangerConfirmation = ({
     open,
-    setOpen
+    setOpen,
+    onConfirm,
+    resourceName
 }: {
     open: boolean
     setOpen: (value: React.SetStateAction<boolean>) => void
+    onConfirm: (resourceName: string) => void
+    resourceName: string
 }) => {
-    const { selectedServer, setSelectedServer } = useSelectedServerContext()
     const [confirmText, setConfirmText] = useState('')
-    const [pendingDeletion, setPendingDeletion] = useState<boolean>(false)
-    function deleteServer() {
-        setPendingDeletion(true)
-        if (selectedServer) {
-            deleteContainerApiContainerContainerNameDeleteGet({
-                credentials: 'include',
-                path: { container_name: selectedServer }
-            })
-                .then(() => {
-                    setSelectedServer('')
-                })
-                .finally(() => {
-                    setOpen(false)
-                    setPendingDeletion(false)
-                })
-        }
-    }
-
     return (
         <Dialog.Root role="alertdialog" open={open} onOpenChange={e => setOpen(e.open)}>
-            <Dialog.Trigger width="100%" height="100%"></Dialog.Trigger>
+            <Dialog.Trigger>
+                <Button bg="danger.500" size="md">
+                    <FaTrashCan />
+                </Button>
+            </Dialog.Trigger>
             <Portal>
                 <Dialog.Backdrop>
                     <Dialog.Positioner>
@@ -42,21 +35,20 @@ export const DangerConfirmation = ({
                             </Dialog.Header>
                             <Dialog.Body>
                                 <Text>
-                                    Deleting a server is permanent. To confirm please type in name of server then hit
-                                    confirm
+                                    Deleting this resource is permanent. To confirm please type in name of this resource
+                                    then hit confirm
                                 </Text>
                             </Dialog.Body>
                             <Dialog.Footer>
                                 <Group width="100%">
                                     <Input
                                         value={confirmText}
-                                        placeholder={selectedServer}
+                                        placeholder={resourceName}
                                         onChange={value => setConfirmText(value.target.value)}
                                     ></Input>
                                     <Button
-                                        loading={pendingDeletion}
-                                        onClick={deleteServer}
-                                        disabled={confirmText !== selectedServer}
+                                        onClick={() => onConfirm(resourceName)}
+                                        disabled={confirmText !== resourceName}
                                     >
                                         Confirm
                                     </Button>

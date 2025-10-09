@@ -9,9 +9,9 @@ import { useWebSocketProvider } from '../../../providers/web-socket'
 import { purify } from '../../../utils/dom'
 
 const LogView = () => {
-    const { logMessages } = useWebSocketProvider()
+    // const { logMessages } = useWebSocketProvider()
     const [highlighter, setHighlighter] = useState<any>(null)
-
+    const { logMessages } = useWebSocketProvider()
     // Initialize Shiki highlighter
     useAsync(async () => {
         createHighlighterCore({
@@ -24,8 +24,8 @@ const LogView = () => {
     // Listen for log messages from the server
 
     return (
-        <ScrollArea.Root height="100%" background="#0a0c10">
-            <ScrollArea.Viewport height="100%">
+        <ScrollArea.Root>
+            <ScrollArea.Viewport>
                 <ScrollArea.Content height="100px" textStyle="sm">
                     {logMessages.map((log, idx) => (
                         <Container

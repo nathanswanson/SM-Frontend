@@ -6,7 +6,9 @@ import App from './App'
 import { SelectedServerProvider } from './providers/selected-server-context'
 import { system } from './theme'
 import { WebSocketProvider } from './providers/web-socket'
-import { ColorModeProvider, DarkMode } from './lib/chakra/color-mode'
+import { ColorModeProvider, DarkMode, LightMode } from './lib/chakra/color-mode'
+import { WindowProvider } from './providers/window-context'
+import { UserDataProvider } from './providers/user-data'
 
 const DISABLE_MOCK = true
 async function preLoad() {
@@ -15,6 +17,9 @@ async function preLoad() {
 }
 
 async function enableMocking() {
+    const { client } = await import('./lib/api')
+    console.log('hey-api client baseUrl:', client.getConfig().baseUrl)
+
     if (process.env.NODE_ENV !== 'development' || DISABLE_MOCK) {
         return
     }
@@ -33,7 +38,11 @@ preLoad().then(() => {
                     <ColorModeProvider>
                         <SelectedServerProvider>
                             <WebSocketProvider>
-                                <App />
+                                <WindowProvider>
+                                    <UserDataProvider>
+                                        <App />
+                                    </UserDataProvider>
+                                </WindowProvider>
                             </WebSocketProvider>
                         </SelectedServerProvider>
                     </ColorModeProvider>

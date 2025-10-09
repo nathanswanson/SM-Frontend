@@ -1,17 +1,24 @@
 'use client'
 
-import { ScrollArea, TreeView, createTreeCollection } from '@chakra-ui/react'
+import { Box, Text, ScrollArea, TreeView, createTreeCollection } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { LuFile, LuFolder, LuLoaderCircle } from 'react-icons/lu'
-import {
-    getDirectoryFilenamesApiContainerContainerNameFsListGet,
-    readFileApiContainerContainerNameFsGet,
-    uploadFileApiContainerContainerNameFsUploadPost
-} from '../../lib/hey-api/client'
+
 import { useSelectedServerContext } from '../../providers/selected-server-context'
-import { client } from '../../lib/hey-api/client/client.gen'
-import { toaster } from '../../lib/chakra/toaster'
 import { TextEditorDialog } from './components/text-editor'
+import { DisabledModule } from '../../components/disabled-module'
+import { blob } from 'stream/consumers'
+import { readFile, searchFs, uploadFile } from '../../lib/hey-api/client'
+
+function getRelativePath(from: string, to: string): string {
+    if (from !== '/') {
+        throw new Error('Only supporting relative from root path')
+    }
+    if (to.startsWith(from)) {
+        return to.substring(from.length)
+    }
+    return to
+}
 
 const TEXT_EDITOR_FILE_SIZE_LIMIT = 1024 * 1024 * 5 // 5 MB
 const ALLOWED_TEXT_FILE_EXTENSIONS = [
@@ -67,17 +74,25 @@ const initialCollection = createTreeCollection<Node>({
 })
 
 export const FileManager = ({ ...props }) => {
+    const { selectedServer } = useSelectedServerContext()
+
     return (
-        <ScrollArea.Root {...props}>
-            <ScrollArea.Viewport h="95%">
-                <ScrollArea.Content h="95%">
-                    <FileTree />
-                </ScrollArea.Content>
-                <ScrollArea.Scrollbar>
-                    <ScrollArea.Thumb />
-                </ScrollArea.Scrollbar>
-            </ScrollArea.Viewport>
-        </ScrollArea.Root>
+        <>
+            {!selectedServer ? (
+                <DisabledModule requester="files" />
+            ) : (
+                <ScrollArea.Root height="30em" {...props}>
+                    <ScrollArea.Viewport>
+                        <ScrollArea.Content>
+                            <FileTree />
+                        </ScrollArea.Content>
+                        <ScrollArea.Scrollbar>
+                            <ScrollArea.Thumb />
+                        </ScrollArea.Scrollbar>
+                    </ScrollArea.Viewport>
+                </ScrollArea.Root>
+            )}
+        </>
     )
 }
 
@@ -86,13 +101,14 @@ const FileTree = () => {
     const { selectedServer } = useSelectedServerContext()
     const [editorInputStream, setEditorInputStream] = useState<ReadableStream<Uint8Array> | null>(null)
     const [isEditorOpen, setIsEditorOpen] = useState(false)
+    const [editorFilePath, setEditorFilePath] = useState<string>('.txt')
     const [selectedValue, setSelectedValue] = useState<string[]>([])
+
     async function getPathFiles(path: string, selectedServer: string): Promise<Node[]> {
         if (!selectedServer) return []
-        const strings = await getDirectoryFilenamesApiContainerContainerNameFsListGet({
+        const strings = await searchFs({
             credentials: 'include',
-            path: { container_name: selectedServer },
-            query: { path: path }
+            path: { container_name: selectedServer, path: path }
         })
         if (!strings.data) return []
         return strings.data.items.map(filePath => {
@@ -115,7 +131,7 @@ const FileTree = () => {
             if (!e.focusedValue?.endsWith('/')) {
                 if (!selectedServer) return
                 const path = e.selectedNodes[0]['full_path']
-                const dl = await readFileApiContainerContainerNameFsGet({
+                const dl = await readFile({
                     credentials: 'include',
                     path: { container_name: selectedServer },
                     query: { path: path }
@@ -137,11 +153,12 @@ const FileTree = () => {
                             document.body.appendChild(a)
                             a.click()
                             document.body.removeChild(a)
-                            URL.revokeObjectURL(url)
+                            setTimeout(() => URL.revokeObjectURL(url), 5000)
                             return
                         } else {
                             setEditorInputStream(stream)
                             setIsEditorOpen(true)
+                            setEditorFilePath(path)
                         }
                     }
                 }
@@ -158,21 +175,41 @@ const FileTree = () => {
         }
     }, [selectedServer])
 
-    async function handleEditorOutputStream(outStream: ReadableStream<Uint8Array> | undefined) {
+    async function handleEditorOutputStream(path: string, outStream: ReadableStream<Uint8Array> | undefined) {
         if (!outStream) return
-        const res = new Response(outStream)
-        const blob = await res.blob()
-        if (!selectedServer) return
-        uploadFileApiContainerContainerNameFsUploadPost({
-            body: { file: blob, path: '/tmp' },
-            path: { container_name: selectedServer }
-        })
+        if (!selectedServer) return // temp print stream2
+        const reader = outStream.getReader()
+        const blob = await new Response(
+            new ReadableStream({
+                start(controller) {
+                    function push() {
+                        reader.read().then(({ done, value }) => {
+                            if (done) {
+                                controller.close()
+                                return
+                            }
+                            controller.enqueue(value)
+                            push()
+                        })
+                    }
+                    push()
+                }
+            })
+        )
+            .blob()
+            .then(async blob => {
+                console.log(blob)
+                await uploadFile({
+                    credentials: 'include',
+                    path: { container_name: selectedServer, path: path },
+                    body: { file: blob }
+                })
+            })
     }
 
     return (
-        <>
+        <Box flexGrow={1}>
             <TreeView.Root
-                aspectRatio={1 / 1.5}
                 size="md"
                 collection={collection}
                 loadChildren={loadChildren}
@@ -180,8 +217,7 @@ const FileTree = () => {
                 onSelectionChange={handleFileSelect}
                 selectedValue={selectedValue}
             >
-                <TreeView.Label>Tree</TreeView.Label>
-                <TreeView.Tree height="95%">
+                <TreeView.Tree>
                     <TreeView.Node<Node>
                         indentGuide={<TreeView.BranchIndentGuide />}
                         render={({ node, nodeState }) =>
@@ -207,13 +243,15 @@ const FileTree = () => {
                         }
                     />
                 </TreeView.Tree>
+                <Text>{selectedValue}</Text>
             </TreeView.Root>
             <TextEditorDialog
                 isOpen={isEditorOpen}
                 setIsOpen={setIsEditorOpen}
                 inputStream={editorInputStream as any}
                 onSave={handleEditorOutputStream}
+                fullPath={editorFilePath}
             />
-        </>
+        </Box>
     )
 }
