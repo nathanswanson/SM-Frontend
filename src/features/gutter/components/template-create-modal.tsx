@@ -3,9 +3,9 @@ import { Button, CloseButton, Collapsible, Dialog, Fieldset, Link, Portal } from
 import { useState } from 'react'
 import { useSelectedServerContext } from '../../../providers/selected-server-context'
 import { FormField } from '../../../utils/util'
-import { addTemplateApiTemplateCreatePost } from '../../../lib/hey-api/client/sdk.gen'
 import { MenuSelectButton } from './menu-select-button'
 import { FaSwatchbook } from 'react-icons/fa6'
+import { addTemplate } from '../../../lib/hey-api/client'
 
 export const TemplateCreateDialog = () => {
     const [template_name, setTemplateName] = useState('')
@@ -64,12 +64,12 @@ export const TemplateCreateDialog = () => {
                             </Dialog.ActionTrigger>
                             <Button
                                 onClick={() =>
-                                    addTemplateApiTemplateCreatePost({
+                                    addTemplate({
                                         credentials: 'include',
                                         body: {
                                             name: template_name,
                                             image: template_image,
-                                            tags: null,
+                                            tags: [],
                                             default_env: null,
                                             additional_env: null,
                                             resource_min_cpu: null,

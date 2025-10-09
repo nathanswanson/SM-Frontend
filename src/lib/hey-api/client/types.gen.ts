@@ -5,9 +5,9 @@ export type ClientOptions = {
 };
 
 /**
- * Body_login_user_token_post
+ * Body_login_user_system_token_post
  */
-export type BodyLoginUserTokenPost = {
+export type BodyLoginUserSystemTokenPost = {
     /**
      * Grant Type
      */
@@ -35,13 +35,9 @@ export type BodyLoginUserTokenPost = {
 };
 
 /**
- * Body_upload_file_api_container__container_name__fs_upload__post
+ * Body_upload_file_container__container_name__fs__path__post
  */
-export type BodyUploadFileApiContainerContainerNameFsUploadPost = {
-    /**
-     * Path
-     */
-    path: string;
+export type BodyUploadFileContainerContainerNameFsPathPost = {
     /**
      * File
      */
@@ -52,52 +48,6 @@ export type BodyUploadFileApiContainerContainerNameFsUploadPost = {
  * ContainerCommandResponse
  */
 export type ContainerCommandResponse = {
-    /**
-     * Success
-     */
-    success: boolean;
-};
-
-/**
- * ContainerCreateRequest
- */
-export type ContainerCreateRequest = {
-    /**
-     * Server Name
-     */
-    server_name: string;
-    /**
-     * Template
-     */
-    template: string;
-    /**
-     * Port
-     */
-    port: {
-        [key: string]: number | null;
-    } | null;
-    /**
-     * Env
-     */
-    env: {
-        [key: string]: string;
-    };
-};
-
-/**
- * ContainerCreateResponse
- */
-export type ContainerCreateResponse = {
-    /**
-     * Success
-     */
-    success: boolean;
-};
-
-/**
- * ContainerDeleteResponse
- */
-export type ContainerDeleteResponse = {
     /**
      * Success
      */
@@ -135,16 +85,6 @@ export type ContainerFileUploadResponse = {
 };
 
 /**
- * ContainerListResponse
- */
-export type ContainerListResponse = {
-    /**
-     * Items
-     */
-    items: Array<string>;
-};
-
-/**
  * ContainerLogsResponse
  */
 export type ContainerLogsResponse = {
@@ -152,36 +92,6 @@ export type ContainerLogsResponse = {
      * Items
      */
     items: Array<string>;
-};
-
-/**
- * ContainerStartResponse
- */
-export type ContainerStartResponse = {
-    /**
-     * Success
-     */
-    success: boolean;
-};
-
-/**
- * ContainerStatusResponse
- */
-export type ContainerStatusResponse = {
-    /**
-     * Running
-     */
-    running: boolean;
-};
-
-/**
- * ContainerStopResponse
- */
-export type ContainerStopResponse = {
-    /**
-     * Success
-     */
-    success: boolean;
 };
 
 /**
@@ -219,13 +129,15 @@ export type NodeDiskUsageResponse = {
 };
 
 /**
- * NodePingResponse
+ * NodeListResponse
  */
-export type NodePingResponse = {
+export type NodeListResponse = {
     /**
-     * Recieved At
+     * Items
      */
-    recieved_at: number;
+    items: {
+        [key: string]: number;
+    };
 };
 
 /**
@@ -239,9 +151,14 @@ export type NodeUptimeResponse = {
 };
 
 /**
- * Nodes
+ * NodesBase
  */
-export type Nodes = {
+export type NodesBase = {
+    /**
+     * Name
+     * Node name
+     */
+    name: string;
     /**
      * Cpus
      * Number of CPUs on the node
@@ -268,11 +185,6 @@ export type Nodes = {
      */
     max_hz: number;
     /**
-     * Id
-     * Node name
-     */
-    id: string;
-    /**
      * Arch
      * Node architecture
      */
@@ -280,34 +192,111 @@ export type Nodes = {
 };
 
 /**
- * Servers
+ * NodesRead
  */
-export type Servers = {
+export type NodesRead = {
+    /**
+     * Name
+     * Node name
+     */
+    name: string;
+    /**
+     * Cpus
+     * Number of CPUs on the node
+     */
+    cpus: number;
+    /**
+     * Disk
+     * Total disk space on the node in GB
+     */
+    disk: number;
+    /**
+     * Memory
+     * Total memory on the node in GB
+     */
+    memory: number;
+    /**
+     * Cpu Name
+     * CPU model name
+     */
+    cpu_name: string;
+    /**
+     * Max Hz
+     * Maximum CPU frequency on the node in MHz
+     */
+    max_hz: number;
+    /**
+     * Arch
+     * Node architecture
+     */
+    arch: string;
     /**
      * Id
-     * Server ID
      */
-    id: string;
+    id: number;
+};
+
+/**
+ * ServerDeleteResponse
+ */
+export type ServerDeleteResponse = {
+    /**
+     * Success
+     */
+    success: boolean;
+};
+
+/**
+ * ServerListResponse
+ */
+export type ServerListResponse = {
+    /**
+     * Items
+     */
+    items: {
+        [key: string]: number;
+    };
+};
+
+/**
+ * ServerStartResponse
+ */
+export type ServerStartResponse = {
+    /**
+     * Success
+     */
+    success: boolean;
+};
+
+/**
+ * ServerStatusResponse
+ */
+export type ServerStatusResponse = {
+    /**
+     * Running
+     */
+    running: boolean;
+};
+
+/**
+ * ServerStopResponse
+ */
+export type ServerStopResponse = {
+    /**
+     * Success
+     */
+    success: boolean;
+};
+
+/**
+ * ServersBase
+ */
+export type ServersBase = {
     /**
      * Name
      * Server name
      */
     name: string;
-    /**
-     * Owner
-     * Owner username
-     */
-    owner: string;
-    /**
-     * Node
-     * Node name where the server is hosted
-     */
-    node: string;
-    /**
-     * Template
-     * Template name used for the server
-     */
-    template: string;
     /**
      * Env
      * JSON string of environment variables for the server
@@ -317,22 +306,84 @@ export type Servers = {
      * Cpu
      * CPU resources allocated to the server
      */
-    cpu: number;
+    cpu: number | null;
     /**
      * Disk
      * Disk space allocated to the server in GB
      */
-    disk: number;
+    disk: number | null;
     /**
      * Memory
      * Memory allocated to the server in GB
      */
-    memory: number;
+    memory: number | null;
     /**
      * Port
-     * Port number assigned to the server
+     * List of ports exposed by the server
      */
-    port: number | null;
+    port?: {
+        [key: string]: number | null;
+    } | null;
+    /**
+     * Container Name
+     * Docker container name for the server
+     */
+    container_name?: string;
+};
+
+/**
+ * ServersRead
+ */
+export type ServersRead = {
+    /**
+     * Name
+     * Server name
+     */
+    name: string;
+    /**
+     * Env
+     * JSON string of environment variables for the server
+     */
+    env: string | null;
+    /**
+     * Cpu
+     * CPU resources allocated to the server
+     */
+    cpu: number | null;
+    /**
+     * Disk
+     * Disk space allocated to the server in GB
+     */
+    disk: number | null;
+    /**
+     * Memory
+     * Memory allocated to the server in GB
+     */
+    memory: number | null;
+    /**
+     * Port
+     * List of ports exposed by the server
+     */
+    port?: {
+        [key: string]: number | null;
+    } | null;
+    /**
+     * Container Name
+     * Docker container name for the server
+     */
+    container_name?: string;
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Node Id
+     */
+    node_id: number;
+    /**
+     * Template Id
+     */
+    template_id: number;
 };
 
 /**
@@ -343,16 +394,6 @@ export type TemplateCreateResponse = {
      * Success
      */
     success: boolean;
-};
-
-/**
- * TemplateDeleteRequest
- */
-export type TemplateDeleteRequest = {
-    /**
-     * Item
-     */
-    item: string;
 };
 
 /**
@@ -372,13 +413,15 @@ export type TemplateListResponse = {
     /**
      * Items
      */
-    items: Array<string>;
+    items: {
+        [key: string]: number;
+    };
 };
 
 /**
- * Templates
+ * TemplatesBase
  */
-export type Templates = {
+export type TemplatesBase = {
     /**
      * Name
      * Template name
@@ -393,17 +436,21 @@ export type Templates = {
      * Tags
      * Comma-separated tags for the template
      */
-    tags: string | null;
+    tags: Array<string>;
     /**
      * Default Env
      * JSON string of default environment variables
      */
-    default_env: string | null;
+    default_env: {
+        [key: string]: string;
+    } | null;
     /**
      * Additional Env
      * JSON string of environment variables that will be added to server creator
      */
-    additional_env: string | null;
+    additional_env: {
+        [key: string]: string;
+    } | null;
     /**
      * Resource Min Cpu
      * Minimum CPU resources required
@@ -422,9 +469,75 @@ export type Templates = {
 };
 
 /**
- * UserPublic
+ * TemplatesRead
  */
-export type UserPublic = {
+export type TemplatesRead = {
+    /**
+     * Name
+     * Template name
+     */
+    name: string;
+    /**
+     * Image
+     * Docker image name
+     */
+    image: string;
+    /**
+     * Tags
+     * Comma-separated tags for the template
+     */
+    tags: Array<string>;
+    /**
+     * Default Env
+     * JSON string of default environment variables
+     */
+    default_env: {
+        [key: string]: string;
+    } | null;
+    /**
+     * Additional Env
+     * JSON string of environment variables that will be added to server creator
+     */
+    additional_env: {
+        [key: string]: string;
+    } | null;
+    /**
+     * Resource Min Cpu
+     * Minimum CPU resources required
+     */
+    resource_min_cpu: number | null;
+    /**
+     * Resource Min Disk
+     * Minimum Disk resources required
+     */
+    resource_min_disk: number | null;
+    /**
+     * Resource Min Mem
+     * Minimum Memory resources required
+     */
+    resource_min_mem: number | null;
+    /**
+     * Id
+     */
+    id: number;
+};
+
+/**
+ * UserListResponse
+ */
+export type UserListResponse = {
+    /**
+     * Items
+     */
+    items: {
+        [key: string]: number;
+    };
+};
+
+/**
+ * UsersBase
+ */
+export type UsersBase = {
     /**
      * Username
      * Username
@@ -433,11 +546,11 @@ export type UserPublic = {
     /**
      * Disabled
      */
-    disabled?: boolean | null;
+    disabled?: boolean;
     /**
      * Admin
      */
-    admin?: boolean | null;
+    admin?: boolean;
 };
 
 /**
@@ -472,177 +585,7 @@ export type CreateUserRequestWritable = {
     password: string;
 };
 
-export type ListContainersApiContainerListGetData = {
-    body?: never;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
-    path?: never;
-    query?: never;
-    url: '/api/container/list';
-};
-
-export type ListContainersApiContainerListGetErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type ListContainersApiContainerListGetError = ListContainersApiContainerListGetErrors[keyof ListContainersApiContainerListGetErrors];
-
-export type ListContainersApiContainerListGetResponses = {
-    /**
-     * Successful Response
-     */
-    200: ContainerListResponse;
-};
-
-export type ListContainersApiContainerListGetResponse = ListContainersApiContainerListGetResponses[keyof ListContainersApiContainerListGetResponses];
-
-export type StartContainerApiContainerNameStartGetData = {
-    body?: never;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
-    path: {
-        /**
-         * Name
-         */
-        name: string;
-    };
-    query?: never;
-    url: '/api/container/{name}/start';
-};
-
-export type StartContainerApiContainerNameStartGetErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type StartContainerApiContainerNameStartGetError = StartContainerApiContainerNameStartGetErrors[keyof StartContainerApiContainerNameStartGetErrors];
-
-export type StartContainerApiContainerNameStartGetResponses = {
-    /**
-     * Successful Response
-     */
-    200: ContainerStartResponse;
-};
-
-export type StartContainerApiContainerNameStartGetResponse = StartContainerApiContainerNameStartGetResponses[keyof StartContainerApiContainerNameStartGetResponses];
-
-export type StopContainerApiContainerNameStopGetData = {
-    body?: never;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
-    path: {
-        /**
-         * Name
-         */
-        name: string;
-    };
-    query?: never;
-    url: '/api/container/{name}/stop';
-};
-
-export type StopContainerApiContainerNameStopGetErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type StopContainerApiContainerNameStopGetError = StopContainerApiContainerNameStopGetErrors[keyof StopContainerApiContainerNameStopGetErrors];
-
-export type StopContainerApiContainerNameStopGetResponses = {
-    /**
-     * Successful Response
-     */
-    200: ContainerStopResponse;
-};
-
-export type StopContainerApiContainerNameStopGetResponse = StopContainerApiContainerNameStopGetResponses[keyof StopContainerApiContainerNameStopGetResponses];
-
-export type CreateContainerApiContainerCreateTemplateNamePostData = {
-    body: ContainerCreateRequest;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
-    path?: never;
-    query?: never;
-    url: '/api/container/create/{template_name}';
-};
-
-export type CreateContainerApiContainerCreateTemplateNamePostErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type CreateContainerApiContainerCreateTemplateNamePostError = CreateContainerApiContainerCreateTemplateNamePostErrors[keyof CreateContainerApiContainerCreateTemplateNamePostErrors];
-
-export type CreateContainerApiContainerCreateTemplateNamePostResponses = {
-    /**
-     * Successful Response
-     */
-    200: ContainerCreateResponse;
-};
-
-export type CreateContainerApiContainerCreateTemplateNamePostResponse = CreateContainerApiContainerCreateTemplateNamePostResponses[keyof CreateContainerApiContainerCreateTemplateNamePostResponses];
-
-export type GetContainerStatusApiContainerContainerNameStatusGetData = {
-    body?: never;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
-    path: {
-        /**
-         * Container Name
-         */
-        container_name: string;
-    };
-    query?: never;
-    url: '/api/container/{container_name}/status';
-};
-
-export type GetContainerStatusApiContainerContainerNameStatusGetErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type GetContainerStatusApiContainerContainerNameStatusGetError = GetContainerStatusApiContainerContainerNameStatusGetErrors[keyof GetContainerStatusApiContainerContainerNameStatusGetErrors];
-
-export type GetContainerStatusApiContainerContainerNameStatusGetResponses = {
-    /**
-     * Successful Response
-     */
-    200: ContainerStatusResponse;
-};
-
-export type GetContainerStatusApiContainerContainerNameStatusGetResponse = GetContainerStatusApiContainerContainerNameStatusGetResponses[keyof GetContainerStatusApiContainerContainerNameStatusGetResponses];
-
-export type GetLogMessageApiContainerContainerNameLogsGetData = {
+export type GetLogMessageData = {
     body?: never;
     headers?: {
         /**
@@ -662,185 +605,28 @@ export type GetLogMessageApiContainerContainerNameLogsGetData = {
          */
         line_count?: number | null;
     };
-    url: '/api/container/{container_name}/logs';
+    url: '/container/{container_name}/logs';
 };
 
-export type GetLogMessageApiContainerContainerNameLogsGetErrors = {
+export type GetLogMessageErrors = {
     /**
      * Validation Error
      */
     422: HttpValidationError;
 };
 
-export type GetLogMessageApiContainerContainerNameLogsGetError = GetLogMessageApiContainerContainerNameLogsGetErrors[keyof GetLogMessageApiContainerContainerNameLogsGetErrors];
+export type GetLogMessageError = GetLogMessageErrors[keyof GetLogMessageErrors];
 
-export type GetLogMessageApiContainerContainerNameLogsGetResponses = {
+export type GetLogMessageResponses = {
     /**
      * Successful Response
      */
     200: ContainerLogsResponse;
 };
 
-export type GetLogMessageApiContainerContainerNameLogsGetResponse = GetLogMessageApiContainerContainerNameLogsGetResponses[keyof GetLogMessageApiContainerContainerNameLogsGetResponses];
+export type GetLogMessageResponse = GetLogMessageResponses[keyof GetLogMessageResponses];
 
-export type GetDirectoryFilenamesApiContainerContainerNameFsListGetData = {
-    body?: never;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
-    path: {
-        /**
-         * Container Name
-         */
-        container_name: string;
-    };
-    query: {
-        /**
-         * Path
-         */
-        path: string;
-    };
-    url: '/api/container/{container_name}/fs/list';
-};
-
-export type GetDirectoryFilenamesApiContainerContainerNameFsListGetErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type GetDirectoryFilenamesApiContainerContainerNameFsListGetError = GetDirectoryFilenamesApiContainerContainerNameFsListGetErrors[keyof GetDirectoryFilenamesApiContainerContainerNameFsListGetErrors];
-
-export type GetDirectoryFilenamesApiContainerContainerNameFsListGetResponses = {
-    /**
-     * Successful Response
-     */
-    200: ContainerFileListResponse;
-};
-
-export type GetDirectoryFilenamesApiContainerContainerNameFsListGetResponse = GetDirectoryFilenamesApiContainerContainerNameFsListGetResponses[keyof GetDirectoryFilenamesApiContainerContainerNameFsListGetResponses];
-
-export type ReadFileApiContainerContainerNameFsGetData = {
-    body?: never;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
-    path: {
-        /**
-         * Container Name
-         */
-        container_name: string;
-    };
-    query: {
-        /**
-         * Path
-         */
-        path: string;
-    };
-    url: '/api/container/{container_name}/fs';
-};
-
-export type ReadFileApiContainerContainerNameFsGetErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type ReadFileApiContainerContainerNameFsGetError = ReadFileApiContainerContainerNameFsGetErrors[keyof ReadFileApiContainerContainerNameFsGetErrors];
-
-export type ReadFileApiContainerContainerNameFsGetResponses = {
-    /**
-     * Successful Response
-     */
-    200: unknown;
-};
-
-export type UploadFileApiContainerContainerNameFsUploadPostData = {
-    body: BodyUploadFileApiContainerContainerNameFsUploadPost;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
-    path: {
-        /**
-         * Container Name
-         */
-        container_name: string;
-    };
-    query?: never;
-    url: '/api/container/{container_name}/fs/upload/';
-};
-
-export type UploadFileApiContainerContainerNameFsUploadPostErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type UploadFileApiContainerContainerNameFsUploadPostError = UploadFileApiContainerContainerNameFsUploadPostErrors[keyof UploadFileApiContainerContainerNameFsUploadPostErrors];
-
-export type UploadFileApiContainerContainerNameFsUploadPostResponses = {
-    /**
-     * Successful Response
-     */
-    200: ContainerFileUploadResponse;
-};
-
-export type UploadFileApiContainerContainerNameFsUploadPostResponse = UploadFileApiContainerContainerNameFsUploadPostResponses[keyof UploadFileApiContainerContainerNameFsUploadPostResponses];
-
-export type DeleteFileApiContainerContainerNameFsDeletePostData = {
-    body?: never;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
-    path: {
-        /**
-         * Container Name
-         */
-        container_name: string;
-    };
-    query: {
-        /**
-         * Path
-         */
-        path: string;
-    };
-    url: '/api/container/{container_name}/fs/delete/';
-};
-
-export type DeleteFileApiContainerContainerNameFsDeletePostErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type DeleteFileApiContainerContainerNameFsDeletePostError = DeleteFileApiContainerContainerNameFsDeletePostErrors[keyof DeleteFileApiContainerContainerNameFsDeletePostErrors];
-
-export type DeleteFileApiContainerContainerNameFsDeletePostResponses = {
-    /**
-     * Successful Response
-     */
-    200: ContainerFileDeleteResponse;
-};
-
-export type DeleteFileApiContainerContainerNameFsDeletePostResponse = DeleteFileApiContainerContainerNameFsDeletePostResponses[keyof DeleteFileApiContainerContainerNameFsDeletePostResponses];
-
-export type SendCommandApiContainerContainerNameCommandGetData = {
+export type SendCommandData = {
     body?: never;
     headers?: {
         /**
@@ -860,28 +646,28 @@ export type SendCommandApiContainerContainerNameCommandGetData = {
          */
         command: string;
     };
-    url: '/api/container/{container_name}/command';
+    url: '/container/{container_name}/command';
 };
 
-export type SendCommandApiContainerContainerNameCommandGetErrors = {
+export type SendCommandErrors = {
     /**
      * Validation Error
      */
     422: HttpValidationError;
 };
 
-export type SendCommandApiContainerContainerNameCommandGetError = SendCommandApiContainerContainerNameCommandGetErrors[keyof SendCommandApiContainerContainerNameCommandGetErrors];
+export type SendCommandError = SendCommandErrors[keyof SendCommandErrors];
 
-export type SendCommandApiContainerContainerNameCommandGetResponses = {
+export type SendCommandResponses = {
     /**
      * Successful Response
      */
     200: ContainerCommandResponse;
 };
 
-export type SendCommandApiContainerContainerNameCommandGetResponse = SendCommandApiContainerContainerNameCommandGetResponses[keyof SendCommandApiContainerContainerNameCommandGetResponses];
+export type SendCommandResponse = SendCommandResponses[keyof SendCommandResponses];
 
-export type DeleteContainerApiContainerContainerNameDeleteGetData = {
+export type ReadFileData = {
     body?: never;
     headers?: {
         /**
@@ -895,60 +681,32 @@ export type DeleteContainerApiContainerContainerNameDeleteGetData = {
          */
         container_name: string;
     };
-    query?: never;
-    url: '/api/container/{container_name}/delete';
-};
-
-export type DeleteContainerApiContainerContainerNameDeleteGetErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type DeleteContainerApiContainerContainerNameDeleteGetError = DeleteContainerApiContainerContainerNameDeleteGetErrors[keyof DeleteContainerApiContainerContainerNameDeleteGetErrors];
-
-export type DeleteContainerApiContainerContainerNameDeleteGetResponses = {
-    /**
-     * Successful Response
-     */
-    200: ContainerDeleteResponse;
-};
-
-export type DeleteContainerApiContainerContainerNameDeleteGetResponse = DeleteContainerApiContainerContainerNameDeleteGetResponses[keyof DeleteContainerApiContainerContainerNameDeleteGetResponses];
-
-export type ListTemplatesApiTemplateListGetData = {
-    body?: never;
-    headers?: {
+    query: {
         /**
-         * Authorization
+         * Path
          */
-        authorization?: string | null;
+        path: string;
     };
-    path?: never;
-    query?: never;
-    url: '/api/template/list';
+    url: '/container/{container_name}/fs';
 };
 
-export type ListTemplatesApiTemplateListGetErrors = {
+export type ReadFileErrors = {
     /**
      * Validation Error
      */
     422: HttpValidationError;
 };
 
-export type ListTemplatesApiTemplateListGetError = ListTemplatesApiTemplateListGetErrors[keyof ListTemplatesApiTemplateListGetErrors];
+export type ReadFileError = ReadFileErrors[keyof ReadFileErrors];
 
-export type ListTemplatesApiTemplateListGetResponses = {
+export type ReadFileResponses = {
     /**
      * Successful Response
      */
-    200: TemplateListResponse;
+    200: unknown;
 };
 
-export type ListTemplatesApiTemplateListGetResponse = ListTemplatesApiTemplateListGetResponses[keyof ListTemplatesApiTemplateListGetResponses];
-
-export type GetTemplateNameApiTemplateNameGetData = {
+export type DeleteFileData = {
     body?: never;
     headers?: {
         /**
@@ -958,34 +716,114 @@ export type GetTemplateNameApiTemplateNameGetData = {
     };
     path: {
         /**
-         * Name
+         * Container Name
          */
-        name: string;
+        container_name: string;
+        /**
+         * Path
+         */
+        path: string;
     };
     query?: never;
-    url: '/api/template/{name}';
+    url: '/container/{container_name}/fs/{path}';
 };
 
-export type GetTemplateNameApiTemplateNameGetErrors = {
+export type DeleteFileErrors = {
     /**
      * Validation Error
      */
     422: HttpValidationError;
 };
 
-export type GetTemplateNameApiTemplateNameGetError = GetTemplateNameApiTemplateNameGetErrors[keyof GetTemplateNameApiTemplateNameGetErrors];
+export type DeleteFileError = DeleteFileErrors[keyof DeleteFileErrors];
 
-export type GetTemplateNameApiTemplateNameGetResponses = {
+export type DeleteFileResponses = {
     /**
      * Successful Response
      */
-    200: Templates;
+    200: ContainerFileDeleteResponse;
 };
 
-export type GetTemplateNameApiTemplateNameGetResponse = GetTemplateNameApiTemplateNameGetResponses[keyof GetTemplateNameApiTemplateNameGetResponses];
+export type DeleteFileResponse = DeleteFileResponses[keyof DeleteFileResponses];
 
-export type AddTemplateApiTemplateCreatePostData = {
-    body: Templates;
+export type UploadFileData = {
+    body: BodyUploadFileContainerContainerNameFsPathPost;
+    headers?: {
+        /**
+         * Authorization
+         */
+        authorization?: string | null;
+    };
+    path: {
+        /**
+         * Container Name
+         */
+        container_name: string;
+        /**
+         * Path
+         */
+        path: string;
+    };
+    query?: never;
+    url: '/container/{container_name}/fs/{path}';
+};
+
+export type UploadFileErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type UploadFileError = UploadFileErrors[keyof UploadFileErrors];
+
+export type UploadFileResponses = {
+    /**
+     * Successful Response
+     */
+    200: ContainerFileUploadResponse;
+};
+
+export type UploadFileResponse = UploadFileResponses[keyof UploadFileResponses];
+
+export type GetTemplateData = {
+    body?: never;
+    headers?: {
+        /**
+         * Authorization
+         */
+        authorization?: string | null;
+    };
+    path: {
+        /**
+         * Template Id
+         */
+        template_id: number;
+    };
+    query?: never;
+    url: '/template/{template_id}';
+};
+
+export type GetTemplateErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GetTemplateError = GetTemplateErrors[keyof GetTemplateErrors];
+
+export type GetTemplateResponses = {
+    /**
+     * Successful Response
+     */
+    200: TemplatesRead;
+};
+
+export type GetTemplateResponse = GetTemplateResponses[keyof GetTemplateResponses];
+
+export type AddTemplateData = {
+    body: TemplatesBase;
     headers?: {
         /**
          * Authorization
@@ -994,29 +832,29 @@ export type AddTemplateApiTemplateCreatePostData = {
     };
     path?: never;
     query?: never;
-    url: '/api/template/create';
+    url: '/template/create';
 };
 
-export type AddTemplateApiTemplateCreatePostErrors = {
+export type AddTemplateErrors = {
     /**
      * Validation Error
      */
     422: HttpValidationError;
 };
 
-export type AddTemplateApiTemplateCreatePostError = AddTemplateApiTemplateCreatePostErrors[keyof AddTemplateApiTemplateCreatePostErrors];
+export type AddTemplateError = AddTemplateErrors[keyof AddTemplateErrors];
 
-export type AddTemplateApiTemplateCreatePostResponses = {
+export type AddTemplateResponses = {
     /**
      * Successful Response
      */
     200: TemplateCreateResponse;
 };
 
-export type AddTemplateApiTemplateCreatePostResponse = AddTemplateApiTemplateCreatePostResponses[keyof AddTemplateApiTemplateCreatePostResponses];
+export type AddTemplateResponse = AddTemplateResponses[keyof AddTemplateResponses];
 
-export type DeleteTemplateApiTemplateNameDeletePostData = {
-    body: TemplateDeleteRequest;
+export type DeleteTemplateData = {
+    body?: never;
     headers?: {
         /**
          * Authorization
@@ -1024,60 +862,82 @@ export type DeleteTemplateApiTemplateNameDeletePostData = {
         authorization?: string | null;
     };
     path?: never;
-    query?: never;
-    url: '/api/template/{name}/delete';
+    query: {
+        /**
+         * Template Id
+         */
+        template_id: number;
+    };
+    url: '/template/{name}/delete';
 };
 
-export type DeleteTemplateApiTemplateNameDeletePostErrors = {
+export type DeleteTemplateErrors = {
     /**
      * Validation Error
      */
     422: HttpValidationError;
 };
 
-export type DeleteTemplateApiTemplateNameDeletePostError = DeleteTemplateApiTemplateNameDeletePostErrors[keyof DeleteTemplateApiTemplateNameDeletePostErrors];
+export type DeleteTemplateError = DeleteTemplateErrors[keyof DeleteTemplateErrors];
 
-export type DeleteTemplateApiTemplateNameDeletePostResponses = {
+export type DeleteTemplateResponses = {
     /**
      * Successful Response
      */
     200: TemplateDeleteResponse;
 };
 
-export type DeleteTemplateApiTemplateNameDeletePostResponse = DeleteTemplateApiTemplateNameDeletePostResponses[keyof DeleteTemplateApiTemplateNameDeletePostResponses];
+export type DeleteTemplateResponse = DeleteTemplateResponses[keyof DeleteTemplateResponses];
 
-export type HardwareApiNodesHardwareGetData = {
-    body?: never;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
+export type LoginUserData = {
+    body: BodyLoginUserSystemTokenPost;
     path?: never;
     query?: never;
-    url: '/api/nodes/hardware';
+    url: '/system/token';
 };
 
-export type HardwareApiNodesHardwareGetErrors = {
+export type LoginUserErrors = {
     /**
      * Validation Error
      */
     422: HttpValidationError;
 };
 
-export type HardwareApiNodesHardwareGetError = HardwareApiNodesHardwareGetErrors[keyof HardwareApiNodesHardwareGetErrors];
+export type LoginUserError = LoginUserErrors[keyof LoginUserErrors];
 
-export type HardwareApiNodesHardwareGetResponses = {
+export type LoginUserResponses = {
     /**
      * Successful Response
      */
-    200: Nodes;
+    200: unknown;
 };
 
-export type HardwareApiNodesHardwareGetResponse = HardwareApiNodesHardwareGetResponses[keyof HardwareApiNodesHardwareGetResponses];
+export type CreateUserAccountData = {
+    body: CreateUserRequestWritable;
+    path?: never;
+    query?: never;
+    url: '/system/create';
+};
 
-export type DiskUsageApiNodesDiskUsageGetData = {
+export type CreateUserAccountErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CreateUserAccountError = CreateUserAccountErrors[keyof CreateUserAccountErrors];
+
+export type CreateUserAccountResponses = {
+    /**
+     * Successful Response
+     */
+    200: UsersBase;
+};
+
+export type CreateUserAccountResponse = CreateUserAccountResponses[keyof CreateUserAccountResponses];
+
+export type LogoutUserData = {
     body?: never;
     headers?: {
         /**
@@ -1087,28 +947,419 @@ export type DiskUsageApiNodesDiskUsageGetData = {
     };
     path?: never;
     query?: never;
-    url: '/api/nodes/disk_usage';
+    url: '/system/revoke';
 };
 
-export type DiskUsageApiNodesDiskUsageGetErrors = {
+export type LogoutUserErrors = {
     /**
      * Validation Error
      */
     422: HttpValidationError;
 };
 
-export type DiskUsageApiNodesDiskUsageGetError = DiskUsageApiNodesDiskUsageGetErrors[keyof DiskUsageApiNodesDiskUsageGetErrors];
+export type LogoutUserError = LogoutUserErrors[keyof LogoutUserErrors];
 
-export type DiskUsageApiNodesDiskUsageGetResponses = {
+export type LogoutUserResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
+
+export type GetUserData = {
+    body?: never;
+    headers?: {
+        /**
+         * Authorization
+         */
+        authorization?: string | null;
+    };
+    path?: never;
+    query?: never;
+    url: '/system/me';
+};
+
+export type GetUserErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GetUserError = GetUserErrors[keyof GetUserErrors];
+
+export type GetUserResponses = {
+    /**
+     * Successful Response
+     */
+    200: UsersBase;
+};
+
+export type GetUserResponse = GetUserResponses[keyof GetUserResponses];
+
+export type CreateServerData = {
+    body: ServersBase;
+    headers?: {
+        /**
+         * Authorization
+         */
+        authorization?: string | null;
+    };
+    path?: never;
+    query: {
+        /**
+         * Template Id
+         */
+        template_id: number;
+        /**
+         * Node Id
+         */
+        node_id: number;
+    };
+    url: '/server/';
+};
+
+export type CreateServerErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CreateServerError = CreateServerErrors[keyof CreateServerErrors];
+
+export type CreateServerResponses = {
+    /**
+     * Successful Response
+     */
+    200: ServersRead;
+};
+
+export type CreateServerResponse = CreateServerResponses[keyof CreateServerResponses];
+
+export type DeleteServerData = {
+    body?: never;
+    headers?: {
+        /**
+         * Authorization
+         */
+        authorization?: string | null;
+    };
+    path: {
+        /**
+         * Server Id
+         */
+        server_id: number;
+    };
+    query?: never;
+    url: '/server/{server_id}';
+};
+
+export type DeleteServerErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type DeleteServerError = DeleteServerErrors[keyof DeleteServerErrors];
+
+export type DeleteServerResponses = {
+    /**
+     * Successful Response
+     */
+    200: ServerDeleteResponse;
+};
+
+export type DeleteServerResponse = DeleteServerResponses[keyof DeleteServerResponses];
+
+export type GetServerInfoData = {
+    body?: never;
+    headers?: {
+        /**
+         * Authorization
+         */
+        authorization?: string | null;
+    };
+    path: {
+        /**
+         * Server Id
+         */
+        server_id: number | string;
+    };
+    query?: never;
+    url: '/server/{server_id}';
+};
+
+export type GetServerInfoErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GetServerInfoError = GetServerInfoErrors[keyof GetServerInfoErrors];
+
+export type GetServerInfoResponses = {
+    /**
+     * Successful Response
+     */
+    200: ServersRead;
+};
+
+export type GetServerInfoResponse = GetServerInfoResponses[keyof GetServerInfoResponses];
+
+export type StartServerData = {
+    body?: never;
+    headers?: {
+        /**
+         * Authorization
+         */
+        authorization?: string | null;
+    };
+    path: {
+        /**
+         * Server Id
+         */
+        server_id: number;
+    };
+    query?: never;
+    url: '/server/{server_id}/start';
+};
+
+export type StartServerErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type StartServerError = StartServerErrors[keyof StartServerErrors];
+
+export type StartServerResponses = {
+    /**
+     * Successful Response
+     */
+    200: ServerStartResponse;
+};
+
+export type StartServerResponse = StartServerResponses[keyof StartServerResponses];
+
+export type StopServerData = {
+    body?: never;
+    headers?: {
+        /**
+         * Authorization
+         */
+        authorization?: string | null;
+    };
+    path: {
+        /**
+         * Server Id
+         */
+        server_id: number;
+    };
+    query?: never;
+    url: '/server/{server_id}/stop';
+};
+
+export type StopServerErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type StopServerError = StopServerErrors[keyof StopServerErrors];
+
+export type StopServerResponses = {
+    /**
+     * Successful Response
+     */
+    200: ServerStopResponse;
+};
+
+export type StopServerResponse = StopServerResponses[keyof StopServerResponses];
+
+export type GetServerStatusData = {
+    body?: never;
+    headers?: {
+        /**
+         * Authorization
+         */
+        authorization?: string | null;
+    };
+    path: {
+        /**
+         * Server Id
+         */
+        server_id: number;
+    };
+    query?: never;
+    url: '/server/{server_id}/status';
+};
+
+export type GetServerStatusErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GetServerStatusError = GetServerStatusErrors[keyof GetServerStatusErrors];
+
+export type GetServerStatusResponses = {
+    /**
+     * Successful Response
+     */
+    200: ServerStatusResponse;
+};
+
+export type GetServerStatusResponse = GetServerStatusResponses[keyof GetServerStatusResponses];
+
+export type AddNodeData = {
+    body: NodesBase;
+    headers?: {
+        /**
+         * Authorization
+         */
+        authorization?: string | null;
+    };
+    path?: never;
+    query?: never;
+    url: '/nodes/';
+};
+
+export type AddNodeErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type AddNodeError = AddNodeErrors[keyof AddNodeErrors];
+
+export type AddNodeResponses = {
+    /**
+     * Successful Response
+     */
+    200: NodesRead;
+};
+
+export type AddNodeResponse = AddNodeResponses[keyof AddNodeResponses];
+
+export type DeleteNodeData = {
+    body?: never;
+    headers?: {
+        /**
+         * Authorization
+         */
+        authorization?: string | null;
+    };
+    path: {
+        /**
+         * Node Id
+         */
+        node_id: number;
+    };
+    query?: never;
+    url: '/nodes/{node_id}';
+};
+
+export type DeleteNodeErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type DeleteNodeError = DeleteNodeErrors[keyof DeleteNodeErrors];
+
+export type DeleteNodeResponses = {
+    /**
+     * Response Delete Node Nodes  Node Id  Delete
+     * Successful Response
+     */
+    200: {
+        [key: string]: unknown;
+    };
+};
+
+export type DeleteNodeResponse = DeleteNodeResponses[keyof DeleteNodeResponses];
+
+export type GetNodeData = {
+    body?: never;
+    headers?: {
+        /**
+         * Authorization
+         */
+        authorization?: string | null;
+    };
+    path: {
+        /**
+         * Node Id
+         */
+        node_id: number;
+    };
+    query?: never;
+    url: '/nodes/{node_id}';
+};
+
+export type GetNodeErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GetNodeError = GetNodeErrors[keyof GetNodeErrors];
+
+export type GetNodeResponses = {
+    /**
+     * Successful Response
+     */
+    200: NodesRead;
+};
+
+export type GetNodeResponse = GetNodeResponses[keyof GetNodeResponses];
+
+export type DiskUsageData = {
+    body?: never;
+    headers?: {
+        /**
+         * Authorization
+         */
+        authorization?: string | null;
+    };
+    path: {
+        /**
+         * Node Id
+         */
+        node_id: number;
+    };
+    query?: never;
+    url: '/nodes/{node_id}/disk_usage';
+};
+
+export type DiskUsageErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type DiskUsageError = DiskUsageErrors[keyof DiskUsageErrors];
+
+export type DiskUsageResponses = {
     /**
      * Successful Response
      */
     200: NodeDiskUsageResponse;
 };
 
-export type DiskUsageApiNodesDiskUsageGetResponse = DiskUsageApiNodesDiskUsageGetResponses[keyof DiskUsageApiNodesDiskUsageGetResponses];
+export type DiskUsageResponse = DiskUsageResponses[keyof DiskUsageResponses];
 
-export type RuntimeApiNodesRuntimeGetData = {
+export type RuntimeData = {
     body?: never;
     headers?: {
         /**
@@ -1116,30 +1367,35 @@ export type RuntimeApiNodesRuntimeGetData = {
          */
         authorization?: string | null;
     };
-    path?: never;
+    path: {
+        /**
+         * Node Id
+         */
+        node_id: number;
+    };
     query?: never;
-    url: '/api/nodes/runtime';
+    url: '/nodes/{node_id}/runtime';
 };
 
-export type RuntimeApiNodesRuntimeGetErrors = {
+export type RuntimeErrors = {
     /**
      * Validation Error
      */
     422: HttpValidationError;
 };
 
-export type RuntimeApiNodesRuntimeGetError = RuntimeApiNodesRuntimeGetErrors[keyof RuntimeApiNodesRuntimeGetErrors];
+export type RuntimeError = RuntimeErrors[keyof RuntimeErrors];
 
-export type RuntimeApiNodesRuntimeGetResponses = {
+export type RuntimeResponses = {
     /**
      * Successful Response
      */
     200: NodeUptimeResponse;
 };
 
-export type RuntimeApiNodesRuntimeGetResponse = RuntimeApiNodesRuntimeGetResponses[keyof RuntimeApiNodesRuntimeGetResponses];
+export type RuntimeResponse = RuntimeResponses[keyof RuntimeResponses];
 
-export type PingApiNodesPingGetData = {
+export type SearchData = {
     body?: never;
     headers?: {
         /**
@@ -1149,28 +1405,59 @@ export type PingApiNodesPingGetData = {
     };
     path?: never;
     query?: never;
-    url: '/api/nodes/ping';
+    url: '/search/users/';
 };
 
-export type PingApiNodesPingGetErrors = {
+export type SearchErrors = {
     /**
      * Validation Error
      */
     422: HttpValidationError;
 };
 
-export type PingApiNodesPingGetError = PingApiNodesPingGetErrors[keyof PingApiNodesPingGetErrors];
+export type SearchError = SearchErrors[keyof SearchErrors];
 
-export type PingApiNodesPingGetResponses = {
+export type SearchResponses = {
     /**
      * Successful Response
      */
-    200: NodePingResponse;
+    200: UserListResponse;
 };
 
-export type PingApiNodesPingGetResponse = PingApiNodesPingGetResponses[keyof PingApiNodesPingGetResponses];
+export type SearchResponse = SearchResponses[keyof SearchResponses];
 
-export type DeleteServerServerNameDeleteData = {
+export type SearchServersData = {
+    body?: never;
+    headers?: {
+        /**
+         * Authorization
+         */
+        authorization?: string | null;
+    };
+    path?: never;
+    query?: never;
+    url: '/search/servers/';
+};
+
+export type SearchServersErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type SearchServersError = SearchServersErrors[keyof SearchServersErrors];
+
+export type SearchServersResponses = {
+    /**
+     * Successful Response
+     */
+    200: ServerListResponse;
+};
+
+export type SearchServersResponse = SearchServersResponses[keyof SearchServersResponses];
+
+export type SearchFsData = {
     body?: never;
     headers?: {
         /**
@@ -1180,144 +1467,37 @@ export type DeleteServerServerNameDeleteData = {
     };
     path: {
         /**
-         * Server Name
+         * Container Name
          */
-        server_name: string;
-    };
-    query?: never;
-    url: '/{server_name}';
-};
-
-export type DeleteServerServerNameDeleteErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type DeleteServerServerNameDeleteError = DeleteServerServerNameDeleteErrors[keyof DeleteServerServerNameDeleteErrors];
-
-export type DeleteServerServerNameDeleteResponses = {
-    /**
-     * Successful Response
-     */
-    200: unknown;
-};
-
-export type GetServerInfoServerNameGetData = {
-    body?: never;
-    headers?: {
+        container_name: string;
         /**
-         * Authorization
+         * Path
          */
-        authorization?: string | null;
-    };
-    path: {
-        /**
-         * Server Name
-         */
-        server_name: string;
+        path: string;
     };
     query?: never;
-    url: '/{server_name}';
+    url: '/search/fs/{container_name}/{path}';
 };
 
-export type GetServerInfoServerNameGetErrors = {
+export type SearchFsErrors = {
     /**
      * Validation Error
      */
     422: HttpValidationError;
 };
 
-export type GetServerInfoServerNameGetError = GetServerInfoServerNameGetErrors[keyof GetServerInfoServerNameGetErrors];
+export type SearchFsError = SearchFsErrors[keyof SearchFsErrors];
 
-export type GetServerInfoServerNameGetResponses = {
+export type SearchFsResponses = {
     /**
      * Successful Response
      */
-    200: Servers;
+    200: ContainerFileListResponse;
 };
 
-export type GetServerInfoServerNameGetResponse = GetServerInfoServerNameGetResponses[keyof GetServerInfoServerNameGetResponses];
+export type SearchFsResponse = SearchFsResponses[keyof SearchFsResponses];
 
-export type CreateServerPostData = {
-    body: Servers;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
-    path?: never;
-    query?: never;
-    url: '/';
-};
-
-export type CreateServerPostErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type CreateServerPostError = CreateServerPostErrors[keyof CreateServerPostErrors];
-
-export type CreateServerPostResponses = {
-    /**
-     * Successful Response
-     */
-    200: unknown;
-};
-
-export type LoginUserTokenPostData = {
-    body: BodyLoginUserTokenPost;
-    path?: never;
-    query?: never;
-    url: '/token';
-};
-
-export type LoginUserTokenPostErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type LoginUserTokenPostError = LoginUserTokenPostErrors[keyof LoginUserTokenPostErrors];
-
-export type LoginUserTokenPostResponses = {
-    /**
-     * Successful Response
-     */
-    200: unknown;
-};
-
-export type CreateUserAccountCreatePostData = {
-    body: CreateUserRequestWritable;
-    path?: never;
-    query?: never;
-    url: '/create';
-};
-
-export type CreateUserAccountCreatePostErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type CreateUserAccountCreatePostError = CreateUserAccountCreatePostErrors[keyof CreateUserAccountCreatePostErrors];
-
-export type CreateUserAccountCreatePostResponses = {
-    /**
-     * Successful Response
-     */
-    200: UserPublic;
-};
-
-export type CreateUserAccountCreatePostResponse = CreateUserAccountCreatePostResponses[keyof CreateUserAccountCreatePostResponses];
-
-export type LogoutUserLogoutPostData = {
+export type SearchNodesData = {
     body?: never;
     headers?: {
         /**
@@ -1327,26 +1507,28 @@ export type LogoutUserLogoutPostData = {
     };
     path?: never;
     query?: never;
-    url: '/logout';
+    url: '/search/nodes/';
 };
 
-export type LogoutUserLogoutPostErrors = {
+export type SearchNodesErrors = {
     /**
      * Validation Error
      */
     422: HttpValidationError;
 };
 
-export type LogoutUserLogoutPostError = LogoutUserLogoutPostErrors[keyof LogoutUserLogoutPostErrors];
+export type SearchNodesError = SearchNodesErrors[keyof SearchNodesErrors];
 
-export type LogoutUserLogoutPostResponses = {
+export type SearchNodesResponses = {
     /**
      * Successful Response
      */
-    200: unknown;
+    200: NodeListResponse;
 };
 
-export type GetUserMePostData = {
+export type SearchNodesResponse = SearchNodesResponses[keyof SearchNodesResponses];
+
+export type SearchTemplatesData = {
     body?: never;
     headers?: {
         /**
@@ -1356,23 +1538,23 @@ export type GetUserMePostData = {
     };
     path?: never;
     query?: never;
-    url: '/me';
+    url: '/search/templates/';
 };
 
-export type GetUserMePostErrors = {
+export type SearchTemplatesErrors = {
     /**
      * Validation Error
      */
     422: HttpValidationError;
 };
 
-export type GetUserMePostError = GetUserMePostErrors[keyof GetUserMePostErrors];
+export type SearchTemplatesError = SearchTemplatesErrors[keyof SearchTemplatesErrors];
 
-export type GetUserMePostResponses = {
+export type SearchTemplatesResponses = {
     /**
      * Successful Response
      */
-    200: UserPublic;
+    200: TemplateListResponse;
 };
 
-export type GetUserMePostResponse = GetUserMePostResponses[keyof GetUserMePostResponses];
+export type SearchTemplatesResponse = SearchTemplatesResponses[keyof SearchTemplatesResponses];

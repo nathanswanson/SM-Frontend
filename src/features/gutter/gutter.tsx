@@ -10,15 +10,15 @@ import {
     CloseButton,
     IconButton
 } from '@chakra-ui/react'
-import { FaBars, FaBarsProgress, FaDatabase, FaGear, FaSwatchbook, FaUserLock } from 'react-icons/fa6'
+import { FaBars, FaGear, FaUserLock } from 'react-icons/fa6'
 import { MenuSelectButton } from './components/menu-select-button'
 
 import { useUserDataContext } from '../../providers/user-data'
-import { logoutUserLogoutPost } from '../../lib/hey-api/client/sdk.gen'
 import { ColorModeButton } from '../../lib/chakra/color-mode.js'
 import { TemplateCreateDialog } from './components/template-create-modal'
 import { NodeCreateDialog } from './components/node-create-modal'
 import { ServerCreationDialog } from './components/server-create-modal'
+import { logoutUser } from '../../lib/hey-api/client'
 
 const UserProfile = ({ ...props }) => {
     const { userData } = useUserDataContext()
@@ -81,7 +81,7 @@ const MenuOptions = ({ ...props }) => {
             </MenuSelectButton>
             <MenuSelectButton
                 onClick={async () => {
-                    await logoutUserLogoutPost({ credentials: 'include' }).then(() => {
+                    await logoutUser({ credentials: 'include' }).then(() => {
                         window.location.reload()
                     })
                 }}

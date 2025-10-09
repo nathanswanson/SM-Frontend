@@ -1,11 +1,12 @@
 import { createContext, useEffect, useState } from 'react'
 import { useContext } from 'react'
 import { ReactNode } from 'react'
-import { getContainerStatusApiContainerContainerNameStatusGet } from '../lib/hey-api/client'
+import { getServerInfo, getServerStatus, ServersBase, ServersRead } from '../lib/hey-api/client'
 import { useEffectOnce } from 'react-use'
 
 interface ISelectedServerContext {
     selectedServer: string | undefined
+    serverInfo: ServersRead | undefined
     serverOnline: boolean | undefined
     setServerOnline: (online: boolean) => void
     setSelectedServer: (id: string) => void
@@ -24,7 +25,7 @@ export const useSelectedServerContext = () => {
 export const SelectedServerProvider = ({ children }: { children: ReactNode }) => {
     const [selectedServer, setSelectedServer] = useState<string | undefined>(undefined)
     const [serverOnline, setServerOnline] = useState<boolean | undefined>(undefined)
-
+    const [serverInfo, setServerInfo] = useState<ServersRead | undefined>(undefined)
     useEffectOnce(() => {
         const saved = localStorage.getItem('selectedServer')
         if (saved) {
@@ -32,8 +33,27 @@ export const SelectedServerProvider = ({ children }: { children: ReactNode }) =>
         }
     })
 
+    // change serverInfo to match selectedServer
     useEffect(() => {
         if (selectedServer == undefined || selectedServer == '') {
+            setServerInfo(undefined)
+        } else {
+            const abortController = new AbortController()
+            getServerInfo({
+                credentials: 'include',
+                path: { server_id: selectedServer },
+                signal: abortController.signal
+            }).then(res => {
+                setServerInfo(res.data ?? undefined)
+            })
+            return () => {
+                abortController.abort()
+            }
+        }
+    }, [selectedServer])
+
+    useEffect(() => {
+        if (selectedServer == undefined || selectedServer == '' || serverInfo == undefined) {
             setServerOnline(undefined)
             localStorage.removeItem('selectedServer')
             return
@@ -41,9 +61,9 @@ export const SelectedServerProvider = ({ children }: { children: ReactNode }) =>
 
         const abortController = new AbortController()
 
-        getContainerStatusApiContainerContainerNameStatusGet({
+        getServerStatus({
             credentials: 'include',
-            path: { container_name: selectedServer },
+            path: { server_id: serverInfo.id ?? -1 },
             signal: abortController.signal
         }).then(res => {
             setServerOnline(res.data?.running)
@@ -53,10 +73,12 @@ export const SelectedServerProvider = ({ children }: { children: ReactNode }) =>
         return () => {
             abortController.abort()
         }
-    }, [selectedServer])
+    }, [serverInfo])
 
     return (
-        <SelectedServerContext.Provider value={{ selectedServer, setSelectedServer, serverOnline, setServerOnline }}>
+        <SelectedServerContext.Provider
+            value={{ selectedServer, serverInfo, setSelectedServer, serverOnline, setServerOnline }}
+        >
             {children}
         </SelectedServerContext.Provider>
     )

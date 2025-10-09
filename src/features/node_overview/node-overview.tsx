@@ -1,19 +1,19 @@
 import { AbsoluteCenter, Group, HStack, Spinner } from '@chakra-ui/react'
-import { hardwareApiNodesHardwareGet, Nodes } from '../../lib/hey-api/client'
 import { useState, ComponentProps } from 'react'
 import { useAsync } from 'react-use'
 import { AsyncState } from 'react-use/lib/useAsync'
 import { InfoList } from '../../components/info-list'
+import { getNode, NodesRead } from '../../lib/hey-api/client'
 
 interface IHardwareInfoProps extends ComponentProps<typeof Group> {
     hardwareState: AsyncState<void>
-    hardwareInfo: Nodes
+    hardwareInfo: NodesRead | undefined
 }
 
 export const NodeOverview = () => {
-    const [hardwareInfo, setHardwareInfo] = useState<Nodes | undefined>(undefined)
+    const [hardwareInfo, setHardwareInfo] = useState<NodesRead | undefined>(undefined)
     const hardwareState = useAsync(async () => {
-        const hardwareInfo = await hardwareApiNodesHardwareGet({ credentials: 'include' })
+        const hardwareInfo = await getNode({ credentials: 'include', path: { node_id: 1 } })
         setHardwareInfo(hardwareInfo.data)
     }, [])
 

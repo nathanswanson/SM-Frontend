@@ -7,20 +7,16 @@ import { Tooltip } from '../../../components/tooltip'
 import { useSelectedServerContext } from '../../../providers/selected-server-context'
 import { Spinner } from '@chakra-ui/react'
 import { useState } from 'react'
-import {
-    deleteContainerApiContainerContainerNameDeleteGet,
-    startContainerApiContainerNameStartGet,
-    stopContainerApiContainerNameStopGet
-} from '../../../lib/hey-api/client'
+import { deleteServer, startServer, stopServer } from '../../../lib/hey-api/client'
 
 export const ConsoleCommands = ({ ...props }) => {
-    const { selectedServer, setSelectedServer, serverOnline, setServerOnline } = useSelectedServerContext()
+    const { selectedServer, serverInfo, setSelectedServer, serverOnline, setServerOnline } = useSelectedServerContext()
     const [commandLoading, setCommandLoading] = useState(false)
 
-    const startServer = async () => {
+    const start_server = async () => {
         setCommandLoading(true)
         // await api call
-        startContainerApiContainerNameStartGet({ credentials: 'include', path: { name: selectedServer ?? '' } })
+        startServer({ credentials: 'include', path: { server_id: serverInfo?.id ?? -1 } })
             .then(response => {
                 if (response.response.ok) {
                     setServerOnline(true)
@@ -31,9 +27,9 @@ export const ConsoleCommands = ({ ...props }) => {
             })
     }
 
-    const stopServer = async () => {
+    const stop_server = async () => {
         setCommandLoading(true)
-        stopContainerApiContainerNameStopGet({ credentials: 'include', path: { name: selectedServer ?? '' } })
+        stopServer({ credentials: 'include', path: { server_id: serverInfo?.id ?? -1 } })
             .then(response => {
                 if (response.response.ok) {
                     setServerOnline(false)
@@ -46,28 +42,20 @@ export const ConsoleCommands = ({ ...props }) => {
 
     const restartServer = async () => {
         setCommandLoading(true)
-        const stopResponse = await stopContainerApiContainerNameStopGet({
-            credentials: 'include',
-            path: { name: selectedServer ?? '' }
-        })
-        if (stopResponse.response.ok) {
-            setServerOnline(false)
-        }
-        const startResponse = await startContainerApiContainerNameStartGet({
-            credentials: 'include',
-            path: { name: selectedServer ?? '' }
-        })
-        if (startResponse.response.ok) {
-            setServerOnline(true)
-        }
-        setCommandLoading(false)
+        stop_server()
+            .then(() => {
+                start_server()
+            })
+            .finally(() => {
+                setCommandLoading(false)
+            })
     }
 
-    const deleteServer = async () => {
+    const delete_server = async () => {
         setCommandLoading(true)
-        deleteContainerApiContainerContainerNameDeleteGet({
+        deleteServer({
             credentials: 'include',
-            path: { container_name: selectedServer ?? '' }
+            path: { server_id: serverInfo?.id ?? -1 }
         })
             .then(response => {
                 if (response.response.ok) {
@@ -83,11 +71,11 @@ export const ConsoleCommands = ({ ...props }) => {
     return (
         <HStack justifyContent={'space-between'} width="100%" {...props}>
             <ButtonGroup width="100%">
-                <CommandButton onClick={startServer} disabled={!selectedServer} label="Start" aria-label="start">
+                <CommandButton onClick={start_server} disabled={!selectedServer} label="Start" aria-label="start">
                     <RiPlayLargeFill />
                 </CommandButton>
                 <CommandButton
-                    onClick={stopServer}
+                    onClick={stop_server}
                     disabled={!selectedServer || !serverOnline}
                     label="Stop"
                     aria-label="stop"
@@ -103,7 +91,7 @@ export const ConsoleCommands = ({ ...props }) => {
                     <RiResetLeftFill />
                 </CommandButton>
 
-                <CommandButton onClick={deleteServer} disabled={!selectedServer} label="Delete" aria-label="delete">
+                <CommandButton onClick={delete_server} disabled={!selectedServer} label="Delete" aria-label="delete">
                     <RiDeleteBin7Fill />
                 </CommandButton>
             </ButtonGroup>

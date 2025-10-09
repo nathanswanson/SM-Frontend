@@ -2,7 +2,7 @@
 
 import { type Client, formDataBodySerializer, type Options as Options2, type TDataShape, urlSearchParamsBodySerializer } from './client';
 import { client } from './client.gen';
-import type { AddTemplateApiTemplateCreatePostData, AddTemplateApiTemplateCreatePostErrors, AddTemplateApiTemplateCreatePostResponses, CreateContainerApiContainerCreateTemplateNamePostData, CreateContainerApiContainerCreateTemplateNamePostErrors, CreateContainerApiContainerCreateTemplateNamePostResponses, CreateServerPostData, CreateServerPostErrors, CreateServerPostResponses, CreateUserAccountCreatePostData, CreateUserAccountCreatePostErrors, CreateUserAccountCreatePostResponses, DeleteContainerApiContainerContainerNameDeleteGetData, DeleteContainerApiContainerContainerNameDeleteGetErrors, DeleteContainerApiContainerContainerNameDeleteGetResponses, DeleteFileApiContainerContainerNameFsDeletePostData, DeleteFileApiContainerContainerNameFsDeletePostErrors, DeleteFileApiContainerContainerNameFsDeletePostResponses, DeleteServerServerNameDeleteData, DeleteServerServerNameDeleteErrors, DeleteServerServerNameDeleteResponses, DeleteTemplateApiTemplateNameDeletePostData, DeleteTemplateApiTemplateNameDeletePostErrors, DeleteTemplateApiTemplateNameDeletePostResponses, DiskUsageApiNodesDiskUsageGetData, DiskUsageApiNodesDiskUsageGetErrors, DiskUsageApiNodesDiskUsageGetResponses, GetContainerStatusApiContainerContainerNameStatusGetData, GetContainerStatusApiContainerContainerNameStatusGetErrors, GetContainerStatusApiContainerContainerNameStatusGetResponses, GetDirectoryFilenamesApiContainerContainerNameFsListGetData, GetDirectoryFilenamesApiContainerContainerNameFsListGetErrors, GetDirectoryFilenamesApiContainerContainerNameFsListGetResponses, GetLogMessageApiContainerContainerNameLogsGetData, GetLogMessageApiContainerContainerNameLogsGetErrors, GetLogMessageApiContainerContainerNameLogsGetResponses, GetServerInfoServerNameGetData, GetServerInfoServerNameGetErrors, GetServerInfoServerNameGetResponses, GetTemplateNameApiTemplateNameGetData, GetTemplateNameApiTemplateNameGetErrors, GetTemplateNameApiTemplateNameGetResponses, GetUserMePostData, GetUserMePostErrors, GetUserMePostResponses, HardwareApiNodesHardwareGetData, HardwareApiNodesHardwareGetErrors, HardwareApiNodesHardwareGetResponses, ListContainersApiContainerListGetData, ListContainersApiContainerListGetErrors, ListContainersApiContainerListGetResponses, ListTemplatesApiTemplateListGetData, ListTemplatesApiTemplateListGetErrors, ListTemplatesApiTemplateListGetResponses, LoginUserTokenPostData, LoginUserTokenPostErrors, LoginUserTokenPostResponses, LogoutUserLogoutPostData, LogoutUserLogoutPostErrors, LogoutUserLogoutPostResponses, PingApiNodesPingGetData, PingApiNodesPingGetErrors, PingApiNodesPingGetResponses, ReadFileApiContainerContainerNameFsGetData, ReadFileApiContainerContainerNameFsGetErrors, ReadFileApiContainerContainerNameFsGetResponses, RuntimeApiNodesRuntimeGetData, RuntimeApiNodesRuntimeGetErrors, RuntimeApiNodesRuntimeGetResponses, SendCommandApiContainerContainerNameCommandGetData, SendCommandApiContainerContainerNameCommandGetErrors, SendCommandApiContainerContainerNameCommandGetResponses, StartContainerApiContainerNameStartGetData, StartContainerApiContainerNameStartGetErrors, StartContainerApiContainerNameStartGetResponses, StopContainerApiContainerNameStopGetData, StopContainerApiContainerNameStopGetErrors, StopContainerApiContainerNameStopGetResponses, UploadFileApiContainerContainerNameFsUploadPostData, UploadFileApiContainerContainerNameFsUploadPostErrors, UploadFileApiContainerContainerNameFsUploadPostResponses } from './types.gen';
+import type { AddNodeData, AddNodeErrors, AddNodeResponses, AddTemplateData, AddTemplateErrors, AddTemplateResponses, CreateServerData, CreateServerErrors, CreateServerResponses, CreateUserAccountData, CreateUserAccountErrors, CreateUserAccountResponses, DeleteFileData, DeleteFileErrors, DeleteFileResponses, DeleteNodeData, DeleteNodeErrors, DeleteNodeResponses, DeleteServerData, DeleteServerErrors, DeleteServerResponses, DeleteTemplateData, DeleteTemplateErrors, DeleteTemplateResponses, DiskUsageData, DiskUsageErrors, DiskUsageResponses, GetLogMessageData, GetLogMessageErrors, GetLogMessageResponses, GetNodeData, GetNodeErrors, GetNodeResponses, GetServerInfoData, GetServerInfoErrors, GetServerInfoResponses, GetServerStatusData, GetServerStatusErrors, GetServerStatusResponses, GetTemplateData, GetTemplateErrors, GetTemplateResponses, GetUserData, GetUserErrors, GetUserResponses, LoginUserData, LoginUserErrors, LoginUserResponses, LogoutUserData, LogoutUserErrors, LogoutUserResponses, ReadFileData, ReadFileErrors, ReadFileResponses, RuntimeData, RuntimeErrors, RuntimeResponses, SearchData, SearchErrors, SearchFsData, SearchFsErrors, SearchFsResponses, SearchNodesData, SearchNodesErrors, SearchNodesResponses, SearchResponses, SearchServersData, SearchServersErrors, SearchServersResponses, SearchTemplatesData, SearchTemplatesErrors, SearchTemplatesResponses, SendCommandData, SendCommandErrors, SendCommandResponses, StartServerData, StartServerErrors, StartServerResponses, StopServerData, StopServerErrors, StopServerResponses, UploadFileData, UploadFileErrors, UploadFileResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -19,82 +19,23 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 };
 
 /**
- * List Containers
- * list all container names
- */
-export const listContainersApiContainerListGet = <ThrowOnError extends boolean = false>(options?: Options<ListContainersApiContainerListGetData, ThrowOnError>) => {
-    return (options?.client ?? client).get<ListContainersApiContainerListGetResponses, ListContainersApiContainerListGetErrors, ThrowOnError>({
-        url: '/api/container/list',
-        ...options
-    });
-};
-
-/**
- * Start Container
- * start a container by name
- */
-export const startContainerApiContainerNameStartGet = <ThrowOnError extends boolean = false>(options: Options<StartContainerApiContainerNameStartGetData, ThrowOnError>) => {
-    return (options.client ?? client).get<StartContainerApiContainerNameStartGetResponses, StartContainerApiContainerNameStartGetErrors, ThrowOnError>({
-        url: '/api/container/{name}/start',
-        ...options
-    });
-};
-
-/**
- * Stop Container
- * stop a container by name
- */
-export const stopContainerApiContainerNameStopGet = <ThrowOnError extends boolean = false>(options: Options<StopContainerApiContainerNameStopGetData, ThrowOnError>) => {
-    return (options.client ?? client).get<StopContainerApiContainerNameStopGetResponses, StopContainerApiContainerNameStopGetErrors, ThrowOnError>({
-        url: '/api/container/{name}/stop',
-        ...options
-    });
-};
-
-/**
- * Create Container
- * create a new container from a template
- */
-export const createContainerApiContainerCreateTemplateNamePost = <ThrowOnError extends boolean = false>(options: Options<CreateContainerApiContainerCreateTemplateNamePostData, ThrowOnError>) => {
-    return (options.client ?? client).post<CreateContainerApiContainerCreateTemplateNamePostResponses, CreateContainerApiContainerCreateTemplateNamePostErrors, ThrowOnError>({
-        url: '/api/container/create/{template_name}',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
-
-/**
- * Get Container Status
- * get container running status
- */
-export const getContainerStatusApiContainerContainerNameStatusGet = <ThrowOnError extends boolean = false>(options: Options<GetContainerStatusApiContainerContainerNameStatusGetData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetContainerStatusApiContainerContainerNameStatusGetResponses, GetContainerStatusApiContainerContainerNameStatusGetErrors, ThrowOnError>({
-        url: '/api/container/{container_name}/status',
-        ...options
-    });
-};
-
-/**
  * Get Log Message
  * get the last line_count lines of container logs, defaults to 25 if not specified
  */
-export const getLogMessageApiContainerContainerNameLogsGet = <ThrowOnError extends boolean = false>(options: Options<GetLogMessageApiContainerContainerNameLogsGetData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetLogMessageApiContainerContainerNameLogsGetResponses, GetLogMessageApiContainerContainerNameLogsGetErrors, ThrowOnError>({
-        url: '/api/container/{container_name}/logs',
+export const getLogMessage = <ThrowOnError extends boolean = false>(options: Options<GetLogMessageData, ThrowOnError>) => {
+    return (options.client ?? client).get<GetLogMessageResponses, GetLogMessageErrors, ThrowOnError>({
+        url: '/container/{container_name}/logs',
         ...options
     });
 };
 
 /**
- * Get Directory Filenames
- * list files in a container volume path
+ * Send Command
+ * send a command to a container
  */
-export const getDirectoryFilenamesApiContainerContainerNameFsListGet = <ThrowOnError extends boolean = false>(options: Options<GetDirectoryFilenamesApiContainerContainerNameFsListGetData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetDirectoryFilenamesApiContainerContainerNameFsListGetResponses, GetDirectoryFilenamesApiContainerContainerNameFsListGetErrors, ThrowOnError>({
-        url: '/api/container/{container_name}/fs/list',
+export const sendCommand = <ThrowOnError extends boolean = false>(options: Options<SendCommandData, ThrowOnError>) => {
+    return (options.client ?? client).get<SendCommandResponses, SendCommandErrors, ThrowOnError>({
+        url: '/container/{container_name}/command',
         ...options
     });
 };
@@ -103,9 +44,20 @@ export const getDirectoryFilenamesApiContainerContainerNameFsListGet = <ThrowOnE
  * Read File
  * read a file in a container volume, returns a tar archive of the file
  */
-export const readFileApiContainerContainerNameFsGet = <ThrowOnError extends boolean = false>(options: Options<ReadFileApiContainerContainerNameFsGetData, ThrowOnError>) => {
-    return (options.client ?? client).get<ReadFileApiContainerContainerNameFsGetResponses, ReadFileApiContainerContainerNameFsGetErrors, ThrowOnError>({
-        url: '/api/container/{container_name}/fs',
+export const readFile = <ThrowOnError extends boolean = false>(options: Options<ReadFileData, ThrowOnError>) => {
+    return (options.client ?? client).get<ReadFileResponses, ReadFileErrors, ThrowOnError>({
+        url: '/container/{container_name}/fs',
+        ...options
+    });
+};
+
+/**
+ * Delete File
+ * delete a file in a container volume
+ */
+export const deleteFile = <ThrowOnError extends boolean = false>(options: Options<DeleteFileData, ThrowOnError>) => {
+    return (options.client ?? client).delete<DeleteFileResponses, DeleteFileErrors, ThrowOnError>({
+        url: '/container/{container_name}/fs/{path}',
         ...options
     });
 };
@@ -114,10 +66,10 @@ export const readFileApiContainerContainerNameFsGet = <ThrowOnError extends bool
  * Upload File
  * upload a zip file to a container volume path, extracts zip and places contents in path
  */
-export const uploadFileApiContainerContainerNameFsUploadPost = <ThrowOnError extends boolean = false>(options: Options<UploadFileApiContainerContainerNameFsUploadPostData, ThrowOnError>) => {
-    return (options.client ?? client).post<UploadFileApiContainerContainerNameFsUploadPostResponses, UploadFileApiContainerContainerNameFsUploadPostErrors, ThrowOnError>({
+export const uploadFile = <ThrowOnError extends boolean = false>(options: Options<UploadFileData, ThrowOnError>) => {
+    return (options.client ?? client).post<UploadFileResponses, UploadFileErrors, ThrowOnError>({
         ...formDataBodySerializer,
-        url: '/api/container/{container_name}/fs/upload/',
+        url: '/container/{container_name}/fs/{path}',
         ...options,
         headers: {
             'Content-Type': null,
@@ -127,56 +79,12 @@ export const uploadFileApiContainerContainerNameFsUploadPost = <ThrowOnError ext
 };
 
 /**
- * Delete File
- * delete a file in a container volume
+ * Get Template
+ * get a template by id
  */
-export const deleteFileApiContainerContainerNameFsDeletePost = <ThrowOnError extends boolean = false>(options: Options<DeleteFileApiContainerContainerNameFsDeletePostData, ThrowOnError>) => {
-    return (options.client ?? client).post<DeleteFileApiContainerContainerNameFsDeletePostResponses, DeleteFileApiContainerContainerNameFsDeletePostErrors, ThrowOnError>({
-        url: '/api/container/{container_name}/fs/delete/',
-        ...options
-    });
-};
-
-/**
- * Send Command
- * send a command to a container
- */
-export const sendCommandApiContainerContainerNameCommandGet = <ThrowOnError extends boolean = false>(options: Options<SendCommandApiContainerContainerNameCommandGetData, ThrowOnError>) => {
-    return (options.client ?? client).get<SendCommandApiContainerContainerNameCommandGetResponses, SendCommandApiContainerContainerNameCommandGetErrors, ThrowOnError>({
-        url: '/api/container/{container_name}/command',
-        ...options
-    });
-};
-
-/**
- * Delete Container
- * delete a container by name
- */
-export const deleteContainerApiContainerContainerNameDeleteGet = <ThrowOnError extends boolean = false>(options: Options<DeleteContainerApiContainerContainerNameDeleteGetData, ThrowOnError>) => {
-    return (options.client ?? client).get<DeleteContainerApiContainerContainerNameDeleteGetResponses, DeleteContainerApiContainerContainerNameDeleteGetErrors, ThrowOnError>({
-        url: '/api/container/{container_name}/delete',
-        ...options
-    });
-};
-
-/**
- * List Templates
- * list all template names
- */
-export const listTemplatesApiTemplateListGet = <ThrowOnError extends boolean = false>(options?: Options<ListTemplatesApiTemplateListGetData, ThrowOnError>) => {
-    return (options?.client ?? client).get<ListTemplatesApiTemplateListGetResponses, ListTemplatesApiTemplateListGetErrors, ThrowOnError>({
-        url: '/api/template/list',
-        ...options
-    });
-};
-
-/**
- * Get Template Name
- * get a template by name
- */
-export const getTemplateNameApiTemplateNameGet = <ThrowOnError extends boolean = false>(options: Options<GetTemplateNameApiTemplateNameGetData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetTemplateNameApiTemplateNameGetResponses, GetTemplateNameApiTemplateNameGetErrors, ThrowOnError>({
-        url: '/api/template/{name}',
+export const getTemplate = <ThrowOnError extends boolean = false>(options: Options<GetTemplateData, ThrowOnError>) => {
+    return (options.client ?? client).get<GetTemplateResponses, GetTemplateErrors, ThrowOnError>({
+        url: '/template/{template_id}',
         ...options
     });
 };
@@ -185,9 +93,9 @@ export const getTemplateNameApiTemplateNameGet = <ThrowOnError extends boolean =
  * Add Template
  * add a new template
  */
-export const addTemplateApiTemplateCreatePost = <ThrowOnError extends boolean = false>(options: Options<AddTemplateApiTemplateCreatePostData, ThrowOnError>) => {
-    return (options.client ?? client).post<AddTemplateApiTemplateCreatePostResponses, AddTemplateApiTemplateCreatePostErrors, ThrowOnError>({
-        url: '/api/template/create',
+export const addTemplate = <ThrowOnError extends boolean = false>(options: Options<AddTemplateData, ThrowOnError>) => {
+    return (options.client ?? client).post<AddTemplateResponses, AddTemplateErrors, ThrowOnError>({
+        url: '/template/create',
         ...options,
         headers: {
             'Content-Type': 'application/json',
@@ -200,96 +108,10 @@ export const addTemplateApiTemplateCreatePost = <ThrowOnError extends boolean = 
  * Delete Template
  * delete a template by name
  */
-export const deleteTemplateApiTemplateNameDeletePost = <ThrowOnError extends boolean = false>(options: Options<DeleteTemplateApiTemplateNameDeletePostData, ThrowOnError>) => {
-    return (options.client ?? client).post<DeleteTemplateApiTemplateNameDeletePostResponses, DeleteTemplateApiTemplateNameDeletePostErrors, ThrowOnError>({
-        url: '/api/template/{name}/delete',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
-
-/**
- * Hardware
- * return hardware information in form of a Nodes object
- * fields: id, name, architecture, cpu_cores, memory, disk, cpu_name
- */
-export const hardwareApiNodesHardwareGet = <ThrowOnError extends boolean = false>(options?: Options<HardwareApiNodesHardwareGetData, ThrowOnError>) => {
-    return (options?.client ?? client).get<HardwareApiNodesHardwareGetResponses, HardwareApiNodesHardwareGetErrors, ThrowOnError>({
-        url: '/api/nodes/hardware',
+export const deleteTemplate = <ThrowOnError extends boolean = false>(options: Options<DeleteTemplateData, ThrowOnError>) => {
+    return (options.client ?? client).delete<DeleteTemplateResponses, DeleteTemplateErrors, ThrowOnError>({
+        url: '/template/{name}/delete',
         ...options
-    });
-};
-
-/**
- * Disk Usage
- * return disk usage in bytes (used, total)
- */
-export const diskUsageApiNodesDiskUsageGet = <ThrowOnError extends boolean = false>(options?: Options<DiskUsageApiNodesDiskUsageGetData, ThrowOnError>) => {
-    return (options?.client ?? client).get<DiskUsageApiNodesDiskUsageGetResponses, DiskUsageApiNodesDiskUsageGetErrors, ThrowOnError>({
-        url: '/api/nodes/disk_usage',
-        ...options
-    });
-};
-
-/**
- * Runtime
- * return runtime in hours
- */
-export const runtimeApiNodesRuntimeGet = <ThrowOnError extends boolean = false>(options?: Options<RuntimeApiNodesRuntimeGetData, ThrowOnError>) => {
-    return (options?.client ?? client).get<RuntimeApiNodesRuntimeGetResponses, RuntimeApiNodesRuntimeGetErrors, ThrowOnError>({
-        url: '/api/nodes/runtime',
-        ...options
-    });
-};
-
-/**
- * Ping
- * ping the server
- */
-export const pingApiNodesPingGet = <ThrowOnError extends boolean = false>(options?: Options<PingApiNodesPingGetData, ThrowOnError>) => {
-    return (options?.client ?? client).get<PingApiNodesPingGetResponses, PingApiNodesPingGetErrors, ThrowOnError>({
-        url: '/api/nodes/ping',
-        ...options
-    });
-};
-
-/**
- * Delete Server
- * Delete a specific server
- */
-export const deleteServerServerNameDelete = <ThrowOnError extends boolean = false>(options: Options<DeleteServerServerNameDeleteData, ThrowOnError>) => {
-    return (options.client ?? client).delete<DeleteServerServerNameDeleteResponses, DeleteServerServerNameDeleteErrors, ThrowOnError>({
-        url: '/{server_name}',
-        ...options
-    });
-};
-
-/**
- * Get Server Info
- * Get information about a specific server
- */
-export const getServerInfoServerNameGet = <ThrowOnError extends boolean = false>(options: Options<GetServerInfoServerNameGetData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetServerInfoServerNameGetResponses, GetServerInfoServerNameGetErrors, ThrowOnError>({
-        url: '/{server_name}',
-        ...options
-    });
-};
-
-/**
- * Create Server
- * Create a new server
- */
-export const createServerPost = <ThrowOnError extends boolean = false>(options: Options<CreateServerPostData, ThrowOnError>) => {
-    return (options.client ?? client).post<CreateServerPostResponses, CreateServerPostErrors, ThrowOnError>({
-        url: '/',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
     });
 };
 
@@ -297,10 +119,10 @@ export const createServerPost = <ThrowOnError extends boolean = false>(options: 
  * Login User
  * login user, return access token in cookie
  */
-export const loginUserTokenPost = <ThrowOnError extends boolean = false>(options: Options<LoginUserTokenPostData, ThrowOnError>) => {
-    return (options.client ?? client).post<LoginUserTokenPostResponses, LoginUserTokenPostErrors, ThrowOnError>({
+export const loginUser = <ThrowOnError extends boolean = false>(options: Options<LoginUserData, ThrowOnError>) => {
+    return (options.client ?? client).post<LoginUserResponses, LoginUserErrors, ThrowOnError>({
         ...urlSearchParamsBodySerializer,
-        url: '/token',
+        url: '/system/token',
         ...options,
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -313,9 +135,9 @@ export const loginUserTokenPost = <ThrowOnError extends boolean = false>(options
  * Create User Account
  * create a new user account
  */
-export const createUserAccountCreatePost = <ThrowOnError extends boolean = false>(options: Options<CreateUserAccountCreatePostData, ThrowOnError>) => {
-    return (options.client ?? client).post<CreateUserAccountCreatePostResponses, CreateUserAccountCreatePostErrors, ThrowOnError>({
-        url: '/create',
+export const createUserAccount = <ThrowOnError extends boolean = false>(options: Options<CreateUserAccountData, ThrowOnError>) => {
+    return (options.client ?? client).post<CreateUserAccountResponses, CreateUserAccountErrors, ThrowOnError>({
+        url: '/system/create',
         ...options,
         headers: {
             'Content-Type': 'application/json',
@@ -327,9 +149,9 @@ export const createUserAccountCreatePost = <ThrowOnError extends boolean = false
 /**
  * Logout User
  */
-export const logoutUserLogoutPost = <ThrowOnError extends boolean = false>(options?: Options<LogoutUserLogoutPostData, ThrowOnError>) => {
-    return (options?.client ?? client).post<LogoutUserLogoutPostResponses, LogoutUserLogoutPostErrors, ThrowOnError>({
-        url: '/logout',
+export const logoutUser = <ThrowOnError extends boolean = false>(options?: Options<LogoutUserData, ThrowOnError>) => {
+    return (options?.client ?? client).post<LogoutUserResponses, LogoutUserErrors, ThrowOnError>({
+        url: '/system/revoke',
         ...options
     });
 };
@@ -338,9 +160,194 @@ export const logoutUserLogoutPost = <ThrowOnError extends boolean = false>(optio
  * Get User
  * get current user information
  */
-export const getUserMePost = <ThrowOnError extends boolean = false>(options?: Options<GetUserMePostData, ThrowOnError>) => {
-    return (options?.client ?? client).post<GetUserMePostResponses, GetUserMePostErrors, ThrowOnError>({
-        url: '/me',
+export const getUser = <ThrowOnError extends boolean = false>(options?: Options<GetUserData, ThrowOnError>) => {
+    return (options?.client ?? client).post<GetUserResponses, GetUserErrors, ThrowOnError>({
+        url: '/system/me',
+        ...options
+    });
+};
+
+/**
+ * Create Server
+ * Create a new server
+ */
+export const createServer = <ThrowOnError extends boolean = false>(options: Options<CreateServerData, ThrowOnError>) => {
+    return (options.client ?? client).post<CreateServerResponses, CreateServerErrors, ThrowOnError>({
+        url: '/server/',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+/**
+ * Delete Server
+ * Delete a specific server
+ */
+export const deleteServer = <ThrowOnError extends boolean = false>(options: Options<DeleteServerData, ThrowOnError>) => {
+    return (options.client ?? client).delete<DeleteServerResponses, DeleteServerErrors, ThrowOnError>({
+        url: '/server/{server_id}',
+        ...options
+    });
+};
+
+/**
+ * Get Server Info
+ * Get information about a specific server
+ */
+export const getServerInfo = <ThrowOnError extends boolean = false>(options: Options<GetServerInfoData, ThrowOnError>) => {
+    return (options.client ?? client).get<GetServerInfoResponses, GetServerInfoErrors, ThrowOnError>({
+        url: '/server/{server_id}',
+        ...options
+    });
+};
+
+/**
+ * Start Server
+ * Start a specific server
+ */
+export const startServer = <ThrowOnError extends boolean = false>(options: Options<StartServerData, ThrowOnError>) => {
+    return (options.client ?? client).post<StartServerResponses, StartServerErrors, ThrowOnError>({
+        url: '/server/{server_id}/start',
+        ...options
+    });
+};
+
+/**
+ * Stop Server
+ * Stop a specific server
+ */
+export const stopServer = <ThrowOnError extends boolean = false>(options: Options<StopServerData, ThrowOnError>) => {
+    return (options.client ?? client).post<StopServerResponses, StopServerErrors, ThrowOnError>({
+        url: '/server/{server_id}/stop',
+        ...options
+    });
+};
+
+/**
+ * Get Server Status
+ * Get the running status of a specific server
+ */
+export const getServerStatus = <ThrowOnError extends boolean = false>(options: Options<GetServerStatusData, ThrowOnError>) => {
+    return (options.client ?? client).get<GetServerStatusResponses, GetServerStatusErrors, ThrowOnError>({
+        url: '/server/{server_id}/status',
+        ...options
+    });
+};
+
+/**
+ * Add Node
+ * add a new node
+ */
+export const addNode = <ThrowOnError extends boolean = false>(options: Options<AddNodeData, ThrowOnError>) => {
+    return (options.client ?? client).post<AddNodeResponses, AddNodeErrors, ThrowOnError>({
+        url: '/nodes/',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+/**
+ * Delete Node
+ * delete a node by name
+ */
+export const deleteNode = <ThrowOnError extends boolean = false>(options: Options<DeleteNodeData, ThrowOnError>) => {
+    return (options.client ?? client).delete<DeleteNodeResponses, DeleteNodeErrors, ThrowOnError>({
+        url: '/nodes/{node_id}',
+        ...options
+    });
+};
+
+/**
+ * Get Node
+ * return hardware information in form of a Nodes object
+ * fields: id, name, architecture, cpu_cores, memory, disk, cpu_name
+ */
+export const getNode = <ThrowOnError extends boolean = false>(options: Options<GetNodeData, ThrowOnError>) => {
+    return (options.client ?? client).get<GetNodeResponses, GetNodeErrors, ThrowOnError>({
+        url: '/nodes/{node_id}',
+        ...options
+    });
+};
+
+/**
+ * Disk Usage
+ * return disk usage in bytes (used, total)
+ */
+export const diskUsage = <ThrowOnError extends boolean = false>(options: Options<DiskUsageData, ThrowOnError>) => {
+    return (options.client ?? client).get<DiskUsageResponses, DiskUsageErrors, ThrowOnError>({
+        url: '/nodes/{node_id}/disk_usage',
+        ...options
+    });
+};
+
+/**
+ * Runtime
+ * return runtime in hours
+ */
+export const runtime = <ThrowOnError extends boolean = false>(options: Options<RuntimeData, ThrowOnError>) => {
+    return (options.client ?? client).get<RuntimeResponses, RuntimeErrors, ThrowOnError>({
+        url: '/nodes/{node_id}/runtime',
+        ...options
+    });
+};
+
+/**
+ * Search
+ * Search for users by username or email
+ */
+export const search = <ThrowOnError extends boolean = false>(options?: Options<SearchData, ThrowOnError>) => {
+    return (options?.client ?? client).get<SearchResponses, SearchErrors, ThrowOnError>({
+        url: '/search/users/',
+        ...options
+    });
+};
+
+/**
+ * Search Servers
+ * Search for servers by name
+ */
+export const searchServers = <ThrowOnError extends boolean = false>(options?: Options<SearchServersData, ThrowOnError>) => {
+    return (options?.client ?? client).get<SearchServersResponses, SearchServersErrors, ThrowOnError>({
+        url: '/search/servers/',
+        ...options
+    });
+};
+
+/**
+ * Search Fs
+ * Search for files in a container's filesystem
+ */
+export const searchFs = <ThrowOnError extends boolean = false>(options: Options<SearchFsData, ThrowOnError>) => {
+    return (options.client ?? client).get<SearchFsResponses, SearchFsErrors, ThrowOnError>({
+        url: '/search/fs/{container_name}/{path}',
+        ...options
+    });
+};
+
+/**
+ * Search Nodes
+ * Search for nodes by name
+ */
+export const searchNodes = <ThrowOnError extends boolean = false>(options?: Options<SearchNodesData, ThrowOnError>) => {
+    return (options?.client ?? client).get<SearchNodesResponses, SearchNodesErrors, ThrowOnError>({
+        url: '/search/nodes/',
+        ...options
+    });
+};
+
+/**
+ * Search Templates
+ * Search for templates by name
+ */
+export const searchTemplates = <ThrowOnError extends boolean = false>(options?: Options<SearchTemplatesData, ThrowOnError>) => {
+    return (options?.client ?? client).get<SearchTemplatesResponses, SearchTemplatesErrors, ThrowOnError>({
+        url: '/search/templates/',
         ...options
     });
 };

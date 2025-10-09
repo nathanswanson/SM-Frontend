@@ -1,10 +1,10 @@
 import { Box, Button, HStack, Input, VStack } from '@chakra-ui/react'
 
 import { useSelectedServerContext } from '../../providers/selected-server-context'
-import { sendCommandApiContainerContainerNameCommandGet } from '../../lib/hey-api/client'
 import { VscChevronRight } from 'react-icons/vsc'
 import React, { useState } from 'react'
 import { DisabledModule } from '../../components/disabled-module'
+import { sendCommand } from '../../lib/hey-api/client'
 
 const LazyLogView = React.lazy(() => import('./components/log-terminal'))
 
@@ -14,7 +14,7 @@ export const LogManager = ({ ...props }) => {
 
     function submit_command(container: string | undefined, command: string) {
         if (container) {
-            sendCommandApiContainerContainerNameCommandGet({
+            sendCommand({
                 credentials: 'include',
                 path: {
                     container_name: container

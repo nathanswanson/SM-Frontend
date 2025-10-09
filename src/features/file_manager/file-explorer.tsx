@@ -3,15 +3,12 @@
 import { Box, Text, ScrollArea, TreeView, createTreeCollection } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { LuFile, LuFolder, LuLoaderCircle } from 'react-icons/lu'
-import {
-    getDirectoryFilenamesApiContainerContainerNameFsListGet,
-    readFileApiContainerContainerNameFsGet,
-    uploadFileApiContainerContainerNameFsUploadPost
-} from '../../lib/hey-api/client'
+
 import { useSelectedServerContext } from '../../providers/selected-server-context'
 import { TextEditorDialog } from './components/text-editor'
 import { DisabledModule } from '../../components/disabled-module'
 import { blob } from 'stream/consumers'
+import { readFile, searchFs, uploadFile } from '../../lib/hey-api/client'
 
 function getRelativePath(from: string, to: string): string {
     if (from !== '/') {
@@ -109,10 +106,9 @@ const FileTree = () => {
 
     async function getPathFiles(path: string, selectedServer: string): Promise<Node[]> {
         if (!selectedServer) return []
-        const strings = await getDirectoryFilenamesApiContainerContainerNameFsListGet({
+        const strings = await searchFs({
             credentials: 'include',
-            path: { container_name: selectedServer },
-            query: { path: path }
+            path: { container_name: selectedServer, path: path }
         })
         if (!strings.data) return []
         return strings.data.items.map(filePath => {
@@ -135,7 +131,7 @@ const FileTree = () => {
             if (!e.focusedValue?.endsWith('/')) {
                 if (!selectedServer) return
                 const path = e.selectedNodes[0]['full_path']
-                const dl = await readFileApiContainerContainerNameFsGet({
+                const dl = await readFile({
                     credentials: 'include',
                     path: { container_name: selectedServer },
                     query: { path: path }
@@ -203,10 +199,10 @@ const FileTree = () => {
             .blob()
             .then(async blob => {
                 console.log(blob)
-                await uploadFileApiContainerContainerNameFsUploadPost({
+                await uploadFile({
                     credentials: 'include',
-                    path: { container_name: selectedServer },
-                    body: { file: blob, path: path }
+                    path: { container_name: selectedServer, path: path },
+                    body: { file: blob }
                 })
             })
     }

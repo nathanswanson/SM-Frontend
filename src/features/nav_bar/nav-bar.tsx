@@ -5,8 +5,8 @@ import { useAsync, useEffectOnce } from 'react-use'
 
 import { useState } from 'react'
 import { useSelectedServerContext } from '../../providers/selected-server-context'
-import { listContainersApiContainerListGet } from '../../lib/hey-api/client/sdk.gen'
 import { useWindowContext } from '../../providers/window-context'
+import { searchServers } from '../../lib/hey-api/client'
 
 export const NavBar = ({ ...props }) => {
     return (
@@ -34,8 +34,12 @@ const SearchComboBox = () => {
     })
 
     const state = useAsync(async () => {
-        const container_list = await listContainersApiContainerListGet({ credentials: 'include' })
-        setServerList(container_list.data?.items ?? [''])
+        const container_list = await searchServers({ credentials: 'include' })
+        setServerList(
+            Object.entries(container_list.data?.items || {}).map(([key, value]) => {
+                return key
+            })
+        )
     }, [selectedServer, openState])
 
     return (

@@ -13,14 +13,14 @@ import {
 } from '@chakra-ui/react'
 import { PasswordInput } from '../lib/chakra/password-input'
 import { VscArrowRight } from 'react-icons/vsc'
-import { getUserMePost, loginUserTokenPost, pingApiNodesPingGet } from '../lib/hey-api/client'
 import { useState, useEffect } from 'react'
 import { Toaster, toaster } from '../lib/chakra/toaster'
 import { useUserDataContext } from '../providers/user-data'
+import { getUser, loginUser } from '../lib/hey-api/client'
 
 async function checkLoginStatus() {
     try {
-        const response = await pingApiNodesPingGet({
+        const response = await getUser({
             credentials: 'include'
         })
         return response.response.status === 200
@@ -56,7 +56,7 @@ export const Login = ({ children }: { children: React.ReactNode }) => {
     useEffect(() => {
         if (isLoggedIn) {
             // Fetch user data
-            getUserMePost({ credentials: 'include' }).then(response => {
+            getUser({ credentials: 'include' }).then(response => {
                 setUserData(response.data)
             })
         }
@@ -65,7 +65,7 @@ export const Login = ({ children }: { children: React.ReactNode }) => {
     const login = async () => {
         setLoginLoading(true)
         try {
-            await loginUserTokenPost({
+            await loginUser({
                 body: { username, password },
                 credentials: 'include'
             }).then(response => {

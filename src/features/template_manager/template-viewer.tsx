@@ -15,7 +15,7 @@ import {
 } from '@chakra-ui/react'
 import { useState } from 'react'
 import { useAsync } from 'react-use'
-import { listTemplatesApiTemplateListGet } from '../../lib/hey-api/client'
+import { searchTemplates } from '../../lib/hey-api/client'
 
 export const TemplateViewer = ({ ...props }) => {
     const { contains } = useFilter({ sensitivity: 'base' })
@@ -28,10 +28,10 @@ export const TemplateViewer = ({ ...props }) => {
     })
 
     useAsync(async () => {
-        const response = await listTemplatesApiTemplateListGet({ credentials: 'include' })
+        const response = await searchTemplates({ credentials: 'include' })
         const data = response.data?.items
         if (data) {
-            set(data)
+            set(Object.entries(data).map(([key, _]) => key))
         }
     }, [set, selectedTemplate])
 

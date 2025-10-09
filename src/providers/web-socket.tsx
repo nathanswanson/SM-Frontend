@@ -31,10 +31,10 @@ interface IWebSocketContext {
     sendMessage: (command: WSPacketCmdType, data: string) => void
 }
 
-function metricFilters(data: number[]): UnitValue[] {
+function metricFilters(core_count: number, data: number[]): UnitValue[] {
     // cpu, mem, net_in, net_out, disk_read, disk_write
 
-    const bytesConvert = (...index: number[]): UnitValue => {
+    const bytesConvert = (core_count: number, ...index: number[]): UnitValue => {
         //sum of all data[index]
         const total = index.reduce((acc, curr) => acc + (data[curr] || 0), 0)
         if (total === 0) return { value: 0, unit: '', timestamp: Date.now() }
@@ -43,7 +43,7 @@ function metricFilters(data: number[]): UnitValue[] {
         return { value: parseFloat(value), unit: unit, timestamp: Date.now() }
     }
     const values: UnitValue[] = [
-        { value: parseFloat((data[0] * 100).toFixed(2)), unit: '% 1-core', timestamp: Date.now() },
+        { value: parseFloat(((data[0] * 100) / core_count).toFixed(2)), unit: '% 1-core', timestamp: Date.now() },
         { value: parseFloat((data[1] * 100).toFixed(2)), unit: '%', timestamp: Date.now() },
         bytesConvert(2, 3),
         bytesConvert(4, 5)
@@ -64,7 +64,7 @@ export const useWebSocketProvider = () => {
 
 const socket = io(getBaseUrl(), { autoConnect: false, transports: ['websocket'] })
 export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
-    const { selectedServer } = useSelectedServerContext()
+    const { selectedServer, serverInfo } = useSelectedServerContext()
     const [connectionStatus, setConnectionStatus] = useState<ConnectionState>(ConnectionState.disconnected)
     const [logMessages, setLogMessages] = useState<string[]>([])
     const [metricMessages, setMetricMessages] = useState<UnitValue[][]>([[], [], [], []])
@@ -87,7 +87,7 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
             setMetricMessages(prev => {
                 // prev is string of "[n,n,n,n]"
                 let parsedData = JSON.parse(data) as number[]
-                let parsedDataUnits = metricFilters(parsedData)
+                let parsedDataUnits = metricFilters(serverInfo?.cpu ?? 1, parsedData)
                 const newMetrics = prev.map((arr, idx) => [...arr, parsedDataUnits[idx]].slice(-METRICS_SIZE))
                 return newMetrics
             })

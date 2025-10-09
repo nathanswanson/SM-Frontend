@@ -3,7 +3,7 @@ import { DataList } from '@chakra-ui/react/data-list'
 import { CopyField } from './copy-field'
 
 interface AllocatedResourceListProps extends BoxProps {
-    items: { id: string; value: string }[]
+    items: { id: string; value: string | number }[]
     header: string
 }
 

@@ -1,9 +1,9 @@
 import React from 'react'
-import { UserPublic } from '../lib/hey-api/client/types.gen'
+import { UsersBase } from '../lib/hey-api/client/types.gen'
 
 interface IUserDataContext {
-    userData: UserPublic | undefined
-    setUserData: (data: UserPublic | undefined) => void
+    userData: UsersBase | undefined
+    setUserData: (data: UsersBase | undefined) => void
 }
 
 export const userDataContextProvider = React.createContext<IUserDataContext | undefined>(undefined)
@@ -16,7 +16,7 @@ export const useUserDataContext = () => {
 }
 
 export const UserDataProvider = ({ children }: { children: React.ReactNode }) => {
-    const [userData, setUserData] = React.useState<UserPublic | undefined>(undefined)
+    const [userData, setUserData] = React.useState<UsersBase | undefined>(undefined)
 
     return (
         <userDataContextProvider.Provider value={{ userData, setUserData }}>
