@@ -71,7 +71,7 @@ export const TemplateCreateDialog = () => {
                                             image: template_image,
                                             tags: [],
                                             default_env: null,
-                                            additional_env: null,
+                                            user_env: null,
                                             resource_min_cpu: null,
                                             resource_min_disk: null,
                                             resource_min_mem: null

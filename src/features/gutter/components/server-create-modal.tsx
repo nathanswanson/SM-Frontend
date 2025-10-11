@@ -70,7 +70,7 @@ export const ServerCreationDialog = () => {
             body: {
                 name: serverName,
                 port: parsedPort(serverPort),
-                env: serverEnv,
+                env: {},
                 cpu: 0,
                 memory: 0,
                 disk: 0
