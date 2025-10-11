@@ -5,7 +5,7 @@ import { visualizer } from 'rollup-plugin-visualizer'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    visualizer({open: true}),
+    visualizer({open: false}),
     react({babel: {plugins: ['babel-plugin-react-compiler']}}),
   ],
   test: {
