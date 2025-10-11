@@ -12,10 +12,6 @@ import { ConsoleCommands } from '../server_overview/components/command-bar'
 import { useWebSocketProvider } from '../../providers/web-socket'
 import { SimpleGrid } from '@chakra-ui/react'
 
-// make graph data spuratic
-const tempRandomData = () => {
-    return [...Array(5).keys()].map(() => Math.floor(Math.random() * 100))
-}
 
 export const MainContent = ({ ...props }) => {
     const { metricMessages } = useWebSocketProvider()
