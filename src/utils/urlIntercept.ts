@@ -1,6 +1,7 @@
+import { appendFile } from "fs";
 
 export const getBaseUrl = () => {
-    // Vite exposes DEV and MODE on import.meta.env
-        return `${window.location.protocol}//api.${window.location.host}`
+    
+        return `${window.location.protocol}//${(import.meta.env.DEV) ? "api." : ""}${window.location.host}`
     // return envUrl;
 };

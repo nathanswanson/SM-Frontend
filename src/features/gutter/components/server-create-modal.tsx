@@ -56,26 +56,33 @@ export const ServerCreationDialog = () => {
     const { collection: templateList, set: setTemplateList } = useListCollection<string>({
         initialItems: ['']
     })
+    const [templateMap, setTemplateMap] = useState<{[key: string]: number} | undefined>({})
     const [open, setOpen] = useState(false)
 
     const state = useAsync(async () => {
-        const template_list = await searchTemplates({ credentials: 'include' })
-        setTemplateList([''])
+        const templateList = await searchTemplates({ credentials: 'include' })
+        setTemplateList(Object.entries(templateList.data?.items || {}).map(([key, value]) => {
+                return key
+            }))
+        setTemplateMap(templateList.data?.items)
     }, [selectedTemplate, setTemplateList])
 
     const create_server = async () => {
         setCreateServerLoading(true)
-        createServer({
+        console.log(templateMap)
+        console.log(selectedTemplate)
+        if(templateMap !== undefined) {
+            createServer({
             credentials: 'include',
             body: {
                 name: serverName,
-                port: parsedPort(serverPort),
+                template_id: templateMap[selectedTemplate],
+                node_id: 1,
                 env: {},
                 cpu: 0,
                 memory: 0,
                 disk: 0
             },
-            query: { template_id: -1, node_id: 1 } // TODO: Fix template ID
         })
             .finally(() => {
                 // Server Responded
@@ -86,6 +93,8 @@ export const ServerCreationDialog = () => {
                 setOpen(false)
                 setSelectedServer(serverName)
             })
+        }
+        
     }
     return (
         <Dialog.Root open={open} onOpenChange={e => setOpen(e.open)}>

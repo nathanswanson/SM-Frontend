@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.2",
   "scripts": {
-    "openapi-ts": "openapi-ts -c https://localhost",
+    "openapi-ts": "@hey-api/openapi-ts --input <(curl -k https://api.localhost/openapi.json) -o src/lib/hey-api/client",
     "dev": "vite --port=4000",
     "build": "tsc && vite build",
     "preview": "vite preview",

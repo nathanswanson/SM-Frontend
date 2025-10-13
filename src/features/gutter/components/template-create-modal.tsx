@@ -70,11 +70,11 @@ export const TemplateCreateDialog = () => {
                                             name: template_name,
                                             image: template_image,
                                             tags: [],
-                                            default_env: null,
-                                            user_env: null,
-                                            resource_min_cpu: null,
-                                            resource_min_disk: null,
-                                            resource_min_mem: null
+                                            default_env: {},
+                                            user_env: {},
+                                            resource_min_cpu: 1,
+                                            resource_min_disk: 1,
+                                            resource_min_mem: 4
                                         }
                                     })
                                 }
