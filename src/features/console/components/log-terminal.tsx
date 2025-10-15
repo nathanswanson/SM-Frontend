@@ -24,7 +24,7 @@ const LogView = () => {
     // Listen for log messages from the server
 
     return (
-        <ScrollArea.Root>
+        <ScrollArea.Root borderWidth={1}>
             <ScrollArea.Viewport>
                 <ScrollArea.Content height="100px" textStyle="sm">
                     {logMessages.map((log, idx) => (

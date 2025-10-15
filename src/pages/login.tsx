@@ -59,6 +59,7 @@ export const Login = ({ children }: { children: React.ReactNode }) => {
             getUser({ credentials: 'include' }).then(response => {
                 setUserData(response.data)
             })
+            window.sessionStorage.setItem("logged_in", "true");
         }
     }, [isLoggedIn])
 

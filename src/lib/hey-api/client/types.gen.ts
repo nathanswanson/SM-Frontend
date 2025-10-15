@@ -276,6 +276,10 @@ export type ServerStatusResponse = {
      * Running
      */
     running: boolean;
+    /**
+     * Health
+     */
+    health?: string | null;
 };
 
 /**
