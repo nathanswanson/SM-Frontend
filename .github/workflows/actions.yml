@@ -9,9 +9,6 @@ on:
 
 jobs:
     build:
-        defaults:
-            run:
-                working-directory: ./SM-Frontend
         runs-on: ubuntu-latest
 
         strategy:
@@ -34,4 +31,4 @@ jobs:
               uses: actions/upload-artifact@v4
               with:
                   name: server-manager-frontend
-                  path: ./SM-Frontend/dist/*
+                  path: dist/*
