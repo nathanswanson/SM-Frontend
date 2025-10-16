@@ -20,7 +20,7 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v4
               with:
-                  repository: ${{ github.repository}}
+                  repository: nathanswanson/SM-Frontend
                   ref: main
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v4
