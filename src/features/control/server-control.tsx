@@ -5,7 +5,7 @@ import { VscDebugRestart, VscDebugStart, VscDebugStop } from 'react-icons/vsc'
 import { useSelectedServerContext } from '../../providers/selected-server-context'
 import { DangerConfirmation } from '../../components/danger-confirmation'
 import { FaFileExport } from 'react-icons/fa6'
-import { deleteServer, startServer, stopServer } from '../../lib/hey-api/client'
+import { deleteServer, startServer, stopServer } from '../../../lib/hey-api/client'
 import { server } from '../../mocks/node'
 
 export const ServerControl = ({ ...props }) => {

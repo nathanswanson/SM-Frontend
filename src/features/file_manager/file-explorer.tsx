@@ -8,7 +8,7 @@ import { useSelectedServerContext } from '../../providers/selected-server-contex
 import { TextEditorDialog } from './components/text-editor'
 import { DisabledModule } from '../../components/disabled-module'
 import { blob } from 'stream/consumers'
-import { readFile, searchFs, uploadFile } from '../../lib/hey-api/client'
+import { readFile, searchFs, uploadFile } from '../../../lib/hey-api/client'
 
 function getRelativePath(from: string, to: string): string {
     if (from !== '/') {

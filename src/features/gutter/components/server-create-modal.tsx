@@ -17,7 +17,7 @@ import { useAsync } from 'react-use'
 import { useSelectedServerContext } from '../../../providers/selected-server-context'
 import { MenuSelectButton } from './menu-select-button'
 import { FaDatabase } from 'react-icons/fa6'
-import { createServer, searchTemplates } from '../../../lib/hey-api/client'
+import { createServer, searchTemplates } from '../../../../lib/hey-api/client'
 
 function parsedPort(serverPort: string): { [key: string]: number | null } | null {
     const entries: Record<string, number | null> = {}
@@ -56,45 +56,44 @@ export const ServerCreationDialog = () => {
     const { collection: templateList, set: setTemplateList } = useListCollection<string>({
         initialItems: ['']
     })
-    const [templateMap, setTemplateMap] = useState<{[key: string]: number} | undefined>({})
+    const [templateMap, setTemplateMap] = useState<{ [key: string]: number } | undefined>({})
     const [open, setOpen] = useState(false)
 
     const state = useAsync(async () => {
         const templateList = await searchTemplates({ credentials: 'include' })
-        setTemplateList(Object.entries(templateList.data?.items || {}).map(([key, value]) => {
+        setTemplateList(
+            Object.entries(templateList.data?.items || {}).map(([key, value]) => {
                 return key
-            }))
+            })
+        )
         setTemplateMap(templateList.data?.items)
     }, [selectedTemplate, setTemplateList])
 
     const create_server = async () => {
         setCreateServerLoading(true)
-        console.log(templateMap)
-        console.log(selectedTemplate)
-        if(templateMap !== undefined) {
+        if (templateMap !== undefined) {
             createServer({
-            credentials: 'include',
-            body: {
-                name: serverName,
-                template_id: templateMap[selectedTemplate],
-                node_id: 1,
-                env: {},
-                cpu: 0,
-                memory: 0,
-                disk: 0
-            },
-        })
-            .finally(() => {
-                // Server Responded
-                setCreateServerLoading(false)
+                credentials: 'include',
+                body: {
+                    name: serverName,
+                    template_id: templateMap[selectedTemplate],
+                    node_id: 1,
+                    env: {},
+                    cpu: 0,
+                    memory: 0,
+                    disk: 0
+                }
             })
-            .then(() => {
-                // Created successfully
-                setOpen(false)
-                setSelectedServer(serverName)
-            })
+                .finally(() => {
+                    // Server Responded
+                    setCreateServerLoading(false)
+                })
+                .then(() => {
+                    // Created successfully
+                    setOpen(false)
+                    setSelectedServer(serverName)
+                })
         }
-        
     }
     return (
         <Dialog.Root open={open} onOpenChange={e => setOpen(e.open)}>

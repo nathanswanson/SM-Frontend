@@ -11,12 +11,12 @@ import {
     Spinner,
     VStack
 } from '@chakra-ui/react'
-import { PasswordInput } from '../lib/chakra/password-input'
+import { PasswordInput } from '../../lib/chakra/password-input'
 import { VscArrowRight } from 'react-icons/vsc'
 import { useState, useEffect } from 'react'
-import { Toaster, toaster } from '../lib/chakra/toaster'
+import { Toaster, toaster } from '../../lib/chakra/toaster'
 import { useUserDataContext } from '../providers/user-data'
-import { getUser, loginUser } from '../lib/hey-api/client'
+import { getUser, loginUser } from '../../lib/hey-api/client'
 
 async function checkLoginStatus() {
     try {
@@ -59,7 +59,7 @@ export const Login = ({ children }: { children: React.ReactNode }) => {
             getUser({ credentials: 'include' }).then(response => {
                 setUserData(response.data)
             })
-            window.sessionStorage.setItem("logged_in", "true");
+            window.sessionStorage.setItem('logged_in', 'true')
         }
     }, [isLoggedIn])
 

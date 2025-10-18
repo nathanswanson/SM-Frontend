@@ -1,8 +1,9 @@
-import { createContext, ReactNode, useCallback, useContext, useEffect, useRef, useState } from 'react'
-import { useSelectedServerContext } from './selected-server-context'
-import { io } from 'socket.io-client'
-import { getBaseUrl } from '../utils/urlIntercept'
 import bytes from 'bytes'
+import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from 'react'
+import { io } from 'socket.io-client'
+import { getLogMessage } from '../../lib/hey-api/client'
+import { getBaseUrl } from '../utils/urlIntercept'
+import { useSelectedServerContext } from './selected-server-context'
 const METRICS_SIZE = 50
 const LOG_SIZE = 50
 
@@ -104,6 +105,10 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
 
     useEffect(() => {
         if (selectedServer) {
+            // grab historical logs via http
+            getLogMessage({ path: { server_id: serverInfo?.id ?? -1 }, credentials: 'include' }).then(res => {
+                setLogMessages(res.data?.items || [])
+            })
             sendMessage(WSPacketCmdType.SUBSCRIBE, `01+${selectedServer}`)
         }
         return () => {

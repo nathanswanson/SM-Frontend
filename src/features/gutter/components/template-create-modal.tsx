@@ -5,7 +5,7 @@ import { useSelectedServerContext } from '../../../providers/selected-server-con
 import { FormField } from '../../../utils/util'
 import { MenuSelectButton } from './menu-select-button'
 import { FaSwatchbook } from 'react-icons/fa6'
-import { addTemplate } from '../../../lib/hey-api/client'
+import { addTemplate } from '../../../../lib/hey-api/client'
 
 export const TemplateCreateDialog = () => {
     const [template_name, setTemplateName] = useState('')

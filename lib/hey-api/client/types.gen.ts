@@ -5,9 +5,9 @@ export type ClientOptions = {
 };
 
 /**
- * Body_login_user_system_token_post
+ * Body_login_user_users_token_post
  */
-export type BodyLoginUserSystemTokenPost = {
+export type BodyLoginUserUsersTokenPost = {
     /**
      * Grant Type
      */
@@ -35,9 +35,9 @@ export type BodyLoginUserSystemTokenPost = {
 };
 
 /**
- * Body_upload_file_container__container_name__fs__path__post
+ * Body_upload_file_containers__container_name__fs__path__post
  */
-export type BodyUploadFileContainerContainerNameFsPathPost = {
+export type BodyUploadFileContainersContainerNameFsPathPost = {
     /**
      * File
      */
@@ -601,9 +601,9 @@ export type GetLogMessageData = {
     };
     path: {
         /**
-         * Container Name
+         * Server Id
          */
-        container_name: string;
+        server_id: number;
     };
     query?: {
         /**
@@ -611,7 +611,7 @@ export type GetLogMessageData = {
          */
         line_count?: number | null;
     };
-    url: '/container/{container_name}/logs';
+    url: '/containers/{server_id}/logs';
 };
 
 export type GetLogMessageErrors = {
@@ -642,9 +642,9 @@ export type SendCommandData = {
     };
     path: {
         /**
-         * Container Name
+         * Server Id
          */
-        container_name: string;
+        server_id: number;
     };
     query: {
         /**
@@ -652,7 +652,7 @@ export type SendCommandData = {
          */
         command: string;
     };
-    url: '/container/{container_name}/command';
+    url: '/containers/{server_id}/command';
 };
 
 export type SendCommandErrors = {
@@ -693,7 +693,7 @@ export type ReadFileData = {
          */
         path: string;
     };
-    url: '/container/{container_name}/fs';
+    url: '/containers/{container_name}/fs';
 };
 
 export type ReadFileErrors = {
@@ -731,7 +731,7 @@ export type DeleteFileData = {
         path: string;
     };
     query?: never;
-    url: '/container/{container_name}/fs/{path}';
+    url: '/containers/{container_name}/fs/{path}';
 };
 
 export type DeleteFileErrors = {
@@ -753,7 +753,7 @@ export type DeleteFileResponses = {
 export type DeleteFileResponse = DeleteFileResponses[keyof DeleteFileResponses];
 
 export type UploadFileData = {
-    body: BodyUploadFileContainerContainerNameFsPathPost;
+    body: BodyUploadFileContainersContainerNameFsPathPost;
     headers?: {
         /**
          * Authorization
@@ -771,7 +771,7 @@ export type UploadFileData = {
         path: string;
     };
     query?: never;
-    url: '/container/{container_name}/fs/{path}';
+    url: '/containers/{container_name}/fs/{path}';
 };
 
 export type UploadFileErrors = {
@@ -792,42 +792,6 @@ export type UploadFileResponses = {
 
 export type UploadFileResponse = UploadFileResponses[keyof UploadFileResponses];
 
-export type GetTemplateData = {
-    body?: never;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
-    path: {
-        /**
-         * Template Id
-         */
-        template_id: number;
-    };
-    query?: never;
-    url: '/template/{template_id}';
-};
-
-export type GetTemplateErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type GetTemplateError = GetTemplateErrors[keyof GetTemplateErrors];
-
-export type GetTemplateResponses = {
-    /**
-     * Successful Response
-     */
-    200: TemplatesRead;
-};
-
-export type GetTemplateResponse = GetTemplateResponses[keyof GetTemplateResponses];
-
 export type AddTemplateData = {
     body: TemplatesBase;
     headers?: {
@@ -838,7 +802,7 @@ export type AddTemplateData = {
     };
     path?: never;
     query?: never;
-    url: '/template/create';
+    url: '/templates/';
 };
 
 export type AddTemplateErrors = {
@@ -859,6 +823,42 @@ export type AddTemplateResponses = {
 
 export type AddTemplateResponse = AddTemplateResponses[keyof AddTemplateResponses];
 
+export type GetTemplateData = {
+    body?: never;
+    headers?: {
+        /**
+         * Authorization
+         */
+        authorization?: string | null;
+    };
+    path: {
+        /**
+         * Template Id
+         */
+        template_id: number;
+    };
+    query?: never;
+    url: '/templates/{template_id}';
+};
+
+export type GetTemplateErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GetTemplateError = GetTemplateErrors[keyof GetTemplateErrors];
+
+export type GetTemplateResponses = {
+    /**
+     * Successful Response
+     */
+    200: TemplatesRead;
+};
+
+export type GetTemplateResponse = GetTemplateResponses[keyof GetTemplateResponses];
+
 export type DeleteTemplateData = {
     body?: never;
     headers?: {
@@ -874,7 +874,7 @@ export type DeleteTemplateData = {
          */
         template_id: number;
     };
-    url: '/template/{name}/delete';
+    url: '/templates/{name}/delete';
 };
 
 export type DeleteTemplateErrors = {
@@ -895,34 +895,11 @@ export type DeleteTemplateResponses = {
 
 export type DeleteTemplateResponse = DeleteTemplateResponses[keyof DeleteTemplateResponses];
 
-export type LoginUserData = {
-    body: BodyLoginUserSystemTokenPost;
-    path?: never;
-    query?: never;
-    url: '/system/token';
-};
-
-export type LoginUserErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type LoginUserError = LoginUserErrors[keyof LoginUserErrors];
-
-export type LoginUserResponses = {
-    /**
-     * Successful Response
-     */
-    200: unknown;
-};
-
 export type CreateUserAccountData = {
     body: CreateUserRequestWritable;
     path?: never;
     query?: never;
-    url: '/system/create';
+    url: '/users/';
 };
 
 export type CreateUserAccountErrors = {
@@ -943,6 +920,29 @@ export type CreateUserAccountResponses = {
 
 export type CreateUserAccountResponse = CreateUserAccountResponses[keyof CreateUserAccountResponses];
 
+export type LoginUserData = {
+    body: BodyLoginUserUsersTokenPost;
+    path?: never;
+    query?: never;
+    url: '/users/token';
+};
+
+export type LoginUserErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type LoginUserError = LoginUserErrors[keyof LoginUserErrors];
+
+export type LoginUserResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
+
 export type LogoutUserData = {
     body?: never;
     headers?: {
@@ -953,7 +953,7 @@ export type LogoutUserData = {
     };
     path?: never;
     query?: never;
-    url: '/system/revoke';
+    url: '/users/revoke';
 };
 
 export type LogoutUserErrors = {
@@ -982,7 +982,7 @@ export type GetUserData = {
     };
     path?: never;
     query?: never;
-    url: '/system/me';
+    url: '/users/me';
 };
 
 export type GetUserErrors = {
@@ -1013,7 +1013,7 @@ export type CreateServerData = {
     };
     path?: never;
     query?: never;
-    url: '/server/';
+    url: '/servers/';
 };
 
 export type CreateServerErrors = {
@@ -1049,7 +1049,7 @@ export type DeleteServerData = {
         server_id: number;
     };
     query?: never;
-    url: '/server/{server_id}';
+    url: '/servers/{server_id}';
 };
 
 export type DeleteServerErrors = {
@@ -1082,10 +1082,10 @@ export type GetServerInfoData = {
         /**
          * Server Id
          */
-        server_id: number | string;
+        server_id: number;
     };
     query?: never;
-    url: '/server/{server_id}';
+    url: '/servers/{server_id}';
 };
 
 export type GetServerInfoErrors = {
@@ -1121,7 +1121,7 @@ export type StartServerData = {
         server_id: number;
     };
     query?: never;
-    url: '/server/{server_id}/start';
+    url: '/servers/{server_id}/start';
 };
 
 export type StartServerErrors = {
@@ -1157,7 +1157,7 @@ export type StopServerData = {
         server_id: number;
     };
     query?: never;
-    url: '/server/{server_id}/stop';
+    url: '/servers/{server_id}/stop';
 };
 
 export type StopServerErrors = {
@@ -1193,7 +1193,7 @@ export type GetServerStatusData = {
         server_id: number;
     };
     query?: never;
-    url: '/server/{server_id}/status';
+    url: '/servers/{server_id}/status';
 };
 
 export type GetServerStatusErrors = {

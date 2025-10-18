@@ -2,7 +2,7 @@ import { InfoList } from '../../components/info-list'
 import { useSelectedServerContext } from '../../providers/selected-server-context'
 
 export const ServerOverview = () => {
-    const { selectedServer, serverOnline, serverInfo } = useSelectedServerContext()
+    const { serverOnline, serverInfo } = useSelectedServerContext()
 
     const items = [
         { id: 'template', value: serverInfo?.template_id.toString() ?? 'N/A' },

@@ -14,11 +14,11 @@ import { FaBars, FaGear, FaUserLock } from 'react-icons/fa6'
 import { MenuSelectButton } from './components/menu-select-button'
 
 import { useUserDataContext } from '../../providers/user-data'
-import { ColorModeButton } from '../../lib/chakra/color-mode.js'
+import { ColorModeButton } from '../../../lib/chakra/color-mode.js'
 import { TemplateCreateDialog } from './components/template-create-modal'
 import { NodeCreateDialog } from './components/node-create-modal'
 import { ServerCreationDialog } from './components/server-create-modal'
-import { logoutUser } from '../../lib/hey-api/client'
+import { logoutUser } from '../../../lib/hey-api/client'
 
 const UserProfile = ({ ...props }) => {
     const { userData } = useUserDataContext()

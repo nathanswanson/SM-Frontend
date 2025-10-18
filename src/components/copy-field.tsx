@@ -1,6 +1,6 @@
 import { ReactNode } from 'react'
 import { Button } from '@chakra-ui/react/button'
-import { toaster } from '../lib/chakra/toaster'
+import { toaster } from '../../lib/chakra/toaster'
 import { Text } from '@chakra-ui/react/text'
 export const CopyField = ({ children }: { children: ReactNode }) => {
     return (

@@ -1,12 +1,12 @@
 'use client'
 
-import { Combobox, HStack, Portal, Span, Spinner, useListCollection } from '@chakra-ui/react'
+import { Combobox, createListCollection, HStack, Portal, Span, Spinner } from '@chakra-ui/react'
 import { useAsync, useEffectOnce } from 'react-use'
 
 import { useState } from 'react'
+import { searchServers } from '../../../lib/hey-api/client'
 import { useSelectedServerContext } from '../../providers/selected-server-context'
 import { useWindowContext } from '../../providers/window-context'
-import { searchServers } from '../../lib/hey-api/client'
 
 export const NavBar = ({ ...props }) => {
     return (
@@ -18,11 +18,13 @@ export const NavBar = ({ ...props }) => {
 }
 
 const SearchComboBox = () => {
-    const { selectedServer, setSelectedServer } = useSelectedServerContext()
+    const { selectedServer, setSelectedServer, serverInfo } = useSelectedServerContext()
     const { scrollPosition } = useWindowContext()
     const [openState, setOpenState] = useState<Boolean>(false)
-    const { collection: serverList, set: setServerList } = useListCollection<string>({
-        initialItems: []
+    const [serverList, setServerList] = useState<{ [key: string]: number }>({})
+
+    const serverCollection = createListCollection({
+        items: Object.keys(serverList)
     })
 
     useEffectOnce(() => {
@@ -35,11 +37,9 @@ const SearchComboBox = () => {
 
     const state = useAsync(async () => {
         const container_list = await searchServers({ credentials: 'include' })
-        setServerList(
-            Object.entries(container_list.data?.items || {}).map(([key, value]) => {
-                return key
-            })
-        )
+        if (container_list.data?.items) {
+            setServerList(container_list.data?.items || {})
+        }
     }, [selectedServer, openState])
 
     return (
@@ -51,9 +51,11 @@ const SearchComboBox = () => {
             bg={scrollPosition.y == 0 ? 'bg.panel' : 'bg.panel'}
             transitionDuration={'0.3ms'}
             borderRadius={'sm'}
-            collection={serverList}
+            collection={serverCollection}
             placeholder="Search characters..."
-            onInputValueChange={e => setSelectedServer(e.inputValue)}
+            onInputValueChange={e => {
+                setSelectedServer(e.inputValue)
+            }}
             positioning={{ sameWidth: false, placement: 'bottom-start' }}
             onOpenChange={value => {
                 if (value.open) setOpenState(prev => !prev)
@@ -84,7 +86,7 @@ const SearchComboBox = () => {
                                 Error fetching
                             </Span>
                         ) : (
-                            serverList.items?.map(container => (
+                            serverCollection.items?.map(container => (
                                 <Combobox.Item key={container} item={container}>
                                     <HStack display="flex" justify="space-between" textStyle="sm">
                                         <Span fontWeight="medium" truncate>

@@ -28,7 +28,9 @@
   ],
   "include": [
     "src",
-    "example.test.ts"
+    "example.test.ts",
+    "public/mockServiceWorker.js",
+    "lib",
   ],
   "references": [
     {

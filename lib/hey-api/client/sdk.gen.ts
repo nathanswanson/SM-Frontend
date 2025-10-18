@@ -24,18 +24,17 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
  */
 export const getLogMessage = <ThrowOnError extends boolean = false>(options: Options<GetLogMessageData, ThrowOnError>) => {
     return (options.client ?? client).get<GetLogMessageResponses, GetLogMessageErrors, ThrowOnError>({
-        url: '/container/{container_name}/logs',
+        url: '/containers/{server_id}/logs',
         ...options
     });
 };
 
 /**
  * Send Command
- * send a command to a container
  */
 export const sendCommand = <ThrowOnError extends boolean = false>(options: Options<SendCommandData, ThrowOnError>) => {
-    return (options.client ?? client).get<SendCommandResponses, SendCommandErrors, ThrowOnError>({
-        url: '/container/{container_name}/command',
+    return (options.client ?? client).post<SendCommandResponses, SendCommandErrors, ThrowOnError>({
+        url: '/containers/{server_id}/command',
         ...options
     });
 };
@@ -46,7 +45,7 @@ export const sendCommand = <ThrowOnError extends boolean = false>(options: Optio
  */
 export const readFile = <ThrowOnError extends boolean = false>(options: Options<ReadFileData, ThrowOnError>) => {
     return (options.client ?? client).get<ReadFileResponses, ReadFileErrors, ThrowOnError>({
-        url: '/container/{container_name}/fs',
+        url: '/containers/{container_name}/fs',
         ...options
     });
 };
@@ -57,7 +56,7 @@ export const readFile = <ThrowOnError extends boolean = false>(options: Options<
  */
 export const deleteFile = <ThrowOnError extends boolean = false>(options: Options<DeleteFileData, ThrowOnError>) => {
     return (options.client ?? client).delete<DeleteFileResponses, DeleteFileErrors, ThrowOnError>({
-        url: '/container/{container_name}/fs/{path}',
+        url: '/containers/{container_name}/fs/{path}',
         ...options
     });
 };
@@ -69,10 +68,25 @@ export const deleteFile = <ThrowOnError extends boolean = false>(options: Option
 export const uploadFile = <ThrowOnError extends boolean = false>(options: Options<UploadFileData, ThrowOnError>) => {
     return (options.client ?? client).post<UploadFileResponses, UploadFileErrors, ThrowOnError>({
         ...formDataBodySerializer,
-        url: '/container/{container_name}/fs/{path}',
+        url: '/containers/{container_name}/fs/{path}',
         ...options,
         headers: {
             'Content-Type': null,
+            ...options.headers
+        }
+    });
+};
+
+/**
+ * Add Template
+ * add a new template
+ */
+export const addTemplate = <ThrowOnError extends boolean = false>(options: Options<AddTemplateData, ThrowOnError>) => {
+    return (options.client ?? client).post<AddTemplateResponses, AddTemplateErrors, ThrowOnError>({
+        url: '/templates/',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
             ...options.headers
         }
     });
@@ -84,23 +98,8 @@ export const uploadFile = <ThrowOnError extends boolean = false>(options: Option
  */
 export const getTemplate = <ThrowOnError extends boolean = false>(options: Options<GetTemplateData, ThrowOnError>) => {
     return (options.client ?? client).get<GetTemplateResponses, GetTemplateErrors, ThrowOnError>({
-        url: '/template/{template_id}',
+        url: '/templates/{template_id}',
         ...options
-    });
-};
-
-/**
- * Add Template
- * add a new template
- */
-export const addTemplate = <ThrowOnError extends boolean = false>(options: Options<AddTemplateData, ThrowOnError>) => {
-    return (options.client ?? client).post<AddTemplateResponses, AddTemplateErrors, ThrowOnError>({
-        url: '/template/create',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
     });
 };
 
@@ -110,8 +109,23 @@ export const addTemplate = <ThrowOnError extends boolean = false>(options: Optio
  */
 export const deleteTemplate = <ThrowOnError extends boolean = false>(options: Options<DeleteTemplateData, ThrowOnError>) => {
     return (options.client ?? client).delete<DeleteTemplateResponses, DeleteTemplateErrors, ThrowOnError>({
-        url: '/template/{name}/delete',
+        url: '/templates/{name}/delete',
         ...options
+    });
+};
+
+/**
+ * Create User Account
+ * create a new user account
+ */
+export const createUserAccount = <ThrowOnError extends boolean = false>(options: Options<CreateUserAccountData, ThrowOnError>) => {
+    return (options.client ?? client).post<CreateUserAccountResponses, CreateUserAccountErrors, ThrowOnError>({
+        url: '/users/',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
     });
 };
 
@@ -122,7 +136,7 @@ export const deleteTemplate = <ThrowOnError extends boolean = false>(options: Op
 export const loginUser = <ThrowOnError extends boolean = false>(options: Options<LoginUserData, ThrowOnError>) => {
     return (options.client ?? client).post<LoginUserResponses, LoginUserErrors, ThrowOnError>({
         ...urlSearchParamsBodySerializer,
-        url: '/system/token',
+        url: '/users/token',
         ...options,
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -132,26 +146,12 @@ export const loginUser = <ThrowOnError extends boolean = false>(options: Options
 };
 
 /**
- * Create User Account
- * create a new user account
- */
-export const createUserAccount = <ThrowOnError extends boolean = false>(options: Options<CreateUserAccountData, ThrowOnError>) => {
-    return (options.client ?? client).post<CreateUserAccountResponses, CreateUserAccountErrors, ThrowOnError>({
-        url: '/system/create',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
-
-/**
  * Logout User
+ * logout user, delete access token cookie
  */
 export const logoutUser = <ThrowOnError extends boolean = false>(options?: Options<LogoutUserData, ThrowOnError>) => {
     return (options?.client ?? client).post<LogoutUserResponses, LogoutUserErrors, ThrowOnError>({
-        url: '/system/revoke',
+        url: '/users/revoke',
         ...options
     });
 };
@@ -161,8 +161,8 @@ export const logoutUser = <ThrowOnError extends boolean = false>(options?: Optio
  * get current user information
  */
 export const getUser = <ThrowOnError extends boolean = false>(options?: Options<GetUserData, ThrowOnError>) => {
-    return (options?.client ?? client).post<GetUserResponses, GetUserErrors, ThrowOnError>({
-        url: '/system/me',
+    return (options?.client ?? client).get<GetUserResponses, GetUserErrors, ThrowOnError>({
+        url: '/users/me',
         ...options
     });
 };
@@ -173,7 +173,7 @@ export const getUser = <ThrowOnError extends boolean = false>(options?: Options<
  */
 export const createServer = <ThrowOnError extends boolean = false>(options: Options<CreateServerData, ThrowOnError>) => {
     return (options.client ?? client).post<CreateServerResponses, CreateServerErrors, ThrowOnError>({
-        url: '/server/',
+        url: '/servers/',
         ...options,
         headers: {
             'Content-Type': 'application/json',
@@ -188,7 +188,7 @@ export const createServer = <ThrowOnError extends boolean = false>(options: Opti
  */
 export const deleteServer = <ThrowOnError extends boolean = false>(options: Options<DeleteServerData, ThrowOnError>) => {
     return (options.client ?? client).delete<DeleteServerResponses, DeleteServerErrors, ThrowOnError>({
-        url: '/server/{server_id}',
+        url: '/servers/{server_id}',
         ...options
     });
 };
@@ -199,7 +199,7 @@ export const deleteServer = <ThrowOnError extends boolean = false>(options: Opti
  */
 export const getServerInfo = <ThrowOnError extends boolean = false>(options: Options<GetServerInfoData, ThrowOnError>) => {
     return (options.client ?? client).get<GetServerInfoResponses, GetServerInfoErrors, ThrowOnError>({
-        url: '/server/{server_id}',
+        url: '/servers/{server_id}',
         ...options
     });
 };
@@ -210,7 +210,7 @@ export const getServerInfo = <ThrowOnError extends boolean = false>(options: Opt
  */
 export const startServer = <ThrowOnError extends boolean = false>(options: Options<StartServerData, ThrowOnError>) => {
     return (options.client ?? client).post<StartServerResponses, StartServerErrors, ThrowOnError>({
-        url: '/server/{server_id}/start',
+        url: '/servers/{server_id}/start',
         ...options
     });
 };
@@ -221,7 +221,7 @@ export const startServer = <ThrowOnError extends boolean = false>(options: Optio
  */
 export const stopServer = <ThrowOnError extends boolean = false>(options: Options<StopServerData, ThrowOnError>) => {
     return (options.client ?? client).post<StopServerResponses, StopServerErrors, ThrowOnError>({
-        url: '/server/{server_id}/stop',
+        url: '/servers/{server_id}/stop',
         ...options
     });
 };
@@ -232,7 +232,7 @@ export const stopServer = <ThrowOnError extends boolean = false>(options: Option
  */
 export const getServerStatus = <ThrowOnError extends boolean = false>(options: Options<GetServerStatusData, ThrowOnError>) => {
     return (options.client ?? client).get<GetServerStatusResponses, GetServerStatusErrors, ThrowOnError>({
-        url: '/server/{server_id}/status',
+        url: '/servers/{server_id}/status',
         ...options
     });
 };

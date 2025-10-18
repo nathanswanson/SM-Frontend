@@ -1,7 +1,7 @@
 import { createContext, useEffect, useState } from 'react'
 import { useContext } from 'react'
 import { ReactNode } from 'react'
-import { getServerInfo, getServerStatus, ServersBase, ServersRead } from '../lib/hey-api/client'
+import { getServerInfo, getServerStatus, ServersBase, ServersRead } from '../../lib/hey-api/client'
 import { useEffectOnce } from 'react-use'
 
 interface ISelectedServerContext {
@@ -41,7 +41,7 @@ export const SelectedServerProvider = ({ children }: { children: ReactNode }) =>
             const abortController = new AbortController()
             getServerInfo({
                 credentials: 'include',
-                path: { server_id: selectedServer },
+                path: { server_id: 1 },
                 signal: abortController.signal
             }).then(res => {
                 setServerInfo(res.data ?? undefined)

@@ -1,5 +1,5 @@
 import React from 'react'
-import { UsersBase } from '../lib/hey-api/client/types.gen'
+import { UsersBase } from '../../lib/hey-api/client/types.gen'
 
 interface IUserDataContext {
     userData: UsersBase | undefined

@@ -7,7 +7,7 @@ import { Tooltip } from '../../../components/tooltip'
 import { useSelectedServerContext } from '../../../providers/selected-server-context'
 import { Spinner } from '@chakra-ui/react'
 import { useState } from 'react'
-import { deleteServer, startServer, stopServer } from '../../../lib/hey-api/client'
+import { deleteServer, startServer, stopServer } from '../../../../lib/hey-api/client'
 
 export const ConsoleCommands = ({ ...props }) => {
     const { selectedServer, serverInfo, setSelectedServer, serverOnline, setServerOnline } = useSelectedServerContext()

@@ -1,3 +1,0 @@
-/**
- * @vitest-environment node
- */

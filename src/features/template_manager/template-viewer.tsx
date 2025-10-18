@@ -15,7 +15,7 @@ import {
 } from '@chakra-ui/react'
 import { useState } from 'react'
 import { useAsync } from 'react-use'
-import { searchTemplates } from '../../lib/hey-api/client'
+import { searchTemplates } from '../../../lib/hey-api/client'
 
 export const TemplateViewer = ({ ...props }) => {
     const { contains } = useFilter({ sensitivity: 'base' })
