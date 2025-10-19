@@ -44,7 +44,7 @@ function metricFilters(core_count: number, data: number[]): UnitValue[] {
         return { value: parseFloat(value), unit: unit, timestamp: Date.now() }
     }
     const values: UnitValue[] = [
-        { value: parseFloat(((data[0] * 100) / core_count).toFixed(2)), unit: '% 1-core', timestamp: Date.now() },
+        { value: parseFloat((data[0] / core_count).toFixed(2)), unit: '% 1-core', timestamp: Date.now() },
         { value: parseFloat((data[1] * 100).toFixed(2)), unit: '%', timestamp: Date.now() },
         bytesConvert(2, 3),
         bytesConvert(4, 5)
@@ -72,19 +72,29 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
 
     useEffect(() => {
         socket.connect()
-        socket.on('connect', () => {
-            setConnectionStatus(ConnectionState.connected)
-        })
+        const onConnect = () => setConnectionStatus(ConnectionState.connected)
+        const onDisconnect = () => setConnectionStatus(ConnectionState.disconnected)
 
-        socket.on('disconnect', () => {
-            setConnectionStatus(ConnectionState.disconnected)
-        })
+        socket.on('connect', onConnect)
+        socket.on('disconnect', onDisconnect)
 
-        socket.on(WSPacketCmdType.LOGS, (msg: string) => {
+        // To prevent the "closed before established" warning in React's StrictMode,
+        // we avoid disconnecting in the cleanup. The socket connection will persist
+        // for the lifetime of the application.
+        return () => {
+            socket.off('connect', onConnect)
+            socket.off('disconnect', onDisconnect)
+        }
+    }, [])
+
+    useEffect(() => {
+        // This effect handles message listeners.
+        // It depends on `serverInfo` to avoid a stale closure in the `onMetric` handler.
+        const onLog = (msg: string) => {
             setLogMessages(prev => [...prev, msg].slice(-LOG_SIZE))
-        })
+        }
 
-        socket.on(WSPacketCmdType.METRICS, (data: string) => {
+        const onMetric = (data: string) => {
             setMetricMessages(prev => {
                 // prev is string of "[n,n,n,n]"
                 let parsedData = JSON.parse(data) as number[]
@@ -92,31 +102,31 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
                 const newMetrics = prev.map((arr, idx) => [...arr, parsedDataUnits[idx]].slice(-METRICS_SIZE))
                 return newMetrics
             })
-        })
+        }
+
+        socket.on(WSPacketCmdType.LOGS, onLog)
+        socket.on(WSPacketCmdType.METRICS, onMetric)
 
         return () => {
-            socket.disconnect()
-            socket.off('connect')
-            socket.off('disconnect')
-            socket.off(WSPacketCmdType.LOGS)
-            socket.off(WSPacketCmdType.METRICS)
+            socket.off(WSPacketCmdType.LOGS, onLog)
+            socket.off(WSPacketCmdType.METRICS, onMetric)
         }
-    }, [])
+    }, [serverInfo])
 
     useEffect(() => {
-        if (selectedServer) {
-            // grab historical logs via http
+        if (serverInfo) {
             getLogMessage({ path: { server_id: serverInfo?.id ?? -1 }, credentials: 'include' }).then(res => {
                 setLogMessages(res.data?.items || [])
             })
-            sendMessage(WSPacketCmdType.SUBSCRIBE, `01+${selectedServer}`)
+            sendMessage(WSPacketCmdType.SUBSCRIBE, `01+${serverInfo.container_name}`)
         }
+
         return () => {
-            if (selectedServer) {
-                sendMessage(WSPacketCmdType.UNSUBCRIBE, `01+${selectedServer}`)
+            if (serverInfo) {
+                sendMessage(WSPacketCmdType.UNSUBCRIBE, `01+${serverInfo.container_name}`)
             }
         }
-    }, [selectedServer])
+    }, [selectedServer, serverInfo])
 
     const sendMessage = useCallback((command: WSPacketCmdType, data: string) => {
         socket.emit(command, data)

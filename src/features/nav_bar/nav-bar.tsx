@@ -1,7 +1,7 @@
 'use client'
 
 import { Combobox, createListCollection, HStack, Portal, Span, Spinner } from '@chakra-ui/react'
-import { useAsync, useEffectOnce } from 'react-use'
+import { useAsync } from 'react-use'
 
 import { useState } from 'react'
 import { searchServers } from '../../../lib/hey-api/client'
@@ -27,14 +27,6 @@ const SearchComboBox = () => {
         items: Object.keys(serverList)
     })
 
-    useEffectOnce(() => {
-        // check if local storage has a selected server
-        const storedServer = localStorage.getItem('selectedServer')
-        if (storedServer) {
-            setSelectedServer(storedServer)
-        }
-    })
-
     const state = useAsync(async () => {
         const container_list = await searchServers({ credentials: 'include' })
         if (container_list.data?.items) {
@@ -54,7 +46,7 @@ const SearchComboBox = () => {
             collection={serverCollection}
             placeholder="Search characters..."
             onInputValueChange={e => {
-                setSelectedServer(e.inputValue)
+                setSelectedServer(serverList[e.inputValue])
             }}
             positioning={{ sameWidth: false, placement: 'bottom-start' }}
             onOpenChange={value => {
@@ -62,11 +54,7 @@ const SearchComboBox = () => {
             }}
         >
             <Combobox.Control>
-                <Combobox.Input
-                    borderWidth={0}
-                    defaultValue={localStorage.getItem('selectedServer') || ''}
-                    placeholder="Select Server..."
-                />
+                <Combobox.Input borderWidth={0} defaultValue={''} placeholder="Select Server..." />
                 <Combobox.IndicatorGroup>
                     <Combobox.ClearTrigger />
                     <Combobox.Trigger />

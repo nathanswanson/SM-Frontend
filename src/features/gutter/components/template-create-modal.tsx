@@ -1,11 +1,11 @@
 import { Button, CloseButton, Collapsible, Dialog, Fieldset, Link, Portal } from '@chakra-ui/react'
 
 import { useState } from 'react'
+import { FaSwatchbook } from 'react-icons/fa6'
+import { addTemplate } from '../../../../lib/hey-api/client'
 import { useSelectedServerContext } from '../../../providers/selected-server-context'
 import { FormField } from '../../../utils/util'
 import { MenuSelectButton } from './menu-select-button'
-import { FaSwatchbook } from 'react-icons/fa6'
-import { addTemplate } from '../../../../lib/hey-api/client'
 
 export const TemplateCreateDialog = () => {
     const [template_name, setTemplateName] = useState('')
@@ -51,10 +51,7 @@ export const TemplateCreateDialog = () => {
 
                                 <Collapsible.Root>
                                     <Collapsible.Trigger>Resource Options - Advanced</Collapsible.Trigger>
-                                    <Collapsible.Content>
-                                        {FormField('CPU Cores', '2', [selectedServer ?? '', setTemplateCpu])}
-                                        {FormField('Memory', '4G', [selectedServer ?? '', setTemplateMemory])}
-                                    </Collapsible.Content>
+                                    <Collapsible.Content></Collapsible.Content>
                                 </Collapsible.Root>
                             </Fieldset.Root>
                         </Dialog.Body>

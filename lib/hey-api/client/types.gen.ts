@@ -65,16 +65,6 @@ export type ContainerFileDeleteResponse = {
 };
 
 /**
- * ContainerFileListResponse
- */
-export type ContainerFileListResponse = {
-    /**
-     * Items
-     */
-    items: Array<string>;
-};
-
-/**
  * ContainerFileUploadResponse
  */
 export type ContainerFileUploadResponse = {
@@ -244,6 +234,16 @@ export type ServerDeleteResponse = {
      * Success
      */
     success: boolean;
+};
+
+/**
+ * ServerFileListResponse
+ */
+export type ServerFileListResponse = {
+    /**
+     * Items
+     */
+    items: Array<string>;
 };
 
 /**
@@ -1489,7 +1489,7 @@ export type SearchFsResponses = {
     /**
      * Successful Response
      */
-    200: ContainerFileListResponse;
+    200: ServerFileListResponse;
 };
 
 export type SearchFsResponse = SearchFsResponses[keyof SearchFsResponses];

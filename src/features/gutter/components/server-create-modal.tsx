@@ -2,22 +2,28 @@ import {
     Button,
     CloseButton,
     Combobox,
+    createListCollection,
     Dialog,
     Field,
-    FieldsetRoot,
+    Fieldset,
     HStack,
+    IconButton,
     Input,
+    InputGroup,
+    NumberInput,
     Portal,
     Span,
-    Spinner,
-    useListCollection
+    Spinner
 } from '@chakra-ui/react'
+
 import { useState } from 'react'
+import { FaDatabase } from 'react-icons/fa6'
+import { LuRefreshCcw } from 'react-icons/lu'
 import { useAsync } from 'react-use'
+import { adjectives, animals, colors, uniqueNamesGenerator } from 'unique-names-generator'
+import { createServer, searchTemplates } from '../../../../lib/hey-api/client'
 import { useSelectedServerContext } from '../../../providers/selected-server-context'
 import { MenuSelectButton } from './menu-select-button'
-import { FaDatabase } from 'react-icons/fa6'
-import { createServer, searchTemplates } from '../../../../lib/hey-api/client'
 
 function parsedPort(serverPort: string): { [key: string]: number | null } | null {
     const entries: Record<string, number | null> = {}
@@ -46,42 +52,64 @@ function parsedEnv(serverEnv: string): { [key: string]: string } {
     return entries
 }
 
+// does not include template name
+// or envs that would be dependent on template
+interface ServerCreateFormData {
+    name: string
+    cpu: number
+    memory: number
+    disk: number
+}
+
+const colSpan = (span: number) => ({ gridColumn: `1 / span ${span}` })
+
 export const ServerCreationDialog = () => {
-    const [serverPort, setPort] = useState<string>('')
-    const [serverEnv, setServerEnv] = useState<string>('')
-    const [serverName, setServerName] = useState<string>('')
-    const [selectedTemplate, setSelectedTemplate] = useState<string>('')
-    const [createServerLoading, setCreateServerLoading] = useState<boolean>(false)
+    // dynamic import of unique-names-generator
+
     const { setSelectedServer } = useSelectedServerContext()
-    const { collection: templateList, set: setTemplateList } = useListCollection<string>({
-        initialItems: ['']
-    })
-    const [templateMap, setTemplateMap] = useState<{ [key: string]: number } | undefined>({})
+    const [createServerLoading, setCreateServerLoading] = useState<boolean>(false)
     const [open, setOpen] = useState(false)
+    const [templateMap, setTemplateMap] = useState<{ [key: string]: number } | undefined>({})
+
+    // form data
+    const [formData, setFormData] = useState<ServerCreateFormData>({
+        name: uniqueNamesGenerator({ length: 2, separator: '-', dictionaries: [adjectives, colors, animals] }),
+        cpu: 1,
+        memory: 1,
+        disk: 16
+    })
+
+    const [selectedTemplate, setSelectedTemplate] = useState<string>('')
+    const node_id = 1 // for now, only one node
+    const templateNames = createListCollection({
+        items: Object.keys(templateMap || {})
+    })
 
     const state = useAsync(async () => {
-        const templateList = await searchTemplates({ credentials: 'include' })
-        setTemplateList(
-            Object.entries(templateList.data?.items || {}).map(([key, value]) => {
-                return key
-            })
-        )
-        setTemplateMap(templateList.data?.items)
-    }, [selectedTemplate, setTemplateList])
+        if (open) {
+            const templateList = await searchTemplates({ credentials: 'include' })
+            setTemplateMap(templateList.data?.items)
+        }
+    }, [open])
+
+    const generateSuggestedName = () => {
+        return uniqueNamesGenerator({ length: 2, separator: '-', dictionaries: [adjectives, colors, animals] })
+    }
 
     const create_server = async () => {
         setCreateServerLoading(true)
         if (templateMap !== undefined) {
+            if (!formData) {
+                setCreateServerLoading(false)
+                return
+            }
             createServer({
                 credentials: 'include',
                 body: {
-                    name: serverName,
+                    ...formData,
+                    node_id: node_id,
                     template_id: templateMap[selectedTemplate],
-                    node_id: 1,
-                    env: {},
-                    cpu: 0,
-                    memory: 0,
-                    disk: 0
+                    env: {} // TODO: Add env parsing
                 }
             })
                 .finally(() => {
@@ -91,12 +119,12 @@ export const ServerCreationDialog = () => {
                 .then(() => {
                     // Created successfully
                     setOpen(false)
-                    setSelectedServer(serverName)
+                    setSelectedServer(undefined)
                 })
         }
     }
     return (
-        <Dialog.Root open={open} onOpenChange={e => setOpen(e.open)}>
+        <Dialog.Root lazyMount size="lg" open={open} onOpenChange={e => setOpen(e.open)}>
             <Dialog.Trigger asChild>
                 <MenuSelectButton color="fg.muted">
                     <FaDatabase />
@@ -110,12 +138,22 @@ export const ServerCreationDialog = () => {
                         <Dialog.Header>
                             <Dialog.Title>Create New Server</Dialog.Title>
                         </Dialog.Header>
-                        <Dialog.Body>
-                            <FieldsetRoot>
-                                <Field.Root>
+                        <Dialog.Body as="form">
+                            <Fieldset.Root
+                                borderRadius={'sm'}
+                                p="1em"
+                                borderWidth={1}
+                                gridAutoRows={'auto'}
+                                gridTemplateColumns={'repeat(3, 1fr)'}
+                                display={'grid'}
+                                gridGap={'1em'}
+                            >
+                                <Fieldset.Legend>Server Details</Fieldset.Legend>
+                                <Field.Root {...colSpan(3)}>
+                                    <Field.Label>Template</Field.Label>
                                     <Combobox.Root
-                                        width="320px"
-                                        collection={templateList}
+                                        maxW="390px"
+                                        collection={templateNames}
                                         placeholder="Search characters..."
                                         onInputValueChange={value => {
                                             setSelectedTemplate(value.inputValue)
@@ -145,7 +183,7 @@ export const ServerCreationDialog = () => {
                                                         Error fetching
                                                     </Span>
                                                 ) : (
-                                                    templateList.items?.map(container => (
+                                                    templateNames.items?.map(container => (
                                                         <Combobox.Item key={container} item={container}>
                                                             <Span fontWeight="medium" truncate>
                                                                 {container}
@@ -158,48 +196,83 @@ export const ServerCreationDialog = () => {
                                         </Combobox.Positioner>
                                     </Combobox.Root>
                                 </Field.Root>
-                                <Field.Root>
+                                <Field.Root aria-autocomplete="none" {...colSpan(3)}>
                                     <Field.Label>Server Name</Field.Label>
-                                    <Input
-                                        onChange={e => setServerName(e.target.value)}
-                                        name="server_name"
-                                        value={serverName}
-                                    ></Input>
+                                    <InputGroup
+                                        maxW="390px"
+                                        endElement={
+                                            <IconButton
+                                                onClick={() => {
+                                                    setFormData({ ...formData, name: generateSuggestedName() })
+                                                }}
+                                                size="xs"
+                                                color="fg.muted"
+                                                variant={'plain'}
+                                            >
+                                                <LuRefreshCcw />
+                                            </IconButton>
+                                        }
+                                        endElementProps={{ padding: '0.25em' }}
+                                    >
+                                        <Input
+                                            autoComplete="off"
+                                            onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                            name="server_name"
+                                            value={formData.name}
+                                        />
+                                    </InputGroup>
                                 </Field.Root>
                                 <Field.Root>
-                                    <Field.Label>Port</Field.Label>
-                                    <Field.HelperText>ex. 25565 ex. 25565/tcp ex. 25565:25565/tcp</Field.HelperText>
-                                    <Input
-                                        value={serverPort}
-                                        onChange={value => {
-                                            setPort(value.target.value)
-                                        }}
-                                    ></Input>
+                                    <Field.Label>CPU cores</Field.Label>
+                                    <NumberInput.Root defaultValue="1" step={1} min={1}>
+                                        <NumberInput.Control />
+                                        <NumberInput.Input />
+                                    </NumberInput.Root>
                                 </Field.Root>
                                 <Field.Root>
-                                    <Field.Label>Environment Variables</Field.Label>
-                                    <Field.HelperText>
-                                        Must be in comma seperate format ex. EULA=TRUE,MODDED=TRUE
-                                    </Field.HelperText>
-                                    <Input
-                                        value={serverEnv}
-                                        onChange={value => {
-                                            setServerEnv(value.target.value)
+                                    <Field.Label>Memory</Field.Label>
+                                    <NumberInput.Root
+                                        defaultValue="1"
+                                        step={1}
+                                        min={1}
+                                        formatOptions={{
+                                            style: 'unit',
+                                            unit: 'gigabyte'
                                         }}
-                                    ></Input>
+                                    >
+                                        <NumberInput.Control />
+                                        <NumberInput.Input />
+                                    </NumberInput.Root>
                                 </Field.Root>
-                            </FieldsetRoot>
+                                <Field.Root>
+                                    <Field.Label>Disk</Field.Label>
+                                    <NumberInput.Root
+                                        defaultValue="16"
+                                        step={16}
+                                        min={16}
+                                        formatOptions={{
+                                            style: 'unit',
+                                            unit: 'gigabyte'
+                                        }}
+                                    >
+                                        <NumberInput.Control />
+                                        <NumberInput.Input />
+                                    </NumberInput.Root>
+                                </Field.Root>
+                            </Fieldset.Root>
                         </Dialog.Body>
                         <Dialog.Footer>
                             <Dialog.ActionTrigger asChild>
-                                <Button variant="outline">Cancel</Button>
+                                <Button size="md" variant="outline">
+                                    Cancel
+                                </Button>
                             </Dialog.ActionTrigger>
-                            <Button onClick={create_server} loading={createServerLoading}>
+                            <Button size="md" type="submit" onClick={create_server} loading={createServerLoading}>
                                 Create
                             </Button>
                         </Dialog.Footer>
                         <Dialog.CloseTrigger asChild>
-                            <CloseButton size="sm" />
+                            <CloseButton size="md" />
                         </Dialog.CloseTrigger>
                     </Dialog.Content>
                 </Dialog.Positioner>

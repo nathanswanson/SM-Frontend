@@ -27,7 +27,7 @@ export const LogManager = ({ ...props }) => {
     }
 
     return (
-        <VStack flexGrow={1} h="100%" {...props}>
+        <VStack flexGrow={1} h="100%" maxW="100%" width="700px" {...props}>
             {!serverInfo ? <DisabledModule requester="logs" /> : <LazyLogView></LazyLogView>}
             <HStack width="100%">
                 <Input

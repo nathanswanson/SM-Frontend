@@ -1,11 +1,7 @@
-import { http, ws } from 'msw'
-import { HttpHandler } from 'msw'
-import { LocalDB } from './local-db'
-import { HttpResponse } from 'msw'
-import { passthrough } from 'msw'
-import { ServerStatusResponse } from '../../lib/hey-api/client/types.gen'
-import { toSocketIo } from '@mswjs/socket.io-binding'
 import { LoremIpsum } from 'lorem-ipsum'
+import { http, HttpResponse, passthrough, ws } from 'msw'
+import { ServerStatusResponse } from '../../lib/hey-api/client/types.gen'
+import { LocalDB } from './local-db'
 const db: LocalDB = LocalDB.getInstance()
 
 const InternalMockData = {
@@ -33,8 +29,6 @@ const auto_login = true
 function generateLogLine(serverName: string): string {
     return `[${new Date().toISOString()}][${serverName}][INFO]:${lorem.generateSentences(1)}`
 }
-
-console.log('Mocking enabled:', auto_login)
 
 export const handlers: any[] = [
     //public functions

@@ -2,7 +2,7 @@ FROM node:20
 
 WORKDIR /app
 
-ENV VITE_SM_MODE=demo
+ENV VITE_SM_MODE=development
 
 COPY package*.json ./
 RUN npm install

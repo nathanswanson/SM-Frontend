@@ -1,11 +1,11 @@
 import { Button, Dialog, FileUpload, Input, Portal } from '@chakra-ui/react'
-import { BiUpload } from 'react-icons/bi'
 import { useState } from 'react'
-import { useSelectedServerContext } from '../../../providers/selected-server-context'
+import { BiUpload } from 'react-icons/bi'
 import { uploadFile } from '../../../../lib/hey-api/client'
+import { useSelectedServerContext } from '../../../providers/selected-server-context'
 
 export const UploadPathPrompt = () => {
-    const { selectedServer } = useSelectedServerContext()
+    const { selectedServer, serverInfo } = useSelectedServerContext()
     const [selectedPath, setSelectedPath] = useState<string>('')
     const [pendingFiles, setPendingFiles] = useState<File>()
 
@@ -18,7 +18,7 @@ export const UploadPathPrompt = () => {
     return (
         <Dialog.Root role="alertdialog">
             <Dialog.Trigger asChild>
-                <Button size="lg" variant="surface" disabled={selectedServer == undefined || selectedServer == ''}>
+                <Button size="lg" variant="surface" disabled={selectedServer == undefined}>
                     <BiUpload /> Upload File
                 </Button>
             </Dialog.Trigger>
@@ -45,8 +45,8 @@ export const UploadPathPrompt = () => {
                             <Dialog.CloseTrigger>
                                 <Button
                                     onClick={() => {
-                                        if (selectedServer && pendingFiles)
-                                            upload_file(selectedServer, selectedPath, pendingFiles)
+                                        if (serverInfo && pendingFiles)
+                                            upload_file(serverInfo.name, selectedPath, pendingFiles)
                                     }}
                                 ></Button>
                             </Dialog.CloseTrigger>

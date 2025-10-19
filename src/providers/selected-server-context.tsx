@@ -1,15 +1,13 @@
-import { createContext, useEffect, useState } from 'react'
-import { useContext } from 'react'
-import { ReactNode } from 'react'
-import { getServerInfo, getServerStatus, ServersBase, ServersRead } from '../../lib/hey-api/client'
+import { createContext, ReactNode, useContext, useEffect, useState } from 'react'
 import { useEffectOnce } from 'react-use'
+import { getServerInfo, getServerStatus, ServersRead } from '../../lib/hey-api/client'
 
 interface ISelectedServerContext {
-    selectedServer: string | undefined
+    selectedServer: number | undefined
     serverInfo: ServersRead | undefined
     serverOnline: boolean | undefined
     setServerOnline: (online: boolean) => void
-    setSelectedServer: (id: string) => void
+    setSelectedServer: (id: number | undefined) => void
 }
 
 const SelectedServerContext = createContext<ISelectedServerContext | undefined>(undefined)
@@ -23,29 +21,34 @@ export const useSelectedServerContext = () => {
 }
 
 export const SelectedServerProvider = ({ children }: { children: ReactNode }) => {
-    const [selectedServer, setSelectedServer] = useState<string | undefined>(undefined)
+    const [selectedServer, setSelectedServer] = useState<number | undefined>(undefined)
     const [serverOnline, setServerOnline] = useState<boolean | undefined>(undefined)
     const [serverInfo, setServerInfo] = useState<ServersRead | undefined>(undefined)
     useEffectOnce(() => {
         const saved = localStorage.getItem('selectedServer')
         if (saved) {
-            setSelectedServer(saved)
+            setSelectedServer(Number(saved))
         }
     })
 
     // change serverInfo to match selectedServer
     useEffect(() => {
-        if (selectedServer == undefined || selectedServer == '') {
+        if (selectedServer == undefined) {
             setServerInfo(undefined)
         } else {
             const abortController = new AbortController()
             getServerInfo({
                 credentials: 'include',
-                path: { server_id: 1 },
+                path: { server_id: selectedServer },
                 signal: abortController.signal
-            }).then(res => {
-                setServerInfo(res.data ?? undefined)
             })
+                .then(res => {
+                    setServerInfo(res.data ?? undefined)
+                })
+                .catch(error => {
+                    console.error('Failed to fetch server info:', error)
+                    setServerInfo(undefined)
+                })
             return () => {
                 abortController.abort()
             }
@@ -53,9 +56,9 @@ export const SelectedServerProvider = ({ children }: { children: ReactNode }) =>
     }, [selectedServer])
 
     useEffect(() => {
-        if (selectedServer == undefined || selectedServer == '' || serverInfo == undefined) {
+        if (selectedServer == undefined || serverInfo == undefined) {
             setServerOnline(undefined)
-            localStorage.removeItem('selectedServer')
+            // localStorage.removeItem('selectedServer')
             return
         }
 
@@ -65,10 +68,15 @@ export const SelectedServerProvider = ({ children }: { children: ReactNode }) =>
             credentials: 'include',
             path: { server_id: serverInfo.id ?? -1 },
             signal: abortController.signal
-        }).then(res => {
-            setServerOnline(res.data?.running)
-            localStorage.setItem('selectedServer', selectedServer)
         })
+            .then(res => {
+                setServerOnline(res.data?.running)
+                // localStorage.setItem('selectedServer', selectedServer.toString())
+            })
+            .catch(error => {
+                console.error('Failed to fetch server status:', error)
+                setServerOnline(false)
+            })
 
         return () => {
             abortController.abort()

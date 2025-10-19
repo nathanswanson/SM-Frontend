@@ -1,14 +1,13 @@
 'use client'
 
-import { Box, Text, ScrollArea, TreeView, createTreeCollection } from '@chakra-ui/react'
+import { Box, ScrollArea, Text, TreeView, createTreeCollection } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { LuFile, LuFolder, LuLoaderCircle } from 'react-icons/lu'
 
+import { readFile, searchFs } from '../../../lib/hey-api/client'
+import { DisabledModule } from '../../components/disabled-module'
 import { useSelectedServerContext } from '../../providers/selected-server-context'
 import { TextEditorDialog } from './components/text-editor'
-import { DisabledModule } from '../../components/disabled-module'
-import { blob } from 'stream/consumers'
-import { readFile, searchFs, uploadFile } from '../../../lib/hey-api/client'
 
 function getRelativePath(from: string, to: string): string {
     if (from !== '/') {
@@ -98,7 +97,7 @@ export const FileManager = ({ ...props }) => {
 
 const FileTree = () => {
     const [collection, setCollection] = useState(initialCollection)
-    const { selectedServer } = useSelectedServerContext()
+    const { selectedServer, serverInfo } = useSelectedServerContext()
     const [editorInputStream, setEditorInputStream] = useState<ReadableStream<Uint8Array> | null>(null)
     const [isEditorOpen, setIsEditorOpen] = useState(false)
     const [editorFilePath, setEditorFilePath] = useState<string>('.txt')
@@ -123,7 +122,7 @@ const FileTree = () => {
 
     function loadChildren(details: TreeView.LoadChildrenDetails<Node>): Promise<Node[]> {
         const value = details.valuePath.join('')
-        return getPathFiles(value, selectedServer || '')
+        return getPathFiles(value, serverInfo?.name || '')
     }
 
     async function handleFileSelect(e: TreeView.SelectionChangeDetails<Node>) {
@@ -133,7 +132,7 @@ const FileTree = () => {
                 const path = e.selectedNodes[0]['full_path']
                 const dl = await readFile({
                     credentials: 'include',
-                    path: { container_name: selectedServer },
+                    path: { container_name: serverInfo?.name || '' },
                     query: { path: path }
                 })
                 if (dl?.data) {
@@ -199,11 +198,12 @@ const FileTree = () => {
             .blob()
             .then(async blob => {
                 console.log(blob)
-                await uploadFile({
-                    credentials: 'include',
-                    path: { container_name: selectedServer, path: path },
-                    body: { file: blob }
-                })
+                //TODO: upload file
+                // await uploadFile({
+                //     credentials: 'include',
+                //     path: { container_name: selectedServer, path: path },
+                //     body: { file: blob }
+                // })
             })
     }
 

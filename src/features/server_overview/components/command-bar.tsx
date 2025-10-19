@@ -1,13 +1,13 @@
-import { HStack } from '@chakra-ui/react/stack'
+import { Spinner } from '@chakra-ui/react'
 import { ButtonGroup } from '@chakra-ui/react/button'
+import { HStack } from '@chakra-ui/react/stack'
 import { Status } from '@chakra-ui/react/status'
-import CommandButton from '../../../components/command-button'
+import { useState } from 'react'
 import { RiDeleteBin7Fill, RiPlayLargeFill, RiResetLeftFill, RiStopLargeFill } from 'react-icons/ri'
+import { deleteServer, startServer, stopServer } from '../../../../lib/hey-api/client'
+import CommandButton from '../../../components/command-button'
 import { Tooltip } from '../../../components/tooltip'
 import { useSelectedServerContext } from '../../../providers/selected-server-context'
-import { Spinner } from '@chakra-ui/react'
-import { useState } from 'react'
-import { deleteServer, startServer, stopServer } from '../../../../lib/hey-api/client'
 
 export const ConsoleCommands = ({ ...props }) => {
     const { selectedServer, serverInfo, setSelectedServer, serverOnline, setServerOnline } = useSelectedServerContext()
@@ -59,7 +59,7 @@ export const ConsoleCommands = ({ ...props }) => {
         })
             .then(response => {
                 if (response.response.ok) {
-                    setSelectedServer('')
+                    setSelectedServer(undefined)
                     setServerOnline(false)
                 }
             })

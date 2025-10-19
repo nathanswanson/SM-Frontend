@@ -1,12 +1,11 @@
-import { Button, ButtonGroup, Flex, Text, IconButton, Status } from '@chakra-ui/react'
+import { Button, ButtonGroup, Flex, IconButton, Status, Text } from '@chakra-ui/react'
 
 import { useState } from 'react'
-import { VscDebugRestart, VscDebugStart, VscDebugStop } from 'react-icons/vsc'
-import { useSelectedServerContext } from '../../providers/selected-server-context'
-import { DangerConfirmation } from '../../components/danger-confirmation'
 import { FaFileExport } from 'react-icons/fa6'
+import { VscDebugRestart, VscDebugStart, VscDebugStop } from 'react-icons/vsc'
 import { deleteServer, startServer, stopServer } from '../../../lib/hey-api/client'
-import { server } from '../../mocks/node'
+import { DangerConfirmation } from '../../components/danger-confirmation'
+import { useSelectedServerContext } from '../../providers/selected-server-context'
 
 export const ServerControl = ({ ...props }) => {
     const { selectedServer, setSelectedServer, serverInfo, serverOnline } = useSelectedServerContext()
@@ -18,7 +17,7 @@ export const ServerControl = ({ ...props }) => {
                 path: { server_id: serverInfo?.id ?? -1 }
             })
                 .then(() => {
-                    setSelectedServer('')
+                    setSelectedServer(undefined)
                 })
                 .finally(() => {
                     setIsOpenDeleteDialog(false)
@@ -33,13 +32,13 @@ export const ServerControl = ({ ...props }) => {
                     <Status.Indicator background={!serverOnline ? 'danger.500' : 'green.500'} />
                 </Status.Root>
             </Text>
-            <Button size="lg" variant="surface" disabled={selectedServer == undefined || selectedServer == ''}>
+            <Button size="lg" variant="surface" disabled={selectedServer == undefined}>
                 <FaFileExport />
                 Export Server
             </Button>
             <CommandButtons />
             <DangerConfirmation
-                resourceName={selectedServer ? selectedServer : ''}
+                resourceName={serverInfo?.name ?? ''}
                 onConfirm={e => {
                     deleteServer({
                         credentials: 'include',
@@ -92,7 +91,7 @@ const CommandButtons = ({ ...props }) => {
         <ButtonGroup size="lg" variant="surface" attached {...props}>
             <IconButton
                 loading={loading}
-                disabled={selectedServer == undefined || selectedServer == ''}
+                disabled={selectedServer == undefined}
                 onClick={serverOnline ? stop_server : start_server}
             >
                 {serverOnline === null ? <VscDebugStart /> : serverOnline ? <VscDebugStop /> : <VscDebugStart />}

@@ -1,0 +1,17 @@
+[
+    {
+        "key": "EULA",
+        "label": "EULA Agreement",
+        "type": "Toggle",
+        "default": false
+    },
+    {
+        "key": "test",
+        "label": "test",
+        "type": "Number",
+        "default": 4,
+        "dependsOn": [
+            "EULA"
+        ]
+    }
+]

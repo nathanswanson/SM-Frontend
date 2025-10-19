@@ -31,7 +31,7 @@ export const ActionHalo = ({ children, rowSpan, colSpan }: ActionHaloProps) => {
             gap="1em"
             display="flex"
             flexDirection={'column'}
-            colSpan={{ base: colSpan, smDown: 3 }}
+            colSpan={{ base: colSpan, smOnly: 3 }}
             rowSpan={rowSpan}
             className="actionhalo-root"
         >

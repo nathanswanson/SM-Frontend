@@ -1,14 +1,14 @@
 import { ChakraProvider } from '@chakra-ui/react'
 import { ThemeProvider } from 'next-themes'
-import { SelectedServerProvider } from './providers/selected-server-context'
-import { system } from './theme'
-import { WebSocketProvider } from './providers/web-socket'
-import { ColorModeProvider, DarkMode, LightMode } from '../lib/chakra/color-mode'
-import { WindowProvider } from './providers/window-context'
-import { UserDataProvider } from './providers/user-data'
 import React from 'react'
 import { createRoot } from 'react-dom/client'
+import { ColorModeProvider } from '../lib/chakra/color-mode'
 import App from './App'
+import { SelectedServerProvider } from './providers/selected-server-context'
+import { UserDataProvider } from './providers/user-data'
+import { WebSocketProvider } from './providers/web-socket'
+import { WindowProvider } from './providers/window-context'
+import { system } from './theme'
 if (!import.meta.env.VITE_SM_MODE) {
     console.warn('VITE_SM_MODE is not set, defaulting to production')
 }
@@ -20,7 +20,7 @@ export const SMMode = {
     DEMO: 'demo'
 }
 
-export const smMode = import.meta.env.VITE_SM_MODE || SMMode.PRODUCTION
+export const smMode = import.meta.env.VITE_SM_MODE ?? SMMode.PRODUCTION
 export function mockingEnabled() {
     return smMode === SMMode.TESTING || smMode === SMMode.DEMO
 }
@@ -30,7 +30,7 @@ async function preLoad() {
         const { client } = await import('./api')
         console.log('hey-api client baseUrl:', client.getConfig().baseUrl)
     }
-    if (smMode == SMMode.DEMO || smMode == SMMode.DEVELOPMENT) await enableMocking()
+    if (mockingEnabled()) await enableMocking()
     await loadClient()
     return
 }
@@ -42,25 +42,29 @@ async function enableMocking() {
     LocalDB.getInstance()
     return worker.start()
 }
-
+export const SM = ({ children }: { children: React.ReactNode }) => {
+    return (
+        <ChakraProvider value={system}>
+            <ThemeProvider attribute="class">
+                <ColorModeProvider>
+                    <SelectedServerProvider>
+                        <WebSocketProvider>
+                            <WindowProvider>
+                                <UserDataProvider>{children}</UserDataProvider>
+                            </WindowProvider>
+                        </WebSocketProvider>
+                    </SelectedServerProvider>
+                </ColorModeProvider>
+            </ThemeProvider>
+        </ChakraProvider>
+    )
+}
 preLoad().then(() => {
     createRoot(document.getElementById('root')!).render(
         <React.StrictMode>
-            <ChakraProvider value={system}>
-                <ThemeProvider attribute="class">
-                    <ColorModeProvider>
-                        <SelectedServerProvider>
-                            <WebSocketProvider>
-                                <WindowProvider>
-                                    <UserDataProvider>
-                                        <App />
-                                    </UserDataProvider>
-                                </WindowProvider>
-                            </WebSocketProvider>
-                        </SelectedServerProvider>
-                    </ColorModeProvider>
-                </ThemeProvider>
-            </ChakraProvider>
+            <SM>
+                <App />
+            </SM>
         </React.StrictMode>
     )
 })
