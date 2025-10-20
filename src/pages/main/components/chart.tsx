@@ -1,7 +1,6 @@
 import { Card, HStack, Stat } from '@chakra-ui/react'
-import { Text } from '@chakra-ui/react/text'
 import React, { useState } from 'react'
-import { UnitValue } from '../providers/web-socket'
+import { UnitValue } from '../../../providers/web-socket'
 
 const SparkLineLazy = React.lazy(() => import('./spark-card').then(module => ({ default: module.SparkLine })))
 
@@ -12,7 +11,7 @@ interface LightCardProps {
     data: UnitValue[]
 }
 
-export const LightCard = ({ label, color, unit, data }: LightCardProps) => {
+export const SMChart = ({ label, color, unit, data }: LightCardProps) => {
     const [highlightedIndex, setHighlightedIndex] = useState<number | null>(null)
     return (
         <>

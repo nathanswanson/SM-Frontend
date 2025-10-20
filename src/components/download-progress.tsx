@@ -11,7 +11,7 @@ export const DownloadProgress = ({ fileName, current, total, ...props }: Downloa
     const progress = total > 0 ? (current / total) * 100 : 0
 
     return (
-        <Progress.Root width="100%" defaultValue={progress} {...props} striped animated>
+        <Progress.Root width="100%" minW="10em" defaultValue={progress} {...props} striped animated>
             {fileName && <Progress.Label>{fileName}</Progress.Label>}
             <HStack>
                 <Progress.Track flex={1}>

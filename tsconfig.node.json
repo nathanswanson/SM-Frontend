@@ -3,7 +3,7 @@
     "jsx": "react",
     "composite": true,
     "module": "esnext",
-    "moduleResolution": "node"
+    "moduleResolution": "node16"
   },
   "include": [
     "vite.config.ts",

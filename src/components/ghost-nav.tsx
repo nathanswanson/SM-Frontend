@@ -1,5 +1,4 @@
 import { Box } from '@chakra-ui/react/box'
-import { useEffect, useState } from 'react'
 import { useWindowContext } from '../providers/window-context'
 
 function minmaxScale(value: number, inMin: number, inMax: number, outMin: number, outMax: number) {

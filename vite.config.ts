@@ -1,8 +1,8 @@
 /// <reference types="vitest" />
 /// <reference types="@vitest/browser/providers/playwright" />
 import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
 import { visualizer } from 'rollup-plugin-visualizer'
+import { defineConfig } from 'vite'
 
 export default defineConfig({
     plugins: [
@@ -19,14 +19,6 @@ export default defineConfig({
             provider: 'playwright',
             instances: [{ browser: 'chromium', include: ['**/__test__/*.test.ts'] }]
         }
-        // projects: [
-        //     {
-        //         test: {
-        //             name: 'default',
-        //             include: ['src/**/*.test.ts']
-        //         }
-        //     }
-        // ]
     },
 
     build: {

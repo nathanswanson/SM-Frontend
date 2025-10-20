@@ -3,7 +3,6 @@ import { Button, CloseButton, Collapsible, Dialog, Fieldset, Link, Portal } from
 import { useState } from 'react'
 import { FaSwatchbook } from 'react-icons/fa6'
 import { addTemplate } from '../../../../lib/hey-api/client'
-import { useSelectedServerContext } from '../../../providers/selected-server-context'
 import { FormField } from '../../../utils/util'
 import { MenuSelectButton } from './menu-select-button'
 
@@ -11,10 +10,6 @@ export const TemplateCreateDialog = () => {
     const [template_name, setTemplateName] = useState('')
     const [template_image, setTemplateImage] = useState('')
     const [template_port, setTemplatePort] = useState('')
-    const [, setTemplateCpu] = useState('2')
-    const [, setTemplateMemory] = useState('4G')
-
-    const { selectedServer } = useSelectedServerContext()
 
     return (
         <Dialog.Root>

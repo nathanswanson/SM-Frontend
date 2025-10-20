@@ -13,10 +13,10 @@ import {
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { VscArrowRight } from 'react-icons/vsc'
-import { PasswordInput } from '../../lib/chakra/password-input'
-import { Toaster, toaster } from '../../lib/chakra/toaster'
-import { getUser, loginUser } from '../../lib/hey-api/client'
-import { useUserDataContext } from '../providers/user-data'
+import { PasswordInput } from '../../../lib/chakra/password-input'
+import { Toaster, toaster } from '../../../lib/chakra/toaster'
+import { getUser, loginUser } from '../../../lib/hey-api/client'
+import { useUserDataContext } from '../../providers/user-data'
 
 async function checkLoginStatus() {
     try {

@@ -45,8 +45,6 @@ export const ServerControl = ({ ...props }) => {
                         path: { server_id: serverInfo?.id ?? -1 }
                     })
                 }}
-                open={isOpenDeleteDialog}
-                setOpen={setIsOpenDeleteDialog}
             />
         </Flex>
     )

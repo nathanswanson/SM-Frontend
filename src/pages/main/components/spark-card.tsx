@@ -1,5 +1,4 @@
 import { Chart, useChart } from '@chakra-ui/charts'
-import { useEffect, useState } from 'react'
 import { Area, AreaChart } from 'recharts'
 
 export interface SparkLineProps {
@@ -11,7 +10,7 @@ export interface SparkLineProps {
     onHighlightIndex?: (index: number | null) => void
 }
 
-export const SparkLine = ({ data, color, highlightedIndex, onHighlightIndex }: SparkLineProps) => {
+export const SparkLine = ({ data, color, onHighlightIndex }: SparkLineProps) => {
     // initialize from controlled prop if provided
 
     const chart = useChart({

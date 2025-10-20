@@ -1,17 +1,15 @@
-import { NodeOverview } from '../node_overview/node-overview'
-import CardModule from '../../components/card'
-import { Grid } from '@chakra-ui/react/grid'
-import { LogManager } from '../console/console'
-import { Flex } from '@chakra-ui/react/flex'
-import { VStack } from '@chakra-ui/react/stack'
-import { ServerOverview } from '../server_overview/server-overview'
-import { LightCard } from '../../components/light-card'
-import { ActionHalo } from '../../components/action-halo'
-import { FileManagerHalo } from '../file_manager/file-manager'
-import { ConsoleCommands } from '../server_overview/components/command-bar'
-import { useWebSocketProvider } from '../../providers/web-socket'
 import { SimpleGrid } from '@chakra-ui/react'
-
+import { Grid } from '@chakra-ui/react/grid'
+import { VStack } from '@chakra-ui/react/stack'
+import { ActionHalo } from '../../components/action-halo'
+import CardModule from '../../components/card'
+import { LogManager } from '../../features/console/console'
+import { FileManagerHalo } from '../../features/file_manager/file-manager'
+import { NodeOverview } from '../../features/node_overview/node-overview'
+import { ConsoleCommands } from '../../features/server_overview/components/command-bar'
+import { ServerOverview } from '../../features/server_overview/server-overview'
+import { useWebSocketProvider } from '../../providers/web-socket'
+import { SMChart } from './components/chart'
 
 export const MainContent = ({ ...props }) => {
     const { metricMessages } = useWebSocketProvider()
@@ -27,10 +25,10 @@ export const MainContent = ({ ...props }) => {
                 mb="1.5em"
                 // flexFlow={'row wrap'}
             >
-                <LightCard color="red" unit="Cores" label="Cpu" data={metricMessages[0]} />
-                <LightCard color="blue" unit="GB" label="Memory" data={metricMessages[1]} />
-                <LightCard color="green" unit="Mbps" label="Network" data={metricMessages[2]} />
-                <LightCard color="orange" unit="GB" label="Disk" data={metricMessages[3]} />
+                <SMChart color="red" unit="Cores" label="Cpu" data={metricMessages[0]} />
+                <SMChart color="blue" unit="GB" label="Memory" data={metricMessages[1]} />
+                <SMChart color="green" unit="Mbps" label="Network" data={metricMessages[2]} />
+                <SMChart color="orange" unit="GB" label="Disk" data={metricMessages[3]} />
             </SimpleGrid>
             <Cards />
         </VStack>
