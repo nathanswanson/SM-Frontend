@@ -22,8 +22,8 @@ import { LuRefreshCcw } from 'react-icons/lu'
 import { useAsync } from 'react-use'
 import { adjectives, animals, colors, uniqueNamesGenerator } from 'unique-names-generator'
 import { createServer, searchTemplates } from '../../../../lib/hey-api/client'
+import { MenuSelectButton } from '../../../mocks/menu-select-button'
 import { useSelectedServerContext } from '../../../providers/selected-server-context'
-import { MenuSelectButton } from './menu-select-button'
 
 function parsedPort(serverPort: string): { [key: string]: number | null } | null {
     const entries: Record<string, number | null> = {}

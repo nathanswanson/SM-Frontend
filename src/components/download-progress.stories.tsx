@@ -12,7 +12,8 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
     args: {
-        current: 0,
-        total: 0
+        current: 10244,
+        total: 16554,
+        fileName: 'server.properties'
     }
 }

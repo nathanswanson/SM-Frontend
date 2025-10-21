@@ -1,4 +1,4 @@
-import { Checkbox, Field, Input, NumberInput } from '@chakra-ui/react'
+import { Box, BoxProps, Checkbox, Field, Input, NumberInput } from '@chakra-ui/react'
 
 export enum TemplateModuleType {
     CHECKBOX = 'checkbox',
@@ -7,7 +7,7 @@ export enum TemplateModuleType {
     NUMBER = 'number'
 }
 
-interface TemplateModuleBaseProps {
+interface TemplateModuleBaseProps extends BoxProps {
     templateModID: string
 }
 
@@ -18,7 +18,7 @@ interface TemplateModuleProps extends TemplateModuleBaseProps {
     description?: string
 }
 
-const CheckboxModule = ({ templateModID }: TemplateModuleBaseProps) => {
+const CheckboxModule = ({ templateModID, ...rest }: TemplateModuleBaseProps) => {
     return (
         <Checkbox.Root>
             <Checkbox.HiddenInput />
@@ -29,42 +29,42 @@ const CheckboxModule = ({ templateModID }: TemplateModuleBaseProps) => {
     )
 }
 
-const SelectModule = ({ templateModID }: TemplateModuleBaseProps) => {
-    return <div>Select Module</div>
+const SelectModule = ({ templateModID, ...rest }: TemplateModuleBaseProps) => {
+    // return <Select.Root {...rest}></Select.Root>
+    return <Box></Box>
 }
 
-const TextModule = ({ templateModID }: TemplateModuleBaseProps) => {
-    return <Input id={templateModID}></Input>
+const TextModule = ({ templateModID, ...rest }: TemplateModuleBaseProps) => {
+    return <Input {...rest}></Input>
 }
-const NumberModule = ({ templateModID }: TemplateModuleBaseProps) => {
+const NumberModule = ({ templateModID, ...rest }: TemplateModuleBaseProps) => {
     return (
-        <NumberInput.Root id={templateModID}>
-            <NumberInput.Input></NumberInput.Input>
+        <NumberInput.Root>
+            <NumberInput.Input {...rest}></NumberInput.Input>
         </NumberInput.Root>
     )
 }
 
-export const TemplateModule = ({ type, templateModID, required, description, label }: TemplateModuleProps) => {
+export const TemplateModule = ({ type, templateModID, required, description, label, ...rest }: TemplateModuleProps) => {
     let templ = null
-    console.log(type)
     switch (type) {
         case TemplateModuleType.CHECKBOX:
-            templ = <CheckboxModule templateModID={templateModID} />
+            templ = <CheckboxModule templateModID={templateModID} {...rest} />
             break
         case TemplateModuleType.TEXT:
-            templ = <TextModule templateModID={templateModID} />
+            templ = <TextModule templateModID={templateModID} {...rest} />
             break
         case TemplateModuleType.SELECT:
-            templ = <SelectModule templateModID={templateModID} />
+            templ = <SelectModule templateModID={templateModID} {...rest} />
             break
         case TemplateModuleType.NUMBER:
-            templ = <NumberModule templateModID={templateModID} />
+            templ = <NumberModule templateModID={templateModID} {...rest} />
             break
         default:
             templ = <div>Unknown Module Type</div>
     }
     return (
-        <Field.Root>
+        <Field.Root {...rest}>
             <Field.Label>{label}</Field.Label>
             {required && <Field.RequiredIndicator />}
             {templ}

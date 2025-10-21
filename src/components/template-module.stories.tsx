@@ -15,7 +15,7 @@ export const Checkbox: Story = {
     args: {
         type: TemplateModuleType.CHECKBOX,
         templateModID: 'EULA',
-        required: false,
+        required: true,
         description: 'Do you accept the terms laid out in the eula?',
         label: 'EULA'
     }

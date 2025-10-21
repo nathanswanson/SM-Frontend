@@ -7,7 +7,7 @@ describe('TemplateModule', () => {
         render(
             <TemplateModule
                 type={TemplateModuleType.CHECKBOX}
-                key="test-checkbox"
+                templateModID="test-checkbox"
                 required={true}
                 label="Test Checkbox"
                 description="This is a test checkbox"

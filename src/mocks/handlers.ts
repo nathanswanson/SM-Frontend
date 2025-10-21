@@ -9,7 +9,8 @@ const InternalMockData = {
     serversOnline: [] as string[]
 }
 
-const ip = 'http://api.localhost'
+// const ip = 'http://api.localhost'
+const ip = window.location.origin
 const ip_ws = 'ws://api.localhost'
 const socketLink = ws.link(ip_ws)
 
@@ -32,11 +33,11 @@ function generateLogLine(serverName: string): string {
 
 export const handlers: any[] = [
     //public functions
-    // socketLink.addEventListener('connection', ({ client }) => {
-    //     client.addEventListener('message', msg => {
-    //         console.log('Received message from client:', msg)
-    //     })
-    // }),
+    socketLink.addEventListener('connection', ({ client }) => {
+        client.addEventListener('message', msg => {
+            console.log('Received message from client:', msg)
+        })
+    }),
     http.post(`${ip}/users/token`, () => {
         InternalMockData.loggedIn = true
         return new HttpResponse({ status: 200 })
@@ -119,7 +120,12 @@ export const handlers: any[] = [
     //CRUD operations
     http.post(`${ip}/:type/`, async ({ request, params }) => {
         const { type } = params
-        const body = await request.clone().json()
+        const bodyRaw = await request.json()
+        if (bodyRaw === undefined || bodyRaw === null) {
+            return new HttpResponse('Bad Request', { status: 400 })
+        }
+        // Narrow/convert so it satisfies LocalDB.add's expected parameter type
+        const body = bodyRaw as unknown as any
         await db.add(type as string, body)
         return HttpResponse.json(body)
     }),
@@ -141,5 +147,8 @@ export const handlers: any[] = [
         const { type, id } = req.params
         await db.del(type as string, Number(id))
         return new HttpResponse(null, { status: 204 })
+    }),
+    http.all(`${ip}/*`, async () => {
+        return passthrough()
     })
 ]

@@ -15,21 +15,23 @@ import { system } from './theme'
 
 export default function Page() {
     return (
-        <Login>
-            <Box height={'svh'} width={'svw'} bg="bg.subtle">
-                <GhostNav />
-                <HStack p="1em" alignItems={'flex-start'} justifySelf={'center'} maxWidth={1980}>
-                    <Gutter top="100px" width="20%" />
+        <SM>
+            <Login>
+                <Box height={'svh'} width={'svw'} bg="bg.subtle">
+                    <GhostNav />
+                    <HStack p="1em" alignItems={'flex-start'} justifySelf={'center'} maxWidth={1980}>
+                        <Gutter top="100px" width="20%" />
 
-                    <VStack marginY="6" marginX="auto" paddingX="6" marginTop="0" marginBottom="0">
-                        {/* nav bar */}
-                        <NavBar width="100%" justifyContent="flex-end"></NavBar>
-                        <MainContent></MainContent>
-                        <Toaster />
-                    </VStack>
-                </HStack>
-            </Box>
-        </Login>
+                        <VStack marginY="6" marginX="auto" paddingX="6" marginTop="0" marginBottom="0">
+                            {/* nav bar */}
+                            <NavBar width="100%" justifyContent="flex-end"></NavBar>
+                            <MainContent></MainContent>
+                            <Toaster />
+                        </VStack>
+                    </HStack>
+                </Box>
+            </Login>
+        </SM>
     )
 }
 

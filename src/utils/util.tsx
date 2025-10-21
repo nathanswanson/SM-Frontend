@@ -28,3 +28,11 @@ export function convertToGB(bytes: number | undefined): number {
 export function roundToNearest4GB(memory_size: number): number {
     return parseFloat((Math.round(memory_size / 4) * 4).toFixed(2))
 }
+
+export function titleCaseString(str: string): string {
+    return str
+        .toLowerCase()
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ')
+}

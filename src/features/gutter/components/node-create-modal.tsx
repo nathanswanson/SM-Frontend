@@ -1,5 +1,5 @@
 import { FaBarsProgress } from 'react-icons/fa6'
-import { MenuSelectButton } from './menu-select-button'
+import { MenuSelectButton } from '../../../mocks/menu-select-button'
 
 export const NodeCreateDialog = () => {
     return (

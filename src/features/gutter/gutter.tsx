@@ -1,24 +1,24 @@
 import {
     Avatar,
-    Text,
-    HStack,
-    Stack,
-    VStack,
-    useBreakpointValue,
-    Drawer,
-    Portal,
     CloseButton,
-    IconButton
+    Drawer,
+    HStack,
+    IconButton,
+    Portal,
+    Stack,
+    Text,
+    VStack,
+    useBreakpointValue
 } from '@chakra-ui/react'
 import { FaBars, FaGear, FaUserLock } from 'react-icons/fa6'
-import { MenuSelectButton } from './components/menu-select-button'
+import { MenuSelectButton } from '../../mocks/menu-select-button'
 
-import { useUserDataContext } from '../../providers/user-data'
 import { ColorModeButton } from '../../../lib/chakra/color-mode.js'
-import { TemplateCreateDialog } from './components/template-create-modal'
+import { logoutUser } from '../../../lib/hey-api/client'
+import { useUserDataContext } from '../../providers/user-data'
 import { NodeCreateDialog } from './components/node-create-modal'
 import { ServerCreationDialog } from './components/server-create-modal'
-import { logoutUser } from '../../../lib/hey-api/client'
+import { TemplateCreateDialog } from './components/template-create-modal'
 
 const UserProfile = ({ ...props }) => {
     const { userData } = useUserDataContext()
