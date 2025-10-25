@@ -57,7 +57,7 @@ export const FormController = ({ children, schema }: FormControllerProps) => {
             <Portal>
                 <Dialog.Backdrop />
                 <Dialog.Positioner>
-                    <Dialog.Content as="form" onSubmit={handleSubmit(onSubmit, onError)}>
+                    <Dialog.Content as="form" onSubmit={handleSubmit(onError)}>
                         <Dialog.Header>
                             {/* Render extracted header inside the dialog header */}
                             {header && <Dialog.Title>{header}</Dialog.Title>}
