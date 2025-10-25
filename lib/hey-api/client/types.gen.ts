@@ -336,6 +336,11 @@ export type ServersBase = {
      * Template Id
      */
     template_id: number;
+    /**
+     * Tags
+     * Comma-separated tags for the server
+     */
+    tags?: Array<string>;
 };
 
 /**
@@ -382,6 +387,11 @@ export type ServersRead = {
      * Template Id
      */
     template_id: number;
+    /**
+     * Tags
+     * Comma-separated tags for the server
+     */
+    tags?: Array<string>;
     /**
      * Id
      */
@@ -444,19 +454,25 @@ export type TemplatesBase = {
      */
     tags: Array<string>;
     /**
-     * Default Env
-     * JSON string of default environment variables
+     * Exposed Port
+     * List of ports that are exposed by the template
      */
-    default_env: {
-        [key: string]: string;
-    } | null;
+    exposed_port: Array<number>;
     /**
-     * User Env
+     * Exposed Volume
+     * List of volumes that are exposed by the template.
+     */
+    exposed_volume?: Array<string> | null;
+    /**
+     * Modules
      * JSON string of "Modules" that will be added to server creator UI
      */
-    user_env: {
-        [key: string]: string;
-    } | null;
+    modules: Array<string> | null;
+    /**
+     * Description
+     * Template description
+     */
+    description?: string | null;
     /**
      * Resource Min Cpu
      * Minimum CPU resources required
@@ -494,19 +510,25 @@ export type TemplatesRead = {
      */
     tags: Array<string>;
     /**
-     * Default Env
-     * JSON string of default environment variables
+     * Exposed Port
+     * List of ports that are exposed by the template
      */
-    default_env: {
-        [key: string]: string;
-    } | null;
+    exposed_port: Array<number>;
     /**
-     * User Env
+     * Exposed Volume
+     * List of volumes that are exposed by the template.
+     */
+    exposed_volume?: Array<string> | null;
+    /**
+     * Modules
      * JSON string of "Modules" that will be added to server creator UI
      */
-    user_env: {
-        [key: string]: string;
-    } | null;
+    modules: Array<string> | null;
+    /**
+     * Description
+     * Template description
+     */
+    description?: string | null;
     /**
      * Resource Min Cpu
      * Minimum CPU resources required
@@ -1207,9 +1229,10 @@ export type GetServerStatusError = GetServerStatusErrors[keyof GetServerStatusEr
 
 export type GetServerStatusResponses = {
     /**
+     * Response Get Server Status Servers  Server Id  Status Get
      * Successful Response
      */
-    200: ServerStatusResponse;
+    200: ServerStatusResponse | null;
 };
 
 export type GetServerStatusResponse = GetServerStatusResponses[keyof GetServerStatusResponses];
