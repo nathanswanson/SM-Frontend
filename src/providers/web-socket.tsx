@@ -2,7 +2,7 @@ import bytes from 'bytes'
 import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from 'react'
 import { io } from 'socket.io-client'
 import { getLogMessage } from '../../lib/hey-api/client'
-import { getBaseUrl } from '../utils/urlIntercept'
+import { getBaseUrl } from '../utils/api'
 import { useSelectedServerContext } from './selected-server-context'
 const METRICS_SIZE = 50
 const LOG_SIZE = 50

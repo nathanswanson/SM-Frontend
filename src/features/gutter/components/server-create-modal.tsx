@@ -6,274 +6,199 @@ import {
     Dialog,
     Field,
     Fieldset,
-    HStack,
-    IconButton,
-    Input,
-    InputGroup,
-    NumberInput,
     Portal,
-    Span,
-    Spinner
+    ScrollArea
 } from '@chakra-ui/react'
-
 import { useState } from 'react'
-import { FaDatabase } from 'react-icons/fa6'
-import { LuRefreshCcw } from 'react-icons/lu'
-import { useAsync } from 'react-use'
-import { adjectives, animals, colors, uniqueNamesGenerator } from 'unique-names-generator'
-import { createServer, searchTemplates } from '../../../../lib/hey-api/client'
+import { useForm } from 'react-hook-form'
+import { LuDatabase } from 'react-icons/lu'
+import { useAsync, useMap } from 'react-use'
+import { z } from 'zod'
+import { createServer, getTemplate, searchTemplates, TemplatesRead } from '../../../../lib/hey-api/client'
+import { TemplateModule } from '../../../components/template-module'
 import { MenuSelectButton } from '../../../mocks/menu-select-button'
-import { useSelectedServerContext } from '../../../providers/selected-server-context'
+import { TemplateModuleSchema, TemplateModuleType } from '../../../utils/template-schema'
 
-function parsedPort(serverPort: string): { [key: string]: number | null } | null {
-    const entries: Record<string, number | null> = {}
-    serverPort.split(',').forEach(entry => {
-        const portSplit = entry.split(':', 2)
-        var portExtNumber = null
-        var portInternal = null
-        if (portSplit.length == 1) {
-            portInternal = portSplit[0]
-        } else {
-            ;[portExtNumber, portInternal] = portSplit
-            portExtNumber = Number(portExtNumber)
-        }
-        entries[portInternal] = portExtNumber
-    })
-    return Object.keys(entries).length > 0 ? entries : null
-}
+const formSchema = z.object({
+    name: z.string().min(1),
+    template_name: z.string().min(1),
+    cpu: z.number().min(1).default(1),
+    tag: z.string().optional(),
+    memory: z.number().min(1).default(1),
+    disk: z.number().min(1).default(16),
+    description: z.string().max(500).optional(),
+    env: z.record(z.string(), z.string())
+})
 
-function parsedEnv(serverEnv: string): { [key: string]: string } {
-    const entries: Record<string, string> = {}
-    serverEnv.split(',').map(value => {
-        const [envKey, envValue] = value.split('=', 2)
-        entries[envKey] = envValue
-    })
-
-    return entries
-}
-
-// does not include template name
-// or envs that would be dependent on template
-interface ServerCreateFormData {
-    name: string
-    cpu: number
-    memory: number
-    disk: number
-}
-
-const colSpan = (span: number) => ({ gridColumn: `1 / span ${span}` })
-
-export const ServerCreationDialog = () => {
-    // dynamic import of unique-names-generator
-
-    const { setSelectedServer } = useSelectedServerContext()
-    const [createServerLoading, setCreateServerLoading] = useState<boolean>(false)
-    const [open, setOpen] = useState(false)
-    const [templateMap, setTemplateMap] = useState<{ [key: string]: number } | undefined>({})
-
-    // form data
-    const [formData, setFormData] = useState<ServerCreateFormData>({
-        name: uniqueNamesGenerator({ length: 2, separator: '-', dictionaries: [adjectives, colors, animals] }),
-        cpu: 1,
-        memory: 1,
-        disk: 16
+export const ServerCreateDialog = () => {
+    type FormData = z.infer<typeof formSchema>
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        control
+    } = useForm<FormData>({
+        // ensure env is always an array at runtime
+        defaultValues: { env: {} }
     })
 
-    const [selectedTemplate, setSelectedTemplate] = useState<string>('')
-    const node_id = 1 // for now, only one node
-    const templateNames = createListCollection({
-        items: Object.keys(templateMap || {})
+    const [templateMap, { set: setTemplateMap, setAll: setAllTemplateMap }] = useMap<{ [key: string]: number }>({})
+    const [selectedTemplate, setSelectedTemplate] = useState<TemplatesRead | undefined>(undefined)
+
+    //names only
+    const templateList = createListCollection({
+        items: Object.keys(templateMap)
     })
 
-    const state = useAsync(async () => {
-        if (open) {
-            const templateList = await searchTemplates({ credentials: 'include' })
-            setTemplateMap(templateList.data?.items)
-        }
-    }, [open])
-
-    const generateSuggestedName = () => {
-        return uniqueNamesGenerator({ length: 2, separator: '-', dictionaries: [adjectives, colors, animals] })
-    }
-
-    const create_server = async () => {
-        setCreateServerLoading(true)
-        if (templateMap !== undefined) {
-            if (!formData) {
-                setCreateServerLoading(false)
+    const templateListState = useAsync(async () => {
+        searchTemplates({}).then(res => {
+            if (!res.data?.items) {
+                setAllTemplateMap({})
                 return
             }
-            createServer({
-                credentials: 'include',
-                body: {
-                    ...formData,
-                    node_id: node_id,
-                    template_id: templateMap[selectedTemplate],
-                    env: {} // TODO: Add env parsing
-                }
-            })
-                .finally(() => {
-                    // Server Responded
-                    setCreateServerLoading(false)
-                })
-                .then(() => {
-                    // Created successfully
-                    setOpen(false)
-                    setSelectedServer(undefined)
-                })
-        }
+            setAllTemplateMap(res.data.items)
+        })
+    }, [])
+
+    const onSubmit = handleSubmit(data => {
+        // transform env array to object map for API
+        const envAsStrings = Object.fromEntries(
+            Object.entries(data.env).map(([key, value]) => [key, typeof value === 'boolean' ? String(value) : value])
+        )
+        createServer({
+            body: {
+                node_id: 1,
+                name: data.name,
+                tags: data.tag ? [data.tag] : [],
+                template_id: selectedTemplate?.id || -1,
+                env: envAsStrings,
+                cpu: data.cpu,
+                disk: data.disk,
+                memory: data.memory
+            }
+        })
+    })
+
+    const handleTemplateChange = async (templateName: string) => {
+        const template = (await getTemplate({ path: { template_id: templateMap[templateName] } })).data
+        setSelectedTemplate(template)
     }
+
+    if (templateListState.loading) {
+        return <div>Loading...</div>
+    }
+
     return (
-        <Dialog.Root lazyMount size="lg" open={open} onOpenChange={e => setOpen(e.open)}>
+        <Dialog.Root size="lg">
             <Dialog.Trigger asChild>
                 <MenuSelectButton color="fg.muted">
-                    <FaDatabase />
-                    Create New Server
+                    <LuDatabase />
+                    Server Management
                 </MenuSelectButton>
             </Dialog.Trigger>
             <Portal>
                 <Dialog.Backdrop />
                 <Dialog.Positioner>
-                    <Dialog.Content>
-                        <Dialog.Header>
-                            <Dialog.Title>Create New Server</Dialog.Title>
-                        </Dialog.Header>
-                        <Dialog.Body as="form">
-                            <Fieldset.Root
-                                borderRadius={'sm'}
-                                p="1em"
-                                borderWidth={1}
-                                gridAutoRows={'auto'}
-                                gridTemplateColumns={'repeat(3, 1fr)'}
-                                display={'grid'}
-                                gridGap={'1em'}
-                            >
-                                <Fieldset.Legend>Server Details</Fieldset.Legend>
-                                <Field.Root {...colSpan(3)}>
-                                    <Field.Label>Template</Field.Label>
-                                    <Combobox.Root
-                                        maxW="390px"
-                                        collection={templateNames}
-                                        placeholder="Search characters..."
-                                        onInputValueChange={value => {
-                                            setSelectedTemplate(value.inputValue)
-                                        }}
-                                        positioning={{
-                                            sameWidth: false,
-                                            placement: 'bottom-start'
-                                        }}
-                                    >
-                                        <Combobox.Control>
-                                            <Combobox.Input placeholder="Type to search" />
-                                            <Combobox.IndicatorGroup>
-                                                <Combobox.ClearTrigger />
-                                                <Combobox.Trigger />
-                                            </Combobox.IndicatorGroup>
-                                        </Combobox.Control>
-
-                                        <Combobox.Positioner>
-                                            <Combobox.Content minW="sm">
-                                                {state.loading ? (
-                                                    <HStack p="4">
-                                                        <Spinner size="xs" borderWidth="1px" />
-                                                        <Span>Loading...</Span>
-                                                    </HStack>
-                                                ) : state.error ? (
-                                                    <Span p="4" color="fg.error">
-                                                        Error fetching
-                                                    </Span>
-                                                ) : (
-                                                    templateNames.items?.map(container => (
-                                                        <Combobox.Item key={container} item={container}>
-                                                            <Span fontWeight="medium" truncate>
-                                                                {container}
-                                                            </Span>
-                                                            <Combobox.ItemIndicator />
-                                                        </Combobox.Item>
-                                                    ))
-                                                )}
-                                            </Combobox.Content>
-                                        </Combobox.Positioner>
-                                    </Combobox.Root>
-                                </Field.Root>
-                                <Field.Root aria-autocomplete="none" {...colSpan(3)}>
-                                    <Field.Label>Server Name</Field.Label>
-                                    <InputGroup
-                                        maxW="390px"
-                                        endElement={
-                                            <IconButton
-                                                onClick={() => {
-                                                    setFormData({ ...formData, name: generateSuggestedName() })
-                                                }}
-                                                size="xs"
-                                                color="fg.muted"
-                                                variant={'plain'}
-                                            >
-                                                <LuRefreshCcw />
-                                            </IconButton>
-                                        }
-                                        endElementProps={{ padding: '0.25em' }}
-                                    >
-                                        <Input
-                                            autoComplete="off"
-                                            onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                            name="server_name"
-                                            value={formData.name}
-                                        />
-                                    </InputGroup>
-                                </Field.Root>
-                                <Field.Root>
-                                    <Field.Label>CPU cores</Field.Label>
-                                    <NumberInput.Root defaultValue="1" step={1} min={1}>
-                                        <NumberInput.Control />
-                                        <NumberInput.Input />
-                                    </NumberInput.Root>
-                                </Field.Root>
-                                <Field.Root>
-                                    <Field.Label>Memory</Field.Label>
-                                    <NumberInput.Root
-                                        defaultValue="1"
-                                        step={1}
-                                        min={1}
-                                        formatOptions={{
-                                            style: 'unit',
-                                            unit: 'gigabyte'
-                                        }}
-                                    >
-                                        <NumberInput.Control />
-                                        <NumberInput.Input />
-                                    </NumberInput.Root>
-                                </Field.Root>
-                                <Field.Root>
-                                    <Field.Label>Disk</Field.Label>
-                                    <NumberInput.Root
-                                        defaultValue="16"
-                                        step={16}
-                                        min={16}
-                                        formatOptions={{
-                                            style: 'unit',
-                                            unit: 'gigabyte'
-                                        }}
-                                    >
-                                        <NumberInput.Control />
-                                        <NumberInput.Input />
-                                    </NumberInput.Root>
-                                </Field.Root>
-                            </Fieldset.Root>
-                        </Dialog.Body>
-                        <Dialog.Footer>
-                            <Dialog.ActionTrigger asChild>
-                                <Button size="md" variant="outline">
-                                    Cancel
-                                </Button>
-                            </Dialog.ActionTrigger>
-                            <Button size="md" type="submit" onClick={create_server} loading={createServerLoading}>
-                                Create
-                            </Button>
-                        </Dialog.Footer>
+                    <Dialog.Content maxH="80vh">
+                        <Dialog.Header>Create New Template</Dialog.Header>
                         <Dialog.CloseTrigger asChild>
-                            <CloseButton size="md" />
+                            <CloseButton size="sm" />
                         </Dialog.CloseTrigger>
+                        <ScrollArea.Root>
+                            <ScrollArea.Viewport scrollSnapType={'y mandatory'}>
+                                <ScrollArea.Content scrollSnapType={'y mandatory'} as="form" onSubmit={onSubmit}>
+                                    <Dialog.Body>
+                                        <Fieldset.Root display="grid" gridTemplateColumns="1fr 1fr 1fr" gap="4">
+                                            <TemplateModule
+                                                key="server-name"
+                                                type={TemplateModuleType.TEXT}
+                                                label="Server Name"
+                                                required={true}
+                                                gridColumn={'1 / span 3'}
+                                                control={control}
+                                                hookName={'name'}
+                                            />
+                                            <Field.Root key="template-select" gridColumn={'span 3'}>
+                                                <Field.Label>Template</Field.Label>
+                                                <Combobox.Root
+                                                    collection={templateList}
+                                                    onInputValueChange={e => handleTemplateChange(e.inputValue)}
+                                                >
+                                                    <Combobox.Control>
+                                                        <Combobox.Input />
+                                                        <Combobox.IndicatorGroup>
+                                                            <Combobox.ClearTrigger />
+                                                            <Combobox.Trigger />
+                                                        </Combobox.IndicatorGroup>
+                                                    </Combobox.Control>
+                                                    <Combobox.Positioner>
+                                                        <Combobox.Content>
+                                                            <Combobox.Empty>No Templates found</Combobox.Empty>
+                                                            {templateList.items.map(templateName => (
+                                                                <Combobox.Item key={templateName} item={templateName}>
+                                                                    {templateName}
+                                                                    <Combobox.ItemIndicator />
+                                                                </Combobox.Item>
+                                                            ))}
+                                                        </Combobox.Content>
+                                                    </Combobox.Positioner>
+                                                </Combobox.Root>
+                                            </Field.Root>
+                                            <TemplateModule
+                                                key="cpu"
+                                                type={TemplateModuleType.NUMBER}
+                                                label="CPU Cores"
+                                                required={false}
+                                                control={control}
+                                                hookName={'cpu'}
+                                            />
+                                            <TemplateModule
+                                                key="memory"
+                                                type={TemplateModuleType.NUMBER}
+                                                label="Memory (GB)"
+                                                required={false}
+                                                control={control}
+                                                hookName={'memory'}
+                                            />
+                                            <TemplateModule
+                                                key="disk-space"
+                                                type={TemplateModuleType.NUMBER}
+                                                label="Disk Space (GB)"
+                                                required={false}
+                                                control={control}
+                                                hookName={'disk'}
+                                            />
+                                            {/* env */}
+                                            {selectedTemplate?.modules?.map((field, index) => {
+                                                const template = JSON.parse(field) as TemplateModuleSchema
+                                                return (
+                                                    <>
+                                                        <TemplateModule
+                                                            key={`env-${index}`}
+                                                            type={template.type.toLowerCase() as TemplateModuleType}
+                                                            label={template.label}
+                                                            description={template.description}
+                                                            required={template.required}
+                                                            control={control}
+                                                            hookName={`env.${template.label}`}
+                                                        />
+                                                    </>
+                                                )
+                                            })}
+                                        </Fieldset.Root>
+                                    </Dialog.Body>
+                                    <Dialog.Footer>
+                                        <Dialog.ActionTrigger asChild>
+                                            <Button variant="subtle">Cancel</Button>
+                                        </Dialog.ActionTrigger>
+                                        <Button type="submit">Create Server</Button>
+                                    </Dialog.Footer>
+                                </ScrollArea.Content>
+                            </ScrollArea.Viewport>
+                            <ScrollArea.Scrollbar>
+                                <ScrollArea.Thumb />
+                            </ScrollArea.Scrollbar>
+                        </ScrollArea.Root>
                     </Dialog.Content>
                 </Dialog.Positioner>
             </Portal>

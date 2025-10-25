@@ -1,38 +1,32 @@
-import { Badge, Field, Input } from '@chakra-ui/react'
-
-export const FormField = (
-    label: string,
-    placeholder: string,
-    state: [string, (value: string) => void],
-    helperText?: any,
-    optional?: boolean
-) => {
-    return (
-        <Field.Root>
-            <Field.Label>
-                {label}
-                {optional && <Field.RequiredIndicator fallback={<Badge>(Optional)</Badge>}></Field.RequiredIndicator>}
-            </Field.Label>
-            <Input placeholder={placeholder} value={state[0]} onChange={e => state[1](e.target.value)} />
-
-            {helperText && <Field.HelperText>{helperText}</Field.HelperText>}
-        </Field.Root>
-    )
-}
-
-export function convertToGB(bytes: number | undefined): number {
-    if (bytes === undefined) return 0
-    return parseFloat((bytes / (1024 * 1024)).toFixed(2))
-}
-
-export function roundToNearest4GB(memory_size: number): number {
-    return parseFloat((Math.round(memory_size / 4) * 4).toFixed(2))
-}
-
 export function titleCaseString(str: string): string {
     return str
         .toLowerCase()
         .split(' ')
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ')
+}
+
+export function prettyErrorMessages(errors: Record<string, any>): string {
+    return Object.entries(errors)
+        .map((error: [string, any], index) => {
+            let message = ''
+            // Handle nested errors for modules
+            if (Array.isArray(error[1])) {
+                message += `${index}. ${errors[0]}:\n`
+                const moduleErrors = error[1].map((modError: any, modIndex: number) => {
+                    const charIndex = String.fromCharCode(modIndex + 97)
+                    if (modError) {
+                        const fieldErrors = Object.entries(modError).map(
+                            (fieldError: [string, any]) => fieldError[1].message
+                        )
+                        return `\t\t${charIndex}. ${fieldErrors.join(', ')}`
+                    }
+                })
+                message += moduleErrors.join('\n')
+            } else {
+                message = `${index + 1}. ${error[1]['message']}`
+            }
+            return message
+        })
+        .join('\n')
 }

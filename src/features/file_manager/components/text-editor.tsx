@@ -5,13 +5,12 @@ import {
     Dialog,
     DialogCloseTrigger,
     DialogHeader,
-    DialogRootProps,
     IconButton,
     Portal,
     Spinner
 } from '@chakra-ui/react'
 import React, { Suspense, useEffect, useRef, useState } from 'react'
-import { FaDownload } from 'react-icons/fa6'
+import { LuDownload } from 'react-icons/lu'
 
 const EditorLazy = React.lazy(() => import('@monaco-editor/react'))
 
@@ -124,7 +123,7 @@ export const TextEditorDialog = ({
                                     left={2}
                                     aria-label="Download"
                                 >
-                                    <FaDownload />
+                                    <LuDownload />
                                 </IconButton>
                             </Box>
                         </Dialog.Body>

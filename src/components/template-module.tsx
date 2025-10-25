@@ -1,26 +1,53 @@
-import { Box, BoxProps, Checkbox, Field, Input, NumberInput } from '@chakra-ui/react'
-
-export enum TemplateModuleType {
-    CHECKBOX = 'checkbox',
-    TEXT = 'text',
-    SELECT = 'select',
-    NUMBER = 'number'
-}
-
+import {
+    BoxProps,
+    Checkbox,
+    createListCollection,
+    Field,
+    Input,
+    NumberInput,
+    Portal,
+    Select,
+    TagsInput
+} from '@chakra-ui/react'
+import { Controller, ControllerRenderProps, FieldValues } from 'react-hook-form'
+import { TemplateModuleType } from '../utils/template-schema'
 interface TemplateModuleBaseProps extends BoxProps {
-    templateModID: string
+    field: ControllerRenderProps<FieldValues, string>
 }
 
-interface TemplateModuleProps extends TemplateModuleBaseProps {
+interface TemplateModuleProps extends BoxProps {
+    hookName: string
+    control: any
     label: string
     type: TemplateModuleType
     required: boolean
     description?: string
+    invalid?: boolean
 }
 
-const CheckboxModule = ({ templateModID, ...rest }: TemplateModuleBaseProps) => {
+interface NumberModuleProps extends TemplateModuleBaseProps {
+    min?: number
+    max?: number
+    step?: number
+    slider?: boolean
+}
+
+interface CheckboxModuleProps extends TemplateModuleBaseProps {}
+
+interface SelectModuleProps extends TemplateModuleBaseProps {
+    options?: Array<string>
+}
+
+const CheckboxModule = ({ field }: CheckboxModuleProps) => {
     return (
-        <Checkbox.Root>
+        <Checkbox.Root
+            name={field.name}
+            checked={field.value}
+            onCheckedChange={e => {
+                console.log(e)
+                field.onChange(!!e.checked.valueOf)
+            }}
+        >
             <Checkbox.HiddenInput />
             <Checkbox.Control>
                 <Checkbox.Indicator />
@@ -29,45 +56,117 @@ const CheckboxModule = ({ templateModID, ...rest }: TemplateModuleBaseProps) => 
     )
 }
 
-const SelectModule = ({ templateModID, ...rest }: TemplateModuleBaseProps) => {
+const SelectModule = ({ options = [] }: SelectModuleProps) => {
     // return <Select.Root {...rest}></Select.Root>
-    return <Box></Box>
+    const collection = createListCollection<string>({ items: options })
+
+    return (
+        <Select.Root collection={collection}>
+            <Select.HiddenSelect />
+            <Select.Control>
+                <Select.Trigger>
+                    <Select.ValueText />
+                </Select.Trigger>
+                <Select.IndicatorGroup>
+                    <Select.Indicator />
+                    <Select.ClearTrigger />
+                </Select.IndicatorGroup>
+            </Select.Control>
+            <Portal>
+                <Select.Positioner>
+                    <Select.Content>
+                        <Select.ItemGroup>
+                            {options.map(option => (
+                                <Select.Item item={option} key={option}>
+                                    <Select.ItemText>{option}</Select.ItemText>
+                                    <Select.ItemIndicator />
+                                </Select.Item>
+                            ))}
+                        </Select.ItemGroup>
+                    </Select.Content>
+                </Select.Positioner>
+            </Portal>
+        </Select.Root>
+    )
 }
 
-const TextModule = ({ templateModID, ...rest }: TemplateModuleBaseProps) => {
-    return <Input {...rest}></Input>
-}
-const NumberModule = ({ templateModID, ...rest }: TemplateModuleBaseProps) => {
+const TextModule = ({ field }: TemplateModuleBaseProps) => {
     return (
-        <NumberInput.Root>
-            <NumberInput.Input {...rest}></NumberInput.Input>
+        <Input
+            value={field.value}
+            onChange={e => {
+                field.onChange(e)
+            }}
+        />
+    )
+}
+const NumberModule = ({ field }: NumberModuleProps) => {
+    return (
+        <NumberInput.Root
+            value={field.value}
+            onValueChange={({ value }) => {
+                field.onChange(Number(value))
+            }}
+        >
+            <NumberInput.Control />
+            <NumberInput.Input onBlur={field.onBlur} />
         </NumberInput.Root>
     )
 }
 
-export const TemplateModule = ({ type, templateModID, required, description, label, ...rest }: TemplateModuleProps) => {
-    let templ = null
-    switch (type) {
-        case TemplateModuleType.CHECKBOX:
-            templ = <CheckboxModule templateModID={templateModID} {...rest} />
-            break
-        case TemplateModuleType.TEXT:
-            templ = <TextModule templateModID={templateModID} {...rest} />
-            break
-        case TemplateModuleType.SELECT:
-            templ = <SelectModule templateModID={templateModID} {...rest} />
-            break
-        case TemplateModuleType.NUMBER:
-            templ = <NumberModule templateModID={templateModID} {...rest} />
-            break
-        default:
-            templ = <div>Unknown Module Type</div>
-    }
+interface ListModuleProps extends TemplateModuleBaseProps {
+    type?: string | number | boolean
+    options?: Array<string>
+    editable?: boolean
+}
+
+const ListModule = ({ field }: ListModuleProps) => {
     return (
-        <Field.Root {...rest}>
+        <TagsInput.Root onValueChange={values => field.onChange(values.value)} value={field.value} editable={true}>
+            <TagsInput.Control>
+                <TagsInput.Items />
+                <TagsInput.Input />
+                <TagsInput.ClearTrigger />
+            </TagsInput.Control>
+            <TagsInput.HiddenInput />
+        </TagsInput.Root>
+    )
+}
+
+export const TemplateModule = ({
+    type,
+    required,
+    description,
+    label,
+    invalid,
+    hookName,
+    control
+}: TemplateModuleProps) => {
+    return (
+        <Field.Root invalid={invalid}>
             <Field.Label>{label}</Field.Label>
             {required && <Field.RequiredIndicator />}
-            {templ}
+            <Controller
+                name={hookName}
+                control={control}
+                render={({ field }) => {
+                    switch (type.toLowerCase()) {
+                        case TemplateModuleType.CHECKBOX:
+                            return <CheckboxModule field={field} />
+                        case TemplateModuleType.TEXT:
+                            return <TextModule field={field} />
+                        case TemplateModuleType.SELECT:
+                            return <SelectModule field={field} />
+                        case TemplateModuleType.NUMBER:
+                            return <NumberModule field={field} />
+                        case TemplateModuleType.LIST:
+                            return <ListModule field={field} />
+                        default:
+                            return <div>Unknown Module Type {type}</div>
+                    }
+                }}
+            />
+
             {description && <Field.HelperText>{description}</Field.HelperText>}
         </Field.Root>
     )

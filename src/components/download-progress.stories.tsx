@@ -17,3 +17,10 @@ export const Default: Story = {
         fileName: 'server.properties'
     }
 }
+
+export const NoFile: Story = {
+    args: {
+        current: 2048,
+        total: 8192
+    }
+}

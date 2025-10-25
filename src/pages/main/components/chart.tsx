@@ -18,10 +18,10 @@ export const SMChart = ({ label, color, unit, data }: LightCardProps) => {
             <Card.Root bg={`${color}.50`} shadow="sm" minH={'150px'} minW="xs" size="sm" overflow="hidden">
                 <Card.Body>
                     <Stat.Root>
-                        <Stat.Label>{label}</Stat.Label>
+                        <Stat.Label color={{ base: 'gray.900', _dark: 'gray.900' }}>{label}</Stat.Label>
 
                         <HStack gap="0.5em">
-                            <Stat.ValueText>
+                            <Stat.ValueText color={{ _light: 'gray.800', _dark: 'gray.800' }}>
                                 {highlightedIndex !== null && data && data[highlightedIndex]
                                     ? data[highlightedIndex].value
                                     : data && data.length > 0
@@ -29,7 +29,11 @@ export const SMChart = ({ label, color, unit, data }: LightCardProps) => {
                                       : '--'}
                             </Stat.ValueText>
 
-                            {unit && <Stat.HelpText>{data ? data[data.length - 1]?.unit : '--'}</Stat.HelpText>}
+                            {unit && (
+                                <Stat.HelpText color={{ base: 'gray.900', _dark: 'gray.900' }}>
+                                    {data ? data[data.length - 1]?.unit : '--'}
+                                </Stat.HelpText>
+                            )}
                         </HStack>
                     </Stat.Root>
                 </Card.Body>

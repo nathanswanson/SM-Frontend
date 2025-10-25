@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { ServerCreateDialog } from './server-create-modal'
+import { MainContent } from './server-manager'
 
 const meta = {
-    component: ServerCreateDialog
-} satisfies Meta<typeof ServerCreateDialog>
+    component: MainContent
+} satisfies Meta<typeof MainContent>
 
 export default meta
 

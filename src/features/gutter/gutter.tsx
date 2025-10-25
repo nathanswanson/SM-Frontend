@@ -5,19 +5,21 @@ import {
     HStack,
     IconButton,
     Portal,
+    Show,
     Stack,
     Text,
     VStack,
     useBreakpointValue
 } from '@chakra-ui/react'
-import { FaBars, FaGear, FaUserLock } from 'react-icons/fa6'
 import { MenuSelectButton } from '../../mocks/menu-select-button'
 
+import { LuLogOut, LuMenu } from 'react-icons/lu'
 import { ColorModeButton } from '../../../lib/chakra/color-mode.js'
 import { logoutUser } from '../../../lib/hey-api/client'
 import { useUserDataContext } from '../../providers/user-data'
 import { NodeCreateDialog } from './components/node-create-modal'
-import { ServerCreationDialog } from './components/server-create-modal'
+import { ServerCreateDialog } from './components/server-create-modal'
+import { SettingsModal } from './components/settings-modal'
 import { TemplateCreateDialog } from './components/template-create-modal'
 
 const UserProfile = ({ ...props }) => {
@@ -47,7 +49,7 @@ const CollapseWrapper = ({ children, ...props }: { children: React.ReactNode }) 
         <Drawer.Root placement={'start'}>
             <Drawer.Trigger asChild>
                 <IconButton variant="outline" size="sm">
-                    <FaBars />
+                    <LuMenu />
                 </IconButton>
             </Drawer.Trigger>
             <Portal>
@@ -70,15 +72,15 @@ const MenuOptions = ({ ...props }) => {
     const { userData } = useUserDataContext()
 
     return (
-        <VStack paddingTop="1em" width="100%" rowGap={'0.05em'} justifyContent="left" {...props}>
+        <VStack paddingTop="1em" rowGap={'0.05em'} alignItems={'flex-start'} {...props}>
             <TemplateCreateDialog />
-            <NodeCreateDialog />
-            <ServerCreationDialog />
+            <Show when={userData?.admin}>
+                <NodeCreateDialog />
+            </Show>
+            <ServerCreateDialog />
             <HStack width="100%" borderBottomWidth="0px" paddingTop={'1.5em'} borderColor="border" />
 
-            <MenuSelectButton color="fg.muted">
-                <FaGear /> Settings
-            </MenuSelectButton>
+            <SettingsModal />
             <MenuSelectButton
                 onClick={async () => {
                     await logoutUser({ credentials: 'include' }).then(() => {
@@ -87,11 +89,11 @@ const MenuOptions = ({ ...props }) => {
                 }}
                 color="danger.500"
             >
-                <FaUserLock />
+                <LuLogOut />
                 Sign Out
             </MenuSelectButton>
             <HStack width="100%" paddingTop={'1.5em'} borderBottomWidth="1px" borderColor="border" />
-            <ColorModeButton width="100%" justifyContent={'left'} paddingLeft="2em" />
+            <ColorModeButton />
         </VStack>
     )
 }

@@ -72,9 +72,7 @@ export const Login = ({ children }: { children: React.ReactNode }) => {
             }).then(response => {
                 if (response.response.status === 200) {
                     setIsLoggedIn(true)
-                    toaster.success({})
                 } else {
-                    console.log('response', response)
                     toaster.error({
                         title: 'Login Failed',
                         description: 'Invalid username or password.'

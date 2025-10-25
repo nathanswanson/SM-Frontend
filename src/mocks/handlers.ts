@@ -1,7 +1,9 @@
 import { LoremIpsum } from 'lorem-ipsum'
-import { http, HttpResponse, passthrough, ws } from 'msw'
+import { http, HttpResponse, passthrough } from 'msw'
 import { ServerStatusResponse } from '../../lib/hey-api/client/types.gen'
+import { getBaseUrl } from '../utils/api'
 import { LocalDB } from './local-db'
+import { socketIOHandlers } from './socket-io-handlers'
 const db: LocalDB = LocalDB.getInstance()
 
 const InternalMockData = {
@@ -10,9 +12,7 @@ const InternalMockData = {
 }
 
 // const ip = 'http://api.localhost'
-const ip = window.location.origin
-const ip_ws = 'ws://api.localhost'
-const socketLink = ws.link(ip_ws)
+const ip = getBaseUrl()
 
 const lorem = new LoremIpsum({
     sentencesPerParagraph: {
@@ -32,12 +32,9 @@ function generateLogLine(serverName: string): string {
 }
 
 export const handlers: any[] = [
+    // socket.io
+    ...socketIOHandlers,
     //public functions
-    socketLink.addEventListener('connection', ({ client }) => {
-        client.addEventListener('message', msg => {
-            console.log('Received message from client:', msg)
-        })
-    }),
     http.post(`${ip}/users/token`, () => {
         InternalMockData.loggedIn = true
         return new HttpResponse({ status: 200 })

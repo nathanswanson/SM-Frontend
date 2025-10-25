@@ -9,8 +9,7 @@ if (!import.meta.env.VITE_SM_MODE) {
 
 async function preLoad() {
     async function loadClient() {
-        const { client } = await import('./api')
-        console.log('hey-api client baseUrl:', client.getConfig().baseUrl)
+        const { client } = await import('./utils/api')
     }
     if (mockingEnabled()) await enableMocking()
     await loadClient()

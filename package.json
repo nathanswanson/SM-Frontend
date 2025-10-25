@@ -12,11 +12,13 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
-    "@chakra-ui/charts": "3.27.0",
-    "@chakra-ui/react": "3.27.0",
+    "@chakra-ui/charts": "3.28.0",
+    "@chakra-ui/react": "3.28.0",
     "@emotion/react": "^11.14.0",
+    "@hookform/resolvers": "^5.2.2",
     "@monaco-editor/react": "^4.7.0-rc.0",
     "@storybook/addon-vitest": "^9.1.13",
+    "@storybook/icons": "^1.6.0",
     "@types/bytes": "^3.1.5",
     "@types/react-cookies": "^0.1.4",
     "@vitest/browser": "^3.2.4",
@@ -35,11 +37,11 @@
     "recharts": "^3.1.2",
     "ring-buffer-ts": "^1.2.0",
     "socket.io-client": "^4.8.1",
-    "streamx": "^2.22.1",
     "unique-names-generator": "^4.7.1",
     "use-stick-to-bottom": "^1.1.1",
     "uuid": "^13.0.0",
-    "vitest-browser-react": "^1.0.1"
+    "vitest-browser-react": "^1.0.1",
+    "zod": "4.1.12"
   },
   "overrides": {
     "dompurify": "^3.2.6"

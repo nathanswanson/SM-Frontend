@@ -64,14 +64,15 @@ export const dbTestData: LocalDBData = {
     templates: [
         {
             name: 'Minecraft Server',
-            default_env: { EULA: 'TRUE' },
             image: 'itzg/minecraft-server',
             tags: ['latest', 'java8'],
-            user_env: {},
+            description: 'A Minecraft Server Template',
             resource_min_cpu: 2,
             resource_min_mem: 2,
             resource_min_disk: 10,
-            id: 1
+            id: 1,
+            modules: [],
+            exposed_port: [25565]
         }
     ]
 }

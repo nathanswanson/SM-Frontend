@@ -1,6 +1,6 @@
 import { Button, Dialog, FileUpload, Input, Portal } from '@chakra-ui/react'
 import { useState } from 'react'
-import { BiUpload } from 'react-icons/bi'
+import { LuUpload } from 'react-icons/lu'
 import { uploadFile } from '../../../../lib/hey-api/client'
 import { useSelectedServerContext } from '../../../providers/selected-server-context'
 
@@ -19,7 +19,7 @@ export const UploadPathPrompt = () => {
         <Dialog.Root role="alertdialog">
             <Dialog.Trigger asChild>
                 <Button size="lg" variant="surface" disabled={selectedServer == undefined}>
-                    <BiUpload /> Upload File
+                    <LuUpload />
                 </Button>
             </Dialog.Trigger>
             <Portal>
@@ -36,7 +36,7 @@ export const UploadPathPrompt = () => {
                             >
                                 <FileUpload.Dropzone w="100%">
                                     <FileUpload.DropzoneContent>
-                                        <BiUpload /> Drag File Here
+                                        <LuUpload /> Drag File Here
                                     </FileUpload.DropzoneContent>
                                 </FileUpload.Dropzone>
                                 <FileUpload.List clearable={true} showSize={true} />

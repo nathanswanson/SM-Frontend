@@ -1,4 +1,4 @@
-import { Box, ChakraProvider, HStack, VStack } from '@chakra-ui/react'
+import { ChakraProvider, HStack, VStack } from '@chakra-ui/react'
 import { ThemeProvider } from 'next-themes'
 import { ColorModeProvider } from '../lib/chakra/color-mode'
 import { Toaster } from '../lib/chakra/toaster'
@@ -13,23 +13,33 @@ import { WebSocketProvider } from './providers/web-socket'
 import { WindowProvider } from './providers/window-context'
 import { system } from './theme'
 
+// const browserLog = console.log
+// const browserError = console.error
+// console.log = (...args: any[]) => {
+//     browserLog(...args)
+//     browserLog('Captured log:', ...args)
+// }
+
+// console.error = (...args: any[]) => {
+//     browserError(...args)
+//     browserError('Captured error:', ...args)
+// }
+
 export default function Page() {
     return (
         <SM>
             <Login>
-                <Box height={'svh'} width={'svw'} bg="bg.subtle">
-                    <GhostNav />
-                    <HStack p="1em" alignItems={'flex-start'} justifySelf={'center'} maxWidth={1980}>
-                        <Gutter top="100px" width="20%" />
+                <GhostNav />
+                <HStack p="1em" alignItems={'flex-start'} justifySelf={'center'} maxWidth={1980}>
+                    <Gutter top="100px" width="20%" />
 
-                        <VStack marginY="6" marginX="auto" paddingX="6" marginTop="0" marginBottom="0">
-                            {/* nav bar */}
-                            <NavBar width="100%" justifyContent="flex-end"></NavBar>
-                            <MainContent></MainContent>
-                            <Toaster />
-                        </VStack>
-                    </HStack>
-                </Box>
+                    <VStack marginY="6" marginX="auto" paddingX="6" marginTop="0" marginBottom="0">
+                        {/* nav bar */}
+                        <NavBar width="100%" justifyContent="flex-end"></NavBar>
+                        <MainContent />
+                        <Toaster />
+                    </VStack>
+                </HStack>
             </Login>
         </SM>
     )

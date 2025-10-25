@@ -85,6 +85,7 @@ const SearchComboBox = () => {
                                 </Combobox.Item>
                             ))
                         )}
+                        <Combobox.Empty>No Servers found</Combobox.Empty>
                     </Combobox.Content>
                 </Combobox.Positioner>
             </Portal>

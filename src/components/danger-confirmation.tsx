@@ -5,7 +5,7 @@ import { Input } from '@chakra-ui/react/input'
 import { Portal } from '@chakra-ui/react/portal'
 import { Text } from '@chakra-ui/react/text'
 import { useState } from 'react'
-import { FaTrashCan } from 'react-icons/fa6'
+import { LuTable2 } from 'react-icons/lu'
 
 export const DangerConfirmation = ({
     onConfirm,
@@ -26,7 +26,7 @@ export const DangerConfirmation = ({
         <Dialog.Root role="alertdialog" open={open} onOpenChange={e => setOpen(e.open)}>
             <Dialog.Trigger>
                 <Button asChild bg="danger.500" size="md">
-                    <FaTrashCan />
+                    <LuTable2 />
                 </Button>
             </Dialog.Trigger>
             <Portal>
