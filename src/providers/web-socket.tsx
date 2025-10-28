@@ -32,6 +32,14 @@ interface IWebSocketContext {
     sendMessage: (command: WSPacketCmdType, data: string) => void
 }
 
+function createUnitValueArray(size: number): UnitValue[] {
+    const arr: UnitValue[] = []
+    for (let i = 0; i < size; i++) {
+        arr.push({ value: 0, unit: '', timestamp: Date.now() })
+    }
+    return arr
+}
+
 function metricFilters(core_count: number, data: number[]): UnitValue[] {
     // cpu, mem, net_in, net_out, disk_read, disk_write
 
@@ -65,10 +73,15 @@ export const useWebSocketProvider = () => {
 
 const socket = io(getBaseUrl(), { autoConnect: false, transports: ['websocket'] })
 export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
-    const { selectedServer, serverInfo } = useSelectedServerContext()
+    const { serverInfo } = useSelectedServerContext()
     const [connectionStatus, setConnectionStatus] = useState<ConnectionState>(ConnectionState.disconnected)
     const [logMessages, setLogMessages] = useState<string[]>([])
-    const [metricMessages, setMetricMessages] = useState<UnitValue[][]>([[], [], [], []])
+    const [metricMessages, setMetricMessages] = useState<UnitValue[][]>([
+        createUnitValueArray(METRICS_SIZE),
+        createUnitValueArray(METRICS_SIZE),
+        createUnitValueArray(METRICS_SIZE),
+        createUnitValueArray(METRICS_SIZE)
+    ])
 
     useEffect(() => {
         socket.connect()
@@ -126,7 +139,7 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
                 sendMessage(WSPacketCmdType.UNSUBCRIBE, `01+${serverInfo.container_name}`)
             }
         }
-    }, [selectedServer, serverInfo])
+    }, [serverInfo])
 
     const sendMessage = useCallback((command: WSPacketCmdType, data: string) => {
         socket.emit(command, data)

@@ -13,7 +13,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { LuDatabase } from 'react-icons/lu'
 import { useAsync, useMap } from 'react-use'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 import { createServer, getTemplate, searchTemplates, TemplatesRead } from '../../../../lib/hey-api/client'
 import { TemplateModule } from '../../../components/template-module'
 import { MenuSelectButton } from '../../../mocks/menu-select-button'
@@ -100,7 +100,7 @@ export const ServerCreateDialog = () => {
                 <Dialog.Backdrop />
                 <Dialog.Positioner>
                     <Dialog.Content maxH="80vh">
-                        <Dialog.Header>Create New Template</Dialog.Header>
+                        <Dialog.Header>Create New Server</Dialog.Header>
                         <Dialog.CloseTrigger asChild>
                             <CloseButton size="sm" />
                         </Dialog.CloseTrigger>

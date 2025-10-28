@@ -2,7 +2,7 @@ import { Button, CloseButton, Dialog, Fieldset, Portal, ScrollArea, Text } from 
 import { zodResolver } from '@hookform/resolvers/zod'
 import React, { createContext, useState } from 'react'
 import { Control, SubmitErrorHandler, useForm } from 'react-hook-form'
-import z from 'zod'
+import z from 'zod/v4'
 import { toaster } from '../../lib/chakra/toaster'
 import { prettyErrorMessages } from '../utils/util'
 

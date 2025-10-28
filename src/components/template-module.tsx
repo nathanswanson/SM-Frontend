@@ -122,7 +122,12 @@ interface ListModuleProps extends TemplateModuleBaseProps {
 
 const ListModule = ({ field }: ListModuleProps) => {
     return (
-        <TagsInput.Root onValueChange={values => field.onChange(values.value)} value={field.value} editable={true}>
+        <TagsInput.Root
+            bg="bg.success"
+            onValueChange={values => field.onChange(values.value)}
+            value={field.value}
+            editable={true}
+        >
             <TagsInput.Control>
                 <TagsInput.Items />
                 <TagsInput.Input />

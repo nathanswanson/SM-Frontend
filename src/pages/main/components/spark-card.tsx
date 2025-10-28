@@ -19,9 +19,10 @@ export const SparkLine = ({ data, color, onHighlightIndex }: SparkLineProps) => 
     })
 
     return (
-        <Chart.Root width="100%" height="10" chart={chart}>
+        <Chart.Root maxH="6em" chart={chart}>
             <AreaChart
                 data={chart.data}
+                style={{}}
                 margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
                 onMouseMove={e => {
                     const idx = e && e.activeLabel != null ? Number(e.activeLabel) : null

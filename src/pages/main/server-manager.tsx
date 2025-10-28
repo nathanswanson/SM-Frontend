@@ -1,4 +1,4 @@
-import { SimpleGrid } from '@chakra-ui/react'
+import { SimpleGrid, SkipNavContent } from '@chakra-ui/react'
 import { Grid } from '@chakra-ui/react/grid'
 import { VStack } from '@chakra-ui/react/stack'
 import { ActionHalo } from '../../components/action-halo'
@@ -30,13 +30,15 @@ export const MainContent = ({ ...props }) => {
                 <SMChart color="green" unit="Mbps" label="Network" data={metricMessages[2]} />
                 <SMChart color="orange" unit="GB" label="Disk" data={metricMessages[3]} />
             </SimpleGrid>
-            <Cards />
+
+            <SkipNavContent>
+                <Cards />
+            </SkipNavContent>
         </VStack>
     )
 }
 
 const Cards = ({ ...props }) => {
-    // const { metricMessages } = useWebSocketProvider()
     return (
         <Grid
             alignSelf="flex-start"

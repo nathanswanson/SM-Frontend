@@ -3,5 +3,5 @@ stats.html
 dist/
 node_modules/
 openapi.json
-*storybook.log
 storybook-static/
+*.log

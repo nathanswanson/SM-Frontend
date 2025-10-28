@@ -1,13 +1,14 @@
 'use client'
 
-import { Box, ScrollArea, Text, TreeView, createTreeCollection } from '@chakra-ui/react'
+import { Box, Group, HStack, IconButton, ScrollArea, TreeView, createTreeCollection } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
-import { LuFile, LuFolder, LuLoaderCircle } from 'react-icons/lu'
+import { LuFile, LuFolder, LuLoaderCircle, LuPlus } from 'react-icons/lu'
 
-import { readFile, searchFs } from '../../../lib/hey-api/client'
-import { DisabledModule } from '../../components/disabled-module'
-import { useSelectedServerContext } from '../../providers/selected-server-context'
-import { TextEditorDialog } from './components/text-editor'
+import { readFile, searchFs } from '../../../../lib/hey-api/client'
+import { DisabledModule } from '../../../components/disabled-module'
+import { useSelectedServerContext } from '../../../providers/selected-server-context'
+import { FileUploadDialog } from './file-upload'
+import { TextEditorDialog } from './text-editor'
 
 function getRelativePath(from: string, to: string): string {
     if (from !== '/') {
@@ -60,7 +61,6 @@ const initialCollection = createTreeCollection<Node>({
         id: 'ROOT',
         name: '',
         full_path: '',
-        // single placeholder entry for the root; real children will be loaded via loadChildren
         children: [
             {
                 id: '/',
@@ -73,11 +73,11 @@ const initialCollection = createTreeCollection<Node>({
 })
 
 export const FileManager = ({ ...props }) => {
-    const { selectedServer } = useSelectedServerContext()
+    const { serverInfo } = useSelectedServerContext()
 
     return (
         <>
-            {!selectedServer ? (
+            {!serverInfo ? (
                 <DisabledModule requester="files" />
             ) : (
                 <ScrollArea.Root height="30em" {...props}>
@@ -103,11 +103,16 @@ const FileTree = () => {
     const [editorFilePath, setEditorFilePath] = useState<string>('.txt')
     const [selectedValue, setSelectedValue] = useState<string[]>([])
 
+    // State for file upload dialog
+    const [isFileUploadDialogOpen, setIsFileUploadDialogOpen] = useState(false)
+    const [fileUploadPath, setFileUploadPath] = useState<string>('')
+
     async function getPathFiles(path: string, selectedServer: string): Promise<Node[]> {
         if (!selectedServer) return []
+        if (!serverInfo) return []
         const strings = await searchFs({
             credentials: 'include',
-            path: { container_name: selectedServer, path: path }
+            path: { server_id: serverInfo?.id, path: path }
         })
         if (!strings.data) return []
         return strings.data.items.map(filePath => {
@@ -130,42 +135,43 @@ const FileTree = () => {
             if (!e.focusedValue?.endsWith('/')) {
                 if (!selectedServer) return
                 const path = e.selectedNodes[0]['full_path']
-                const dl = await readFile({
-                    credentials: 'include',
-                    path: { container_name: serverInfo?.name || '' },
-                    query: { path: path }
-                })
-                if (dl?.data) {
-                    const data = dl.data as Blob
-                    const stream = typeof data.stream === 'function' ? data.stream() : new Response(data).body
+                if (serverInfo) {
+                    await readFile({
+                        credentials: 'include',
+                        path: { server_id: serverInfo?.id },
+                        query: { path: path }
+                    }).then(dl => {
+                        if (dl.data) {
+                            const data = dl.data as Blob
+                            const stream = typeof data.stream === 'function' ? data.stream() : new Response(data).body
 
-                    if (stream) {
-                        if (
-                            data.size > TEXT_EDITOR_FILE_SIZE_LIMIT ||
-                            !ALLOWED_TEXT_FILE_EXTENSIONS.some(ext => path.endsWith(ext))
-                        ) {
-                            // download file instead of opening in editor
-                            const url = URL.createObjectURL(data)
-                            const a = document.createElement('a')
-                            a.href = url
-                            a.download = path.split('/').pop() || 'download'
-                            document.body.appendChild(a)
-                            a.click()
-                            document.body.removeChild(a)
-                            setTimeout(() => URL.revokeObjectURL(url), 5000)
-                            return
-                        } else {
-                            setEditorInputStream(stream)
-                            setIsEditorOpen(true)
-                            setEditorFilePath(path)
+                            if (stream) {
+                                if (
+                                    data.size > TEXT_EDITOR_FILE_SIZE_LIMIT ||
+                                    !ALLOWED_TEXT_FILE_EXTENSIONS.some(ext => path.endsWith(ext))
+                                ) {
+                                    // download file instead of opening in editor
+                                    const url = URL.createObjectURL(data)
+                                    const a = document.createElement('a')
+                                    a.href = url
+                                    a.download = path.split('/').pop() || 'download'
+                                    document.body.appendChild(a)
+                                    a.click()
+                                    document.body.removeChild(a)
+                                    setTimeout(() => URL.revokeObjectURL(url), 5000)
+                                    return
+                                } else {
+                                    setEditorInputStream(stream)
+                                    setIsEditorOpen(true)
+                                    setEditorFilePath(path)
+                                }
+                            }
                         }
-                    }
+                    })
                 }
             }
         }
-        setSelectedValue([''])
     }
-
     useEffect(() => {
         if (initialCollection.rootNode.children) {
             initialCollection.rootNode['children'][0].disabled = !selectedServer
@@ -176,7 +182,7 @@ const FileTree = () => {
 
     async function handleEditorOutputStream(path: string, outStream: ReadableStream<Uint8Array> | undefined) {
         if (!outStream) return
-        if (!selectedServer) return // temp print stream2
+        if (!selectedServer) return
         const reader = outStream.getReader()
         const blob = await new Response(
             new ReadableStream({
@@ -207,6 +213,12 @@ const FileTree = () => {
             })
     }
 
+    const handleFileUploadButton = (path: string) => {
+        console.log('upload to path:', path)
+        setFileUploadPath(path)
+        setIsFileUploadDialogOpen(true)
+    }
+
     return (
         <Box flexGrow={1}>
             <TreeView.Root
@@ -222,18 +234,33 @@ const FileTree = () => {
                         indentGuide={<TreeView.BranchIndentGuide />}
                         render={({ node, nodeState }) =>
                             nodeState.isBranch ? (
-                                <TreeView.BranchControl>
-                                    {nodeState.loading ? (
-                                        <LuLoaderCircle
-                                            style={{
-                                                animation: 'spin 1s infinite'
-                                            }}
-                                        />
-                                    ) : (
-                                        <LuFolder />
-                                    )}
-                                    <TreeView.BranchText>{node.name}</TreeView.BranchText>
-                                </TreeView.BranchControl>
+                                <HStack width="100%" justifyContent={'space-between'}>
+                                    <TreeView.BranchControl width="100%">
+                                        {nodeState.loading ? (
+                                            <LuLoaderCircle
+                                                style={{
+                                                    animation: 'spin 1s infinite'
+                                                }}
+                                            />
+                                        ) : (
+                                            <HStack>
+                                                <Group>
+                                                    <LuFolder />
+                                                    <TreeView.BranchText>{node.name}</TreeView.BranchText>
+                                                </Group>
+                                            </HStack>
+                                        )}
+                                    </TreeView.BranchControl>
+                                    <IconButton
+                                        id={`file-upload-${node.full_path}`}
+                                        variant={'ghost'}
+                                        onClick={() => {
+                                            handleFileUploadButton(node.full_path)
+                                        }}
+                                    >
+                                        <LuPlus />
+                                    </IconButton>
+                                </HStack>
                             ) : (
                                 <TreeView.Item>
                                     <LuFile />
@@ -243,7 +270,6 @@ const FileTree = () => {
                         }
                     />
                 </TreeView.Tree>
-                <Text>{selectedValue}</Text>
             </TreeView.Root>
             <TextEditorDialog
                 isOpen={isEditorOpen}
@@ -251,6 +277,13 @@ const FileTree = () => {
                 inputStream={editorInputStream as any}
                 onSave={handleEditorOutputStream}
                 fullPath={editorFilePath}
+            />
+            <FileUploadDialog
+                isOpen={isFileUploadDialogOpen}
+                setOpen={open => {
+                    return setIsFileUploadDialogOpen(open)
+                }}
+                uploadPath={fileUploadPath}
             />
         </Box>
     )

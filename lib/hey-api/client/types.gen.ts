@@ -35,16 +35,6 @@ export type BodyLoginUserUsersTokenPost = {
 };
 
 /**
- * Body_upload_file_containers__container_name__fs__path__post
- */
-export type BodyUploadFileContainersContainerNameFsPathPost = {
-    /**
-     * File
-     */
-    file: Blob | File;
-};
-
-/**
  * ContainerCommandResponse
  */
 export type ContainerCommandResponse = {
@@ -613,207 +603,6 @@ export type CreateUserRequestWritable = {
     password: string;
 };
 
-export type GetLogMessageData = {
-    body?: never;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
-    path: {
-        /**
-         * Server Id
-         */
-        server_id: number;
-    };
-    query?: {
-        /**
-         * Line Count
-         */
-        line_count?: number | null;
-    };
-    url: '/containers/{server_id}/logs';
-};
-
-export type GetLogMessageErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type GetLogMessageError = GetLogMessageErrors[keyof GetLogMessageErrors];
-
-export type GetLogMessageResponses = {
-    /**
-     * Successful Response
-     */
-    200: ContainerLogsResponse;
-};
-
-export type GetLogMessageResponse = GetLogMessageResponses[keyof GetLogMessageResponses];
-
-export type SendCommandData = {
-    body?: never;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
-    path: {
-        /**
-         * Server Id
-         */
-        server_id: number;
-    };
-    query: {
-        /**
-         * Command
-         */
-        command: string;
-    };
-    url: '/containers/{server_id}/command';
-};
-
-export type SendCommandErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type SendCommandError = SendCommandErrors[keyof SendCommandErrors];
-
-export type SendCommandResponses = {
-    /**
-     * Successful Response
-     */
-    200: ContainerCommandResponse;
-};
-
-export type SendCommandResponse = SendCommandResponses[keyof SendCommandResponses];
-
-export type ReadFileData = {
-    body?: never;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
-    path: {
-        /**
-         * Container Name
-         */
-        container_name: string;
-    };
-    query: {
-        /**
-         * Path
-         */
-        path: string;
-    };
-    url: '/containers/{container_name}/fs';
-};
-
-export type ReadFileErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type ReadFileError = ReadFileErrors[keyof ReadFileErrors];
-
-export type ReadFileResponses = {
-    /**
-     * Successful Response
-     */
-    200: unknown;
-};
-
-export type DeleteFileData = {
-    body?: never;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
-    path: {
-        /**
-         * Container Name
-         */
-        container_name: string;
-        /**
-         * Path
-         */
-        path: string;
-    };
-    query?: never;
-    url: '/containers/{container_name}/fs/{path}';
-};
-
-export type DeleteFileErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type DeleteFileError = DeleteFileErrors[keyof DeleteFileErrors];
-
-export type DeleteFileResponses = {
-    /**
-     * Successful Response
-     */
-    200: ContainerFileDeleteResponse;
-};
-
-export type DeleteFileResponse = DeleteFileResponses[keyof DeleteFileResponses];
-
-export type UploadFileData = {
-    body: BodyUploadFileContainersContainerNameFsPathPost;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
-    path: {
-        /**
-         * Container Name
-         */
-        container_name: string;
-        /**
-         * Path
-         */
-        path: string;
-    };
-    query?: never;
-    url: '/containers/{container_name}/fs/{path}';
-};
-
-export type UploadFileErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type UploadFileError = UploadFileErrors[keyof UploadFileErrors];
-
-export type UploadFileResponses = {
-    /**
-     * Successful Response
-     */
-    200: ContainerFileUploadResponse;
-};
-
-export type UploadFileResponse = UploadFileResponses[keyof UploadFileResponses];
-
 export type AddTemplateData = {
     body: TemplatesBase;
     headers?: {
@@ -1237,6 +1026,88 @@ export type GetServerStatusResponses = {
 
 export type GetServerStatusResponse = GetServerStatusResponses[keyof GetServerStatusResponses];
 
+export type SendCommandData = {
+    body?: never;
+    headers?: {
+        /**
+         * Authorization
+         */
+        authorization?: string | null;
+    };
+    path: {
+        /**
+         * Server Id
+         */
+        server_id: number;
+    };
+    query: {
+        /**
+         * Command
+         */
+        command: string;
+    };
+    url: '/servers/{server_id}/command';
+};
+
+export type SendCommandErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type SendCommandError = SendCommandErrors[keyof SendCommandErrors];
+
+export type SendCommandResponses = {
+    /**
+     * Successful Response
+     */
+    200: ContainerCommandResponse;
+};
+
+export type SendCommandResponse = SendCommandResponses[keyof SendCommandResponses];
+
+export type GetLogMessageData = {
+    body?: never;
+    headers?: {
+        /**
+         * Authorization
+         */
+        authorization?: string | null;
+    };
+    path: {
+        /**
+         * Server Id
+         */
+        server_id: number;
+    };
+    query?: {
+        /**
+         * Line Count
+         */
+        line_count?: number | null;
+    };
+    url: '/servers/{server_id}/logs';
+};
+
+export type GetLogMessageErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GetLogMessageError = GetLogMessageErrors[keyof GetLogMessageErrors];
+
+export type GetLogMessageResponses = {
+    /**
+     * Successful Response
+     */
+    200: ContainerLogsResponse;
+};
+
+export type GetLogMessageResponse = GetLogMessageResponses[keyof GetLogMessageResponses];
+
 export type AddNodeData = {
     body: NodesBase;
     headers?: {
@@ -1487,16 +1358,16 @@ export type SearchFsData = {
     };
     path: {
         /**
-         * Container Name
+         * Server Id
          */
-        container_name: string;
+        server_id: number;
         /**
          * Path
          */
         path: string;
     };
     query?: never;
-    url: '/search/fs/{container_name}/{path}';
+    url: '/search/fs/{server_id}/{path}';
 };
 
 export type SearchFsErrors = {
@@ -1578,3 +1449,163 @@ export type SearchTemplatesResponses = {
 };
 
 export type SearchTemplatesResponse = SearchTemplatesResponses[keyof SearchTemplatesResponses];
+
+export type GetArchiveData = {
+    body?: never;
+    headers?: {
+        /**
+         * Authorization
+         */
+        authorization?: string | null;
+    };
+    path: {
+        /**
+         * Server Id
+         */
+        server_id: number;
+    };
+    query?: {
+        /**
+         * Paths
+         */
+        paths?: string | null;
+    };
+    url: '/volumes/{server_id}/fs/archive';
+};
+
+export type GetArchiveErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GetArchiveError = GetArchiveErrors[keyof GetArchiveErrors];
+
+export type GetArchiveResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
+
+export type ReadFileData = {
+    body?: never;
+    headers?: {
+        /**
+         * Authorization
+         */
+        authorization?: string | null;
+    };
+    path: {
+        /**
+         * Server Id
+         */
+        server_id: number;
+    };
+    query: {
+        /**
+         * Path
+         */
+        path: string;
+    };
+    url: '/volumes/{server_id}/fs';
+};
+
+export type ReadFileErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ReadFileError = ReadFileErrors[keyof ReadFileErrors];
+
+export type ReadFileResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
+
+export type UploadFileData = {
+    body?: never;
+    headers?: {
+        /**
+         * Authorization
+         */
+        authorization?: string | null;
+    };
+    path: {
+        /**
+         * Server Id
+         */
+        server_id: number;
+    };
+    query: {
+        /**
+         * Path
+         */
+        path: string;
+    };
+    url: '/volumes/{server_id}/fs/';
+};
+
+export type UploadFileErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type UploadFileError = UploadFileErrors[keyof UploadFileErrors];
+
+export type UploadFileResponses = {
+    /**
+     * Successful Response
+     */
+    200: ContainerFileUploadResponse;
+};
+
+export type UploadFileResponse = UploadFileResponses[keyof UploadFileResponses];
+
+export type DeleteFileData = {
+    body?: never;
+    headers?: {
+        /**
+         * Authorization
+         */
+        authorization?: string | null;
+    };
+    path: {
+        /**
+         * Path
+         */
+        path: string;
+    };
+    query: {
+        /**
+         * Container Name
+         */
+        container_name: string;
+    };
+    url: '/volumes/{server_id}/fs/{path}';
+};
+
+export type DeleteFileErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type DeleteFileError = DeleteFileErrors[keyof DeleteFileErrors];
+
+export type DeleteFileResponses = {
+    /**
+     * Successful Response
+     */
+    200: ContainerFileDeleteResponse;
+};
+
+export type DeleteFileResponse = DeleteFileResponses[keyof DeleteFileResponses];

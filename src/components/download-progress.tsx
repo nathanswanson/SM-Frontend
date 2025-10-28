@@ -1,32 +1,43 @@
-import { HStack, Progress, Text, VStack } from '@chakra-ui/react'
+import { HStack, Presence, Progress, Text, VStack } from '@chakra-ui/react'
 import bytes from 'bytes'
+import { Tooltip } from '../../lib/chakra/tooltip'
+import { useFileTransferContext } from '../providers/file-transfer'
+import { titleCaseString } from '../utils/util'
 
-interface DownloadProgressProps {
-    fileName?: string
-    current: number
-    total: number
-}
+export const DownloadProgress = ({ ...props }) => {
+    const { file, transferProgress } = useFileTransferContext()
 
-export const DownloadProgress = ({ fileName, current, total, ...props }: DownloadProgressProps) => {
-    const progress = total > 0 ? (current / total) * 100 : 0
-
+    if (!file) {
+        return <></>
+    }
+    const progress = (transferProgress / file.sizeTotal) * 100
     return (
-        <Progress.Root width="100%" minW="15em" height="2em" defaultValue={progress} {...props} striped animated>
-            {fileName && (
+        <Presence
+            present={progress < 100}
+            animationDuration={'slow'}
+            animationDelay={'slow'}
+            animationName={{ _open: 'fade-in', _closed: 'fade-out' }}
+        >
+            <Progress.Root width="100%" minW="20em" height="2em" value={progress} {...props} striped animated>
                 <VStack alignItems={'flex-start'}>
                     <Progress.Label maxW="20em">
-                        <Text>Downloading: </Text>
-                        <Text leftTruncate>{fileName}</Text>
+                        <Text>{titleCaseString(file.direction)}: </Text>
+                        <Tooltip content={file.fileName}>
+                            <Text leftTruncate>{file.fileName}</Text>
+                        </Tooltip>
                     </Progress.Label>
 
                     <HStack width="100%">
                         <Progress.Track flex={1}>
                             <Progress.Range />
                         </Progress.Track>
-                        <Progress.ValueText width={'9em'}>{`${bytes(current)} / ${bytes(total)} `}</Progress.ValueText>
+                        <Progress.ValueText
+                            textWrap={'nowrap'}
+                            width={'9em'}
+                        >{`${bytes(transferProgress, { decimalPlaces: 0 })} / ${bytes(file.sizeTotal, { decimalPlaces: 0 })}`}</Progress.ValueText>
                     </HStack>
                 </VStack>
-            )}
-        </Progress.Root>
+            </Progress.Root>
+        </Presence>
     )
 }

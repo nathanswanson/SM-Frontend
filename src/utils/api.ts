@@ -2,13 +2,16 @@ import { toaster } from '../../lib/chakra/toaster'
 import { client as apiClient } from '../../lib/hey-api/client/client.gen'
 
 export const getBaseUrl = () => {
-    return `http://api.localhost`
+    if (import.meta.env.PROD) {
+        return window.location.origin
+    }
+    return `https://api.localhost`
     // return envUrl;
 }
 
 export const getFrontendUrl = () => {
     // in prod this equals getBaseURL()
-    return 'http://localhost'
+    return 'https://localhost'
 }
 
 apiClient.setConfig({
@@ -18,6 +21,9 @@ apiClient.setConfig({
 
 apiClient.interceptors.error.use(async (error: any, options: any) => {
     // set flag to indicate the app should logout
+    if (import.meta.env.DEV) {
+        console.log(error)
+    }
     if (options.status == 401) {
         if (window.sessionStorage.getItem('logged_in')) {
             console.log('Logging out due to 401')

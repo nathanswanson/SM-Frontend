@@ -1,17 +1,19 @@
-import { ScrollArea, Container } from '@chakra-ui/react'
-import { createHighlighterCore, createJavaScriptRegexEngine } from 'shiki'
-import useAsync from 'react-use/lib/useAsync'
+import { Container, ScrollArea } from '@chakra-ui/react'
 import { useState } from 'react'
+import useAsync from 'react-use/lib/useAsync'
+import { createHighlighterCore, createJavaScriptRegexEngine } from 'shiki'
 
 // theme
 import githubLight from '@shikijs/themes/github-light'
-import { useWebSocketProvider } from '../../../providers/web-socket'
 import { purify } from '../../../utils/dom'
 
-const LogView = () => {
+interface LogTerminalProps {
+    messages: string[]
+}
+
+const LogView = ({ messages }: LogTerminalProps) => {
     // const { logMessages } = useWebSocketProvider()
     const [highlighter, setHighlighter] = useState<any>(null)
-    const { logMessages } = useWebSocketProvider()
     // Initialize Shiki highlighter
     useAsync(async () => {
         createHighlighterCore({
@@ -27,7 +29,7 @@ const LogView = () => {
         <ScrollArea.Root borderWidth={1}>
             <ScrollArea.Viewport>
                 <ScrollArea.Content height="100px" textStyle="sm">
-                    {logMessages.map((log, idx) => (
+                    {messages.map((log, idx) => (
                         <Container
                             p="0"
                             width="auto"
