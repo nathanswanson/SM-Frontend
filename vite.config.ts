@@ -5,22 +5,24 @@ import { storybookTest } from '@storybook/addon-vitest/vitest-plugin'
 import react from '@vitejs/plugin-react'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { visualizer } from 'rollup-plugin-visualizer'
 import { defineConfig } from 'vite'
 const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url))
 
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig({
     plugins: [
-        visualizer({
-            open: false
-        }),
         react({
             babel: {
                 plugins: ['babel-plugin-react-compiler']
             }
         })
     ],
+
+    server: {
+        watch: {}
+        // hmr: false
+    },
+
     test: {
         projects: [
             {
@@ -48,15 +50,15 @@ export default defineConfig({
                 }
             }
         ]
-    },
-    build: {
-        rollupOptions: {
-            output: {
-                chunkFileNames: 'assets/[name]-[hash].js',
-                manualChunks: manualChunks
-            }
-        }
     }
+    // build: {
+    //     rollupOptions: {
+    //         output: {
+    //             chunkFileNames: 'assets/[name]-[hash].js',
+    //             manualChunks: manualChunks
+    //         }
+    //     }
+    // }
 })
 function manualChunks(id) {
     if (id.includes('node_modules')) {

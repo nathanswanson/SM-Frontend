@@ -9,8 +9,8 @@ import {
     Portal,
     Spinner
 } from '@chakra-ui/react'
+import { Download } from 'lucide-react'
 import React, { Suspense, useEffect, useRef, useState } from 'react'
-import { LuDownload } from 'react-icons/lu'
 
 const EditorLazy = React.lazy(() => import('@monaco-editor/react'))
 
@@ -123,7 +123,7 @@ export const TextEditorDialog = ({
                                     left={2}
                                     aria-label="Download"
                                 >
-                                    <LuDownload />
+                                    <Download />
                                 </IconButton>
                             </Box>
                         </Dialog.Body>

@@ -3,7 +3,6 @@ import { http, HttpResponse, passthrough } from 'msw'
 import { ServerStatusResponse } from '../../lib/hey-api/client/types.gen'
 import { getBaseUrl } from '../utils/api'
 import { LocalDB } from './local-db'
-import { socketIOHandlers } from './socket-io-handlers'
 const db: LocalDB = LocalDB.getInstance()
 
 const InternalMockData = {
@@ -11,7 +10,6 @@ const InternalMockData = {
     serversOnline: [] as string[]
 }
 
-// const ip = 'http://api.localhost'
 const ip = getBaseUrl()
 
 const lorem = new LoremIpsum({
@@ -32,8 +30,6 @@ function generateLogLine(serverName: string): string {
 }
 
 export const handlers: any[] = [
-    // socket.io
-    ...socketIOHandlers,
     //public functions
     http.post(`${ip}/users/token`, () => {
         InternalMockData.loggedIn = true

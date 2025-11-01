@@ -2,8 +2,8 @@
 
 import type { ButtonProps, GroupProps, InputProps, StackProps } from '@chakra-ui/react'
 import { Box, HStack, IconButton, Input, InputGroup, Stack, mergeRefs, useControllableState } from '@chakra-ui/react'
+import { Eye, EyeOff } from 'lucide-react'
 import * as React from 'react'
-import { LuEye, LuEyeOff } from 'react-icons/lu'
 
 export interface PasswordVisibilityProps {
     /**
@@ -34,7 +34,7 @@ export const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputPro
         defaultVisible,
         visible: visibleProp,
         onVisibleChange,
-        visibilityIcon = { on: <LuEye />, off: <LuEyeOff /> },
+        visibilityIcon = { on: <Eye />, off: <EyeOff /> },
         ...rest
     } = props
 

@@ -1,10 +1,10 @@
-import { LuServerCog } from 'react-icons/lu'
+import { ServerCog } from 'lucide-react'
 import { MenuSelectButton } from '../../../mocks/menu-select-button'
 
 export const NodeCreateDialog = () => {
     return (
         <MenuSelectButton disable={true} color="fg.muted">
-            <LuServerCog /> Node Management
+            <ServerCog /> Node Management
         </MenuSelectButton>
     )
 }

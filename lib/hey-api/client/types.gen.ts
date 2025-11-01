@@ -1609,3 +1609,38 @@ export type DeleteFileResponses = {
 };
 
 export type DeleteFileResponse = DeleteFileResponses[keyof DeleteFileResponses];
+
+export type HandleHttpGetData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/graphql';
+};
+
+export type HandleHttpGetErrors = {
+    /**
+     * Not found if GraphiQL or query via GET are not enabled.
+     */
+    404: unknown;
+};
+
+export type HandleHttpGetResponses = {
+    /**
+     * The GraphiQL integrated development environment.
+     */
+    200: unknown;
+};
+
+export type HandleHttpPostData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/graphql';
+};
+
+export type HandleHttpPostResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};

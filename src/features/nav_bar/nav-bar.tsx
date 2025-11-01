@@ -18,7 +18,7 @@ export const NavBar = ({ ...props }) => {
 }
 
 const SearchComboBox = () => {
-    const { selectedServer, setSelectedServer, serverInfo } = useSelectedServerContext()
+    const { setSelectedServer, serverInfo } = useSelectedServerContext()
     const { scrollPosition } = useWindowContext()
     const [openState, setOpenState] = useState<Boolean>(false)
     const [serverList, setServerList] = useState<{ [key: string]: number }>({})
@@ -32,7 +32,7 @@ const SearchComboBox = () => {
         if (container_list.data?.items) {
             setServerList(container_list.data?.items || {})
         }
-    }, [selectedServer, openState])
+    }, [serverInfo])
 
     return (
         <Combobox.Root
@@ -54,7 +54,7 @@ const SearchComboBox = () => {
             }}
         >
             <Combobox.Control>
-                <Combobox.Input borderWidth={0} defaultValue={''} placeholder="Select Server..." />
+                <Combobox.Input borderWidth={0} placeholder="Select Server..." />
                 <Combobox.IndicatorGroup>
                     <Combobox.ClearTrigger />
                     <Combobox.Trigger />

@@ -1,5 +1,5 @@
-import { Chart, useChart } from '@chakra-ui/charts'
-import { Area, AreaChart } from 'recharts'
+import { useChart } from '@chakra-ui/charts'
+import { Area, AreaChart, ResponsiveContainer } from 'recharts'
 
 export interface SparkLineProps {
     data: { value: number }[]
@@ -19,10 +19,9 @@ export const SparkLine = ({ data, color, onHighlightIndex }: SparkLineProps) => 
     })
 
     return (
-        <Chart.Root maxH="6em" chart={chart}>
+        <ResponsiveContainer width={320} height="100%" minWidth={1} minHeight={1}>
             <AreaChart
                 data={chart.data}
-                style={{}}
                 margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
                 onMouseMove={e => {
                     const idx = e && e.activeLabel != null ? Number(e.activeLabel) : null
@@ -42,6 +41,6 @@ export const SparkLine = ({ data, color, onHighlightIndex }: SparkLineProps) => 
                     strokeWidth={2}
                 />
             </AreaChart>
-        </Chart.Root>
+        </ResponsiveContainer>
     )
 }

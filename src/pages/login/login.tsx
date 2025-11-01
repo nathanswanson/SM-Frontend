@@ -11,8 +11,8 @@ import {
     Spinner,
     VStack
 } from '@chakra-ui/react'
+import { CircleArrowRight } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { VscArrowRight } from 'react-icons/vsc'
 import { PasswordInput } from '../../../lib/chakra/password-input'
 import { Toaster, toaster } from '../../../lib/chakra/toaster'
 import { getUser, loginUser } from '../../../lib/hey-api/client'
@@ -132,7 +132,7 @@ export const Login = ({ children }: { children: React.ReactNode }) => {
                                                 roundedRight={0}
                                             />
                                             <IconButton type="submit" loading={loginLoading} onClick={login}>
-                                                <VscArrowRight />
+                                                <CircleArrowRight />
                                             </IconButton>
                                         </Group>
                                     </Field.Root>

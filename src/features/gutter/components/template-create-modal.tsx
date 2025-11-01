@@ -19,9 +19,9 @@ import {
     VStack
 } from '@chakra-ui/react'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Plus, SwatchBook, X } from 'lucide-react'
 import { useState } from 'react'
 import { Control, SubmitErrorHandler, SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
-import { LuPlus, LuSwatchBook, LuX } from 'react-icons/lu'
 import { z } from 'zod/v4'
 import { toaster } from '../../../../lib/chakra/toaster'
 import { addTemplate } from '../../../../lib/hey-api/client'
@@ -29,9 +29,11 @@ import { TemplateModule } from '../../../components/template-module'
 import { MenuSelectButton } from '../../../mocks/menu-select-button'
 import { templateModuleSchema, TemplateModuleType } from '../../../utils/template-schema'
 import { prettyErrorMessages, titleCaseString } from '../../../utils/util'
+
 const emptyTemplateModule = {
     label: '',
     type: TemplateModuleType.TEXT,
+    readonly: false,
     required: false,
     description: ''
 }
@@ -52,7 +54,7 @@ const formSchema = z.object({
     resource_min_cpu: z.number().min(1),
     resource_min_mem: z.number().min(1),
     resource_min_disk: z.number().min(16),
-    exposed_port: z.array(z.number()),
+    exposed_port: z.array(z.coerce.number()),
     exposed_volume: z.array(z.string()),
     description: z.string().optional(),
     modules: z.array(templateModuleSchema)
@@ -95,13 +97,16 @@ export const TemplateCreateDialog = () => {
 
     const onSubmit: SubmitHandler<FormData> = data => {
         //modules needs to be string[] made from json[]
+
+        // ensure exposed port is string[]
+
         setLoadingTemplateCreate(true)
         addTemplate({
             body: {
                 name: data.name,
                 image: data.image,
                 tags: data.tags,
-                exposed_port: data.exposed_port,
+                exposed_port: data.exposed_port as number[],
                 exposed_volume: data.exposed_volume,
                 resource_min_cpu: data.resource_min_cpu,
                 resource_min_mem: data.resource_min_mem,
@@ -127,8 +132,12 @@ export const TemplateCreateDialog = () => {
     }
 
     const onError: SubmitErrorHandler<FormData> = errors => {
-        const prettyErrors = prettyErrorMessages(errors)
-        setErrorMessage(prettyErrors)
+        try {
+            const prettyErrors = prettyErrorMessages(errors)
+            setErrorMessage(prettyErrors)
+        } catch (e) {
+            console.log('Failed to pretty print errors:', e)
+        }
         toaster.error({ title: 'Failed to create template ', description: 'See Errors at top of form.' })
     }
 
@@ -136,8 +145,7 @@ export const TemplateCreateDialog = () => {
         <Dialog.Root size="xl" open={open} onOpenChange={e => setOpen(e.open)}>
             <Dialog.Trigger asChild>
                 <MenuSelectButton color="fg.muted">
-                    <LuSwatchBook />
-                    Template Management
+                    <SwatchBook /> Template Management
                 </MenuSelectButton>
             </Dialog.Trigger>
             <Portal>
@@ -269,7 +277,7 @@ export const TemplateCreateDialog = () => {
                                                                     variant={'ghost'}
                                                                     onClick={handleAddRow}
                                                                 >
-                                                                    <LuPlus />
+                                                                    <Plus />
                                                                 </IconButton>
                                                             </Table.ColumnHeader>
                                                         </Table.Row>
@@ -383,7 +391,7 @@ export const TemplateCreateDialog = () => {
                                                                         onClick={() => remove(index)}
                                                                         variant={'ghost'}
                                                                     >
-                                                                        <LuX />
+                                                                        <X />
                                                                     </IconButton>
                                                                 </Table.Cell>
                                                             </Table.Row>

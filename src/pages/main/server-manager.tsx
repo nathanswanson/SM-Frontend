@@ -1,18 +1,55 @@
 import { SimpleGrid, SkipNavContent } from '@chakra-ui/react'
 import { Grid } from '@chakra-ui/react/grid'
 import { VStack } from '@chakra-ui/react/stack'
+import { useEffect, useState } from 'react'
+import { useSubscription } from 'urql'
 import { ActionHalo } from '../../components/action-halo'
 import CardModule from '../../components/card'
+import { ConsoleCommands } from '../../features/console/components/command-bar'
 import { LogManager } from '../../features/console/console'
 import { FileManagerHalo } from '../../features/file_manager/file-manager'
 import { NodeOverview } from '../../features/node_overview/node-overview'
-import { ConsoleCommands } from '../../features/server_overview/components/command-bar'
 import { ServerOverview } from '../../features/server_overview/server-overview'
-import { useWebSocketProvider } from '../../providers/web-socket'
+import { useSelectedServerContext } from '../../providers/selected-server-context'
 import { SMChart } from './components/chart'
 
+const subscribe = (source: string) => {
+    return `
+    subscription metrics {
+        getMetrics(containerName: "${source}") {
+            cpu
+            disk
+            memory
+            network
+        }
+    }
+`
+}
+
+const handleSubscription = (_previous: any, response: any) => {
+    return response.getMetrics
+}
+
+// Helper to cap arrays at 50 items
+const cap50 = <T,>(arr: T[], next: T): T[] => [...arr, next].slice(-50)
+
 export const MainContent = ({ ...props }) => {
-    const { metricMessages } = useWebSocketProvider()
+    const { serverInfo } = useSelectedServerContext()
+    const [res] = useSubscription({ query: subscribe(serverInfo?.container_name ?? '') }, handleSubscription)
+    const [cpuData, setCpuData] = useState<number[]>([])
+    const [memData, setMemData] = useState<number[]>([])
+    const [netData, setNetData] = useState<number[]>([])
+    const [diskData, setDiskData] = useState<number[]>([])
+    useEffect(() => {
+        if (res.data) {
+            const dataPoint = res.data
+            setCpuData(prev => cap50(prev, dataPoint.cpu))
+            setMemData(prev => cap50(prev, dataPoint.memory))
+            setNetData(prev => cap50(prev, dataPoint.network))
+            setDiskData(prev => cap50(prev, dataPoint.disk))
+        }
+    }, [res])
+
     return (
         <VStack {...props}>
             <SimpleGrid
@@ -25,10 +62,10 @@ export const MainContent = ({ ...props }) => {
                 mb="1.5em"
                 // flexFlow={'row wrap'}
             >
-                <SMChart color="red" unit="Cores" label="Cpu" data={metricMessages[0]} />
-                <SMChart color="blue" unit="GB" label="Memory" data={metricMessages[1]} />
-                <SMChart color="green" unit="Mbps" label="Network" data={metricMessages[2]} />
-                <SMChart color="orange" unit="GB" label="Disk" data={metricMessages[3]} />
+                <SMChart color="red" unit="Cores" label="Cpu" data={cpuData} />
+                <SMChart color="blue" unit="GB" label="Memory" data={memData} />
+                <SMChart color="green" unit="Mbps" label="Network" data={netData} />
+                <SMChart color="orange" unit="GB" label="Disk" data={diskData} />
             </SimpleGrid>
 
             <SkipNavContent>

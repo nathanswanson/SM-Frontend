@@ -44,7 +44,6 @@ const CheckboxModule = ({ field }: CheckboxModuleProps) => {
             name={field.name}
             checked={field.value}
             onCheckedChange={e => {
-                console.log(e)
                 field.onChange(!!e.checked.valueOf)
             }}
         >
@@ -122,13 +121,8 @@ interface ListModuleProps extends TemplateModuleBaseProps {
 
 const ListModule = ({ field }: ListModuleProps) => {
     return (
-        <TagsInput.Root
-            bg="bg.success"
-            onValueChange={values => field.onChange(values.value)}
-            value={field.value}
-            editable={true}
-        >
-            <TagsInput.Control>
+        <TagsInput.Root onValueChange={values => field.onChange(values.value)} value={field.value} editable={true}>
+            <TagsInput.Control bg="bg.panel">
                 <TagsInput.Items />
                 <TagsInput.Input />
                 <TagsInput.ClearTrigger />

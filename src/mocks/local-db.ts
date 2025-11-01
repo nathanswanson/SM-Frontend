@@ -27,9 +27,10 @@ export const dbTestData: LocalDBData = {
         {
             name: 'Server-1',
             cpu: 2,
-            env: {},
+            env: { EULA: 'true' },
             disk: 16,
             memory: 4,
+            tags: ['latest'],
             container_name: 'Server-1',
             node_id: 1,
             template_id: 1,
@@ -69,10 +70,23 @@ export const dbTestData: LocalDBData = {
             description: 'A Minecraft Server Template',
             resource_min_cpu: 2,
             resource_min_mem: 2,
-            resource_min_disk: 10,
+            resource_min_disk: 16,
             id: 1,
             modules: [],
-            exposed_port: [25565]
+            exposed_port: [25565],
+            exposed_volume: ['/data']
+        },
+        {
+            name: 'Terraria',
+            image: 'passivelemon/terraria-server',
+            tags: ['latest'],
+            description: 'A Terraria Server Template',
+            resource_min_cpu: 1,
+            resource_min_mem: 1,
+            resource_min_disk: 8,
+            id: 2,
+            modules: [],
+            exposed_port: [7777]
         }
     ]
 }

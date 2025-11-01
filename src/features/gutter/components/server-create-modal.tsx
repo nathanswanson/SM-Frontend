@@ -9,10 +9,10 @@ import {
     Portal,
     ScrollArea
 } from '@chakra-ui/react'
+import { Database } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { LuDatabase } from 'react-icons/lu'
-import { useAsync, useMap } from 'react-use'
+import { useAsyncFn, useMap } from 'react-use'
 import { z } from 'zod/v4'
 import { createServer, getTemplate, searchTemplates, TemplatesRead } from '../../../../lib/hey-api/client'
 import { TemplateModule } from '../../../components/template-module'
@@ -44,13 +44,13 @@ export const ServerCreateDialog = () => {
 
     const [templateMap, { set: setTemplateMap, setAll: setAllTemplateMap }] = useMap<{ [key: string]: number }>({})
     const [selectedTemplate, setSelectedTemplate] = useState<TemplatesRead | undefined>(undefined)
-
+    const [open, setOpen] = useState(false)
     //names only
     const templateList = createListCollection({
         items: Object.keys(templateMap)
     })
 
-    const templateListState = useAsync(async () => {
+    const [templateListState, fetchTemplates] = useAsyncFn(async () => {
         searchTemplates({}).then(res => {
             if (!res.data?.items) {
                 setAllTemplateMap({})
@@ -89,10 +89,21 @@ export const ServerCreateDialog = () => {
     }
 
     return (
-        <Dialog.Root size="lg">
+        <Dialog.Root
+            size="lg"
+            open={open}
+            onOpenChange={e => {
+                if (e.open) {
+                    fetchTemplates()
+                } else {
+                    setSelectedTemplate(undefined)
+                }
+                setOpen(e.open)
+            }}
+        >
             <Dialog.Trigger asChild>
                 <MenuSelectButton color="fg.muted">
-                    <LuDatabase />
+                    <Database />
                     Server Management
                 </MenuSelectButton>
             </Dialog.Trigger>
@@ -172,17 +183,15 @@ export const ServerCreateDialog = () => {
                                             {selectedTemplate?.modules?.map((field, index) => {
                                                 const template = JSON.parse(field) as TemplateModuleSchema
                                                 return (
-                                                    <>
-                                                        <TemplateModule
-                                                            key={`env-${index}`}
-                                                            type={template.type.toLowerCase() as TemplateModuleType}
-                                                            label={template.label}
-                                                            description={template.description}
-                                                            required={template.required}
-                                                            control={control}
-                                                            hookName={`env.${template.label}`}
-                                                        />
-                                                    </>
+                                                    <TemplateModule
+                                                        key={`env-${index}`}
+                                                        type={template.type.toLowerCase() as TemplateModuleType}
+                                                        label={template.label}
+                                                        description={template.description}
+                                                        required={template.required}
+                                                        control={control}
+                                                        hookName={`env.${template.label}`}
+                                                    />
                                                 )
                                             })}
                                         </Fieldset.Root>

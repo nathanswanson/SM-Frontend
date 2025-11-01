@@ -7,26 +7,49 @@ export function titleCaseString(str: string): string {
 }
 
 export function prettyErrorMessages(errors: Record<string, any>): string {
-    return Object.entries(errors)
-        .map((error: [string, any], index) => {
-            let message = ''
-            // Handle nested errors for modules
-            if (Array.isArray(error[1])) {
-                message += `${index}. ${errors[0]}:\n`
-                const moduleErrors = error[1].map((modError: any, modIndex: number) => {
-                    const charIndex = String.fromCharCode(modIndex + 97)
-                    if (modError) {
-                        const fieldErrors = Object.entries(modError).map(
-                            (fieldError: [string, any]) => fieldError[1].message
-                        )
-                        return `\t\t${charIndex}. ${fieldErrors.join(', ')}`
-                    }
-                })
-                message += moduleErrors.join('\n')
-            } else {
-                message = `${index + 1}. ${error[1]['message']}`
+    const formatError = (error: any): string => {
+        if (error && error.message) {
+            return error.message
+        }
+        return 'An unknown error occurred.'
+    }
+
+    const processErrors = (errorObject: Record<string, any>): string[] => {
+        return Object.entries(errorObject).map(([key, value], index) => {
+            if (!value) return ''
+
+            // Handle array of errors (e.g., useFieldArray)
+            if (Array.isArray(value)) {
+                const subErrors = value
+                    .map((itemError, itemIndex) => {
+                        if (!itemError) return null
+                        const charIndex = String.fromCharCode(itemIndex + 97)
+                        const nestedMessages = processErrors(itemError)
+                        if (nestedMessages.length > 0) {
+                            return `\t- Item ${charIndex}: ${nestedMessages.join(', ')}`
+                        }
+                        return null
+                    })
+                    .filter(Boolean)
+                    .join('\n')
+
+                return subErrors ? `${index + 1}. ${key}:\n${subErrors}` : ''
             }
-            return message
+
+            // Handle simple field error
+            if (value.message) {
+                return `${index + 1}. ${key}: ${formatError(value)}`
+            }
+
+            // Handle nested object errors
+            const nestedMessages = processErrors(value)
+            if (nestedMessages.length > 0) {
+                return `${index + 1}. ${key}: ${nestedMessages.join(', ')}`
+            }
+
+            return ''
         })
-        .join('\n')
+    }
+
+    return processErrors(errors).filter(Boolean).join('\n')
 }

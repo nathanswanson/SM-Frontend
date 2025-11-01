@@ -1,24 +1,58 @@
+// ignore-file-checks
 import { Button, HStack, Input, VStack } from '@chakra-ui/react'
 
-import React, { useState } from 'react'
-import { LuChevronRight } from 'react-icons/lu'
+import { ChevronRight } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
+import { useSubscription } from 'urql'
 import { sendCommand } from '../../../lib/hey-api/client'
 import { DisabledModule } from '../../components/disabled-module'
 import { useSelectedServerContext } from '../../providers/selected-server-context'
-import { useWebSocketProvider } from '../../providers/web-socket'
 
 const LazyLogView = React.lazy(() => import('./components/log-terminal'))
+
+const subscribe = (name: string) => {
+    return `
+    subscription logs {
+        getLogs(containerName: "${name}")
+    }
+`
+}
+
+const handleSubscription = (_previous: any, response: any) => {
+    return response.getLogs
+}
+
+// Cap logs at a reasonable size (e.g., 1000 messages)
+const cap50 = <T,>(arr: T[], next: T): T[] => [...arr, next].slice(-50)
 
 export const LogManager = ({ ...props }) => {
     const [commandText, setCommandText] = useState('')
     const { serverInfo } = useSelectedServerContext()
-    const { logMessages } = useWebSocketProvider()
+    const [logMessages, setLogMessages] = useState<string[]>([])
+
+    const [res] = useSubscription(
+        {
+            query: subscribe(serverInfo?.container_name ?? ''),
+            pause: !serverInfo?.container_name
+        },
+        handleSubscription
+    )
+    useEffect(() => {
+        if (res && res.data) {
+            setLogMessages(prev => cap50(prev, res.data))
+        }
+    }, [res])
+
+    useEffect(() => {
+        setLogMessages([])
+    }, [serverInfo])
+
     function submit_command(command: string) {
         if (serverInfo) {
             sendCommand({
                 credentials: 'include',
                 path: {
-                    server_id: serverInfo?.id ?? -1
+                    server_id: serverInfo.id
                 },
                 query: {
                     command: command
@@ -28,7 +62,7 @@ export const LogManager = ({ ...props }) => {
     }
 
     return (
-        <VStack flexGrow={1} h="100%" maxW="100%" width="700px" {...props}>
+        <VStack flexGrow={1} h="350px" maxW="700px" width="100%" {...props}>
             {!serverInfo ? <DisabledModule requester="logs" /> : <LazyLogView messages={logMessages} />}
             <HStack width="100%">
                 <Input
@@ -52,7 +86,7 @@ export const LogManager = ({ ...props }) => {
                         setCommandText('')
                     }}
                 >
-                    <LuChevronRight />
+                    <ChevronRight />
                 </Button>
             </HStack>
         </VStack>

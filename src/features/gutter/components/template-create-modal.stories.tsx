@@ -20,23 +20,43 @@ export const Default: Story = {
         // Check that the dialog opened
         expect(dialog).toBeTruthy()
         await userEvent.type(within(dialog).getByLabelText('Template Name'), 'My Template')
+        await userEvent.type(within(dialog).getByLabelText('Template Description'), 'This is my template')
         await userEvent.type(within(dialog).getByLabelText('Container Image'), 'itzg/minecraft-server')
-        await userEvent.type(within(dialog).getByLabelText('Tags'), 'latest')
+        await userEvent.type(within(dialog).getByLabelText('Image Tags'), 'latest')
+        await userEvent.type(within(dialog).getByLabelText('Volumes'), '/data\n')
+        await userEvent.keyboard('{Enter}')
+
+        await userEvent.type(within(dialog).getByLabelText('Ports'), '25565')
+        await userEvent.keyboard('{Enter}')
+
         await userEvent.type(within(dialog).getByLabelText('Minimum CPU (cores)'), '1')
         await userEvent.type(within(dialog).getByLabelText('Minimum Memory (GB)'), '1')
-        await userEvent.type(within(dialog).getByLabelText('Minimum Disk (GB)'), '5')
+        await userEvent.type(within(dialog).getByLabelText('Minimum Disk (GB)'), '16')
         const moduleTable = within(within(dialog).getByTestId('template-module-rows'))
 
-        // const rows_0 = moduleTable.getAllByRole('row')
-        // // // There should be no rows in the table initially
-        // expect(rows_0.length).toBe(0)
         await userEvent.click(within(dialog).getByTestId('add-template-module-button'))
-        const rows_1 = moduleTable.getAllByRole('row')
-        // There should be one row in the table now
-        expect(rows_1.length).toBe(1)
-        const rows_2 = moduleTable.getAllByRole('row')
-        // There should be no rows in the table now
-        const tempQuery = moduleTable.queryAllByRole('checkbox')
-        await userEvent.click(tempQuery[0])
+
+        const textBoxes = moduleTable.getAllByRole('textbox')
+        const key = textBoxes[0]
+        const default_value = textBoxes[1]
+        const description = textBoxes[2]
+        const checkBoxes = moduleTable.getAllByRole('checkbox')
+        const required = checkBoxes[0]
+        const readonly = checkBoxes[1]
+
+        await userEvent.type(key, 'EULA')
+
+        const select = await moduleTable.getByRole('combobox')
+        await userEvent.click(select)
+        const select_options = await moduleTable.findByRole('listbox')
+        await userEvent.click(within(select_options).getByText('Text', { exact: false }))
+
+        await userEvent.type(default_value, 'FALSE')
+        await userEvent.type(description, 'EULA Acceptance')
+
+        await userEvent.click(required)
+        await userEvent.click(readonly)
+
+        await userEvent.click(within(dialog).getByRole('button', { name: 'Create Template' }))
     }
 }

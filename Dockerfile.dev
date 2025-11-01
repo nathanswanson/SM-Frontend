@@ -11,4 +11,4 @@ COPY . .
 
 EXPOSE 4000
 
-CMD ["npm", "run", "dev", "--", "--host"]
+CMD ["npm", "run", "dev", "--", "--host", "--debug"]

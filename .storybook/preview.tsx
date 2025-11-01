@@ -2,6 +2,7 @@ import { AbsoluteCenter, Badge, Box } from '@chakra-ui/react'
 import type { Preview } from '@storybook/react-vite'
 import { http, passthrough } from 'msw'
 import { initialize, mswLoader } from 'msw-storybook-addon'
+import React from 'react'
 import { spyOn } from 'storybook/test'
 import { Toaster } from '../lib/chakra/toaster'
 import { SM } from '../src/App'
@@ -12,11 +13,10 @@ const worker = initialize()
 const preview: Preview = {
     parameters: {
         backgrounds: {
-            default: 'light',
-            values: [
-                { name: 'light', value: '#1A202C' },
-                { name: 'dark', value: '#0D1117' }
-            ]
+            options: {
+                light: { name: 'light', value: '#1A202C' },
+                dark: { name: 'dark', value: '#0D1117' }
+            }
         },
         controls: {
             matchers: {
@@ -28,6 +28,7 @@ const preview: Preview = {
             handlers
         }
     },
+
     decorators: [
         (Story, context) => {
             const { apiSource } = context.globals
@@ -63,6 +64,7 @@ const preview: Preview = {
             )
         }
     ],
+
     globalTypes: {
         apiSource: {
             name: 'API Source',
@@ -77,7 +79,14 @@ const preview: Preview = {
             }
         }
     },
-    loaders: [mswLoader]
+
+    loaders: [mswLoader],
+
+    initialGlobals: {
+        backgrounds: {
+            value: 'light'
+        }
+    }
 }
 
 export const beforeEach = () => {

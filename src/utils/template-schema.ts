@@ -13,8 +13,8 @@ export const templateModuleSchema = z.object({
         .string()
         .transform(val => val as TemplateModuleType)
         .default(TemplateModuleType.TEXT),
-    required: z.boolean(),
-    readonly: z.boolean().optional(),
+    required: z.coerce.boolean(),
+    readonly: z.coerce.boolean(),
     defaultValue: z.any().optional(),
     description: z.string().optional()
 })

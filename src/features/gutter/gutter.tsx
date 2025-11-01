@@ -13,7 +13,7 @@ import {
 } from '@chakra-ui/react'
 import { MenuSelectButton } from '../../mocks/menu-select-button'
 
-import { LuLogOut, LuMenu } from 'react-icons/lu'
+import { LogOut, Menu } from 'lucide-react'
 import { ColorModeButton } from '../../../lib/chakra/color-mode.js'
 import { logoutUser } from '../../../lib/hey-api/client'
 import { useUserDataContext } from '../../providers/user-data'
@@ -49,7 +49,7 @@ const CollapseWrapper = ({ children, ...props }: { children: React.ReactNode }) 
         <Drawer.Root placement={'start'}>
             <Drawer.Trigger asChild>
                 <IconButton variant="outline" size="sm">
-                    <LuMenu />
+                    <Menu />
                 </IconButton>
             </Drawer.Trigger>
             <Portal>
@@ -83,13 +83,11 @@ const MenuOptions = ({ ...props }) => {
             <SettingsModal />
             <MenuSelectButton
                 onClick={async () => {
-                    await logoutUser({ credentials: 'include' }).then(() => {
-                        window.location.reload()
-                    })
+                    await logoutUser({ credentials: 'include' }).then(() => {})
                 }}
                 color="danger.500"
             >
-                <LuLogOut />
+                <LogOut />
                 Sign Out
             </MenuSelectButton>
             <HStack width="100%" paddingTop={'1.5em'} borderBottomWidth="1px" borderColor="border" />

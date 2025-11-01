@@ -2,22 +2,17 @@ import React from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App'
 import { mockingEnabled } from './utils/mode'
-
 if (!import.meta.env.VITE_SM_MODE) {
     console.warn('VITE_SM_MODE is not set, defaulting to production')
 }
 
 async function preLoad() {
-    async function loadClient() {
-        const { client } = await import('./utils/api')
-    }
     if (mockingEnabled()) await enableMocking()
-    await loadClient()
+
     return
 }
 
 async function enableMocking() {
-    console.log('Mocking enabled')
     const { worker } = await import('./mocks/browser')
     const { LocalDB } = await import('./mocks/local-db')
     LocalDB.getInstance()

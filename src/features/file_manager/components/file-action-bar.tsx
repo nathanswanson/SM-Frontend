@@ -1,8 +1,8 @@
 import { DownloadTrigger, IconButton } from '@chakra-ui/react'
 import { HStack } from '@chakra-ui/react/stack'
+import { FileDown } from 'lucide-react'
 import { fetch } from 'ofetch'
 import { useState } from 'react'
-import { LuFileDown } from 'react-icons/lu'
 import { getTemplate } from '../../../../lib/hey-api/client'
 import { DownloadProgress } from '../../../components/download-progress'
 import { useFileTransferContext } from '../../../providers/file-transfer'
@@ -68,7 +68,7 @@ export const FileActionBar = ({ ...props }) => {
         <HStack justifyContent={'space-between'} width="100%" {...props}>
             <DownloadTrigger asChild fileName="export.tar" mimeType="application/x-tar" data={data}>
                 <IconButton loading={loading} variant={'ghost'}>
-                    <LuFileDown size={20} />
+                    <FileDown size={20} />
                 </IconButton>
             </DownloadTrigger>
 

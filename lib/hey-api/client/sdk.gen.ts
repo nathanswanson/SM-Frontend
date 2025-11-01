@@ -2,7 +2,7 @@
 
 import { type Client, type Options as Options2, type TDataShape, urlSearchParamsBodySerializer } from './client';
 import { client } from './client.gen';
-import type { AddNodeData, AddNodeErrors, AddNodeResponses, AddTemplateData, AddTemplateErrors, AddTemplateResponses, CreateServerData, CreateServerErrors, CreateServerResponses, CreateUserAccountData, CreateUserAccountErrors, CreateUserAccountResponses, DeleteFileData, DeleteFileErrors, DeleteFileResponses, DeleteNodeData, DeleteNodeErrors, DeleteNodeResponses, DeleteServerData, DeleteServerErrors, DeleteServerResponses, DeleteTemplateData, DeleteTemplateErrors, DeleteTemplateResponses, DiskUsageData, DiskUsageErrors, DiskUsageResponses, GetArchiveData, GetArchiveErrors, GetArchiveResponses, GetLogMessageData, GetLogMessageErrors, GetLogMessageResponses, GetNodeData, GetNodeErrors, GetNodeResponses, GetServerInfoData, GetServerInfoErrors, GetServerInfoResponses, GetServerStatusData, GetServerStatusErrors, GetServerStatusResponses, GetTemplateData, GetTemplateErrors, GetTemplateResponses, GetUserData, GetUserErrors, GetUserResponses, LoginUserData, LoginUserErrors, LoginUserResponses, LogoutUserData, LogoutUserErrors, LogoutUserResponses, ReadFileData, ReadFileErrors, ReadFileResponses, RuntimeData, RuntimeErrors, RuntimeResponses, SearchData, SearchErrors, SearchFsData, SearchFsErrors, SearchFsResponses, SearchNodesData, SearchNodesErrors, SearchNodesResponses, SearchResponses, SearchServersData, SearchServersErrors, SearchServersResponses, SearchTemplatesData, SearchTemplatesErrors, SearchTemplatesResponses, SendCommandData, SendCommandErrors, SendCommandResponses, StartServerData, StartServerErrors, StartServerResponses, StopServerData, StopServerErrors, StopServerResponses, UploadFileData, UploadFileErrors, UploadFileResponses } from './types.gen';
+import type { AddNodeData, AddNodeErrors, AddNodeResponses, AddTemplateData, AddTemplateErrors, AddTemplateResponses, CreateServerData, CreateServerErrors, CreateServerResponses, CreateUserAccountData, CreateUserAccountErrors, CreateUserAccountResponses, DeleteFileData, DeleteFileErrors, DeleteFileResponses, DeleteNodeData, DeleteNodeErrors, DeleteNodeResponses, DeleteServerData, DeleteServerErrors, DeleteServerResponses, DeleteTemplateData, DeleteTemplateErrors, DeleteTemplateResponses, DiskUsageData, DiskUsageErrors, DiskUsageResponses, GetArchiveData, GetArchiveErrors, GetArchiveResponses, GetLogMessageData, GetLogMessageErrors, GetLogMessageResponses, GetNodeData, GetNodeErrors, GetNodeResponses, GetServerInfoData, GetServerInfoErrors, GetServerInfoResponses, GetServerStatusData, GetServerStatusErrors, GetServerStatusResponses, GetTemplateData, GetTemplateErrors, GetTemplateResponses, GetUserData, GetUserErrors, GetUserResponses, HandleHttpGetData, HandleHttpGetErrors, HandleHttpGetResponses, HandleHttpPostData, HandleHttpPostResponses, LoginUserData, LoginUserErrors, LoginUserResponses, LogoutUserData, LogoutUserErrors, LogoutUserResponses, ReadFileData, ReadFileErrors, ReadFileResponses, RuntimeData, RuntimeErrors, RuntimeResponses, SearchData, SearchErrors, SearchFsData, SearchFsErrors, SearchFsResponses, SearchNodesData, SearchNodesErrors, SearchNodesResponses, SearchResponses, SearchServersData, SearchServersErrors, SearchServersResponses, SearchTemplatesData, SearchTemplatesErrors, SearchTemplatesResponses, SendCommandData, SendCommandErrors, SendCommandResponses, StartServerData, StartServerErrors, StartServerResponses, StopServerData, StopServerErrors, StopServerResponses, UploadFileData, UploadFileErrors, UploadFileResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -353,6 +353,26 @@ export const uploadFile = <ThrowOnError extends boolean = false>(options: Option
 export const deleteFile = <ThrowOnError extends boolean = false>(options: Options<DeleteFileData, ThrowOnError>) => {
     return (options.client ?? client).delete<DeleteFileResponses, DeleteFileErrors, ThrowOnError>({
         url: '/volumes/{server_id}/fs/{path}',
+        ...options
+    });
+};
+
+/**
+ * Handle Http Get
+ */
+export const handleHttpGet = <ThrowOnError extends boolean = false>(options?: Options<HandleHttpGetData, ThrowOnError>) => {
+    return (options?.client ?? client).get<HandleHttpGetResponses, HandleHttpGetErrors, ThrowOnError>({
+        url: '/graphql',
+        ...options
+    });
+};
+
+/**
+ * Handle Http Post
+ */
+export const handleHttpPost = <ThrowOnError extends boolean = false>(options?: Options<HandleHttpPostData, ThrowOnError>) => {
+    return (options?.client ?? client).post<HandleHttpPostResponses, unknown, ThrowOnError>({
+        url: '/graphql',
         ...options
     });
 };

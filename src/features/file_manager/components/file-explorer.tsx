@@ -1,10 +1,10 @@
 'use client'
 
-import { Box, Group, HStack, IconButton, ScrollArea, TreeView, createTreeCollection } from '@chakra-ui/react'
+import { Box, createTreeCollection, Group, HStack, IconButton, ScrollArea, TreeView } from '@chakra-ui/react'
+import { File, Folder, LoaderCircle, Plus } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { LuFile, LuFolder, LuLoaderCircle, LuPlus } from 'react-icons/lu'
 
-import { readFile, searchFs } from '../../../../lib/hey-api/client'
+import { readFile, searchFs, ServersRead } from '../../../../lib/hey-api/client'
 import { DisabledModule } from '../../../components/disabled-module'
 import { useSelectedServerContext } from '../../../providers/selected-server-context'
 import { FileUploadDialog } from './file-upload'
@@ -97,18 +97,18 @@ export const FileManager = ({ ...props }) => {
 
 const FileTree = () => {
     const [collection, setCollection] = useState(initialCollection)
-    const { selectedServer, serverInfo } = useSelectedServerContext()
+    const { serverInfo, serverOnline } = useSelectedServerContext()
     const [editorInputStream, setEditorInputStream] = useState<ReadableStream<Uint8Array> | null>(null)
-    const [isEditorOpen, setIsEditorOpen] = useState(false)
+    const [isEditorOpen, setIsEditorOpen] = useState<boolean>(false)
     const [editorFilePath, setEditorFilePath] = useState<string>('.txt')
-    const [selectedValue, setSelectedValue] = useState<string[]>([])
+    const [selectedValue, setSelectedValue] = useState<string[]>([]) //TODO: why is this needed?
 
     // State for file upload dialog
     const [isFileUploadDialogOpen, setIsFileUploadDialogOpen] = useState(false)
     const [fileUploadPath, setFileUploadPath] = useState<string>('')
 
-    async function getPathFiles(path: string, selectedServer: string): Promise<Node[]> {
-        if (!selectedServer) return []
+    async function getPathFiles(path: string, serverInfo: ServersRead): Promise<Node[]> {
+        if (!serverOnline) return []
         if (!serverInfo) return []
         const strings = await searchFs({
             credentials: 'include',
@@ -127,13 +127,14 @@ const FileTree = () => {
 
     function loadChildren(details: TreeView.LoadChildrenDetails<Node>): Promise<Node[]> {
         const value = details.valuePath.join('')
-        return getPathFiles(value, serverInfo?.name || '')
+        if (!serverInfo) return Promise.resolve([])
+        return getPathFiles(value, serverInfo)
     }
 
     async function handleFileSelect(e: TreeView.SelectionChangeDetails<Node>) {
         if (e.selectedNodes.length > 0) {
             if (!e.focusedValue?.endsWith('/')) {
-                if (!selectedServer) return
+                if (!serverInfo) return
                 const path = e.selectedNodes[0]['full_path']
                 if (serverInfo) {
                     await readFile({
@@ -174,15 +175,15 @@ const FileTree = () => {
     }
     useEffect(() => {
         if (initialCollection.rootNode.children) {
-            initialCollection.rootNode['children'][0].disabled = !selectedServer
+            initialCollection.rootNode['children'][0].disabled = !serverOnline
 
             setCollection(initialCollection)
         }
-    }, [selectedServer])
+    }, [serverInfo, serverOnline])
 
     async function handleEditorOutputStream(path: string, outStream: ReadableStream<Uint8Array> | undefined) {
         if (!outStream) return
-        if (!selectedServer) return
+        if (!serverInfo) return
         const reader = outStream.getReader()
         const blob = await new Response(
             new ReadableStream({
@@ -237,7 +238,7 @@ const FileTree = () => {
                                 <HStack width="100%" justifyContent={'space-between'}>
                                     <TreeView.BranchControl width="100%">
                                         {nodeState.loading ? (
-                                            <LuLoaderCircle
+                                            <LoaderCircle
                                                 style={{
                                                     animation: 'spin 1s infinite'
                                                 }}
@@ -245,7 +246,7 @@ const FileTree = () => {
                                         ) : (
                                             <HStack>
                                                 <Group>
-                                                    <LuFolder />
+                                                    <Folder />
                                                     <TreeView.BranchText>{node.name}</TreeView.BranchText>
                                                 </Group>
                                             </HStack>
@@ -258,12 +259,12 @@ const FileTree = () => {
                                             handleFileUploadButton(node.full_path)
                                         }}
                                     >
-                                        <LuPlus />
+                                        <Plus />
                                     </IconButton>
                                 </HStack>
                             ) : (
                                 <TreeView.Item>
-                                    <LuFile />
+                                    <File />
                                     <TreeView.ItemText>{node.name}</TreeView.ItemText>
                                 </TreeView.Item>
                             )

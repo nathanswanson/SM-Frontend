@@ -1,5 +1,5 @@
 import { Button, Dialog, Portal, Text } from '@chakra-ui/react'
-import { LuSettings } from 'react-icons/lu'
+import { Settings } from 'lucide-react'
 import { MenuSelectButton } from '../../../mocks/menu-select-button'
 
 export const SettingsModal = ({}) => {
@@ -7,7 +7,7 @@ export const SettingsModal = ({}) => {
         <Dialog.Root>
             <Dialog.Trigger asChild>
                 <MenuSelectButton color="fg.muted">
-                    <LuSettings />
+                    <Settings />
                     Settings
                 </MenuSelectButton>
             </Dialog.Trigger>

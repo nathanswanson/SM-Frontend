@@ -1,9 +1,9 @@
-import { AbsoluteCenter, Group, HStack, Spinner } from '@chakra-ui/react'
-import { useState, ComponentProps } from 'react'
+import { AbsoluteCenter, Group, Spinner } from '@chakra-ui/react'
+import { ComponentProps, useState } from 'react'
 import { useAsync } from 'react-use'
 import { AsyncState } from 'react-use/lib/useAsync'
-import { InfoList } from '../../components/info-list'
 import { getNode, NodesRead } from '../../../lib/hey-api/client'
+import { InfoList } from '../../components/info-list'
 
 interface IHardwareInfoProps extends ComponentProps<typeof Group> {
     hardwareState: AsyncState<void>
