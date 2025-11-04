@@ -19,7 +19,7 @@ export const SparkLine = ({ data, color, onHighlightIndex }: SparkLineProps) => 
     })
 
     return (
-        <ResponsiveContainer width={320} height="100%" minWidth={1} minHeight={1}>
+        <ResponsiveContainer width={340} height="100%" minWidth={1} minHeight={1}>
             <AreaChart
                 data={chart.data}
                 margin={{ top: 0, right: 0, left: 0, bottom: 0 }}

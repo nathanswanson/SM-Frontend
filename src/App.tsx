@@ -5,7 +5,8 @@ import { ColorModeProvider } from '../lib/chakra/color-mode'
 import { Toaster } from '../lib/chakra/toaster'
 import { GhostNav } from './components/ghost-nav'
 import { Gutter } from './features/gutter/gutter'
-import { NavBar } from './features/nav_bar/nav-bar'
+// import { NavBar } from './features/nav_bar/nav-bar'
+import { lazy } from 'react'
 import { Login } from './pages/login/login'
 import { MainContent } from './pages/main/server-manager'
 import { graphql_client } from './providers/graphql'
@@ -14,32 +15,7 @@ import { UserDataProvider } from './providers/user-data'
 import { WindowProvider } from './providers/window-context'
 import { system } from './theme'
 
-// const Messages = () => {
-//     const [res] = useSubscription({ query: subscribe }, handleSubscription)
-
-//     if (res.fetching) {
-//         return <p>Loading...</p>
-//     }
-
-//     if (res.error) {
-//         return <p>Error: {res.error.message}</p>
-//     }
-
-//     if (!res.data) {
-//         return <p>No data received</p>
-//     }
-
-//     const metrics = res.data
-//     return (
-//         <div>
-//             <p>Memory: {metrics.memory}</p>
-//             <p>CPU: {metrics.cpu}</p>
-//             <p>Disk: {metrics.disk}</p>
-//             <p>Network: {metrics.network}</p>
-//         </div>
-//     )
-// }
-
+const NavBar = lazy(() => import('./features/nav_bar/nav-bar'))
 export default function Page() {
     return (
         <SM>
@@ -52,9 +28,10 @@ export default function Page() {
 
                     <VStack marginY="6" marginX="auto" paddingX="6" marginTop="0" marginBottom="0">
                         {/* nav bar */}
-                        <NavBar width="100%" justifyContent="flex-end"></NavBar>
+                        {/* <Suspense> add fallback */}
+                        <NavBar width="100%" justifyContent="flex-end" />
+                        {/* </Suspense> */}
                         <Provider value={graphql_client}>
-                            {/* <Messages /> */}
                             <MainContent />
                         </Provider>
                         <Toaster />

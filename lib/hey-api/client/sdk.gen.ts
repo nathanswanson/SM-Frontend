@@ -2,7 +2,7 @@
 
 import { type Client, type Options as Options2, type TDataShape, urlSearchParamsBodySerializer } from './client';
 import { client } from './client.gen';
-import type { AddNodeData, AddNodeErrors, AddNodeResponses, AddTemplateData, AddTemplateErrors, AddTemplateResponses, CreateServerData, CreateServerErrors, CreateServerResponses, CreateUserAccountData, CreateUserAccountErrors, CreateUserAccountResponses, DeleteFileData, DeleteFileErrors, DeleteFileResponses, DeleteNodeData, DeleteNodeErrors, DeleteNodeResponses, DeleteServerData, DeleteServerErrors, DeleteServerResponses, DeleteTemplateData, DeleteTemplateErrors, DeleteTemplateResponses, DiskUsageData, DiskUsageErrors, DiskUsageResponses, GetArchiveData, GetArchiveErrors, GetArchiveResponses, GetLogMessageData, GetLogMessageErrors, GetLogMessageResponses, GetNodeData, GetNodeErrors, GetNodeResponses, GetServerInfoData, GetServerInfoErrors, GetServerInfoResponses, GetServerStatusData, GetServerStatusErrors, GetServerStatusResponses, GetTemplateData, GetTemplateErrors, GetTemplateResponses, GetUserData, GetUserErrors, GetUserResponses, HandleHttpGetData, HandleHttpGetErrors, HandleHttpGetResponses, HandleHttpPostData, HandleHttpPostResponses, LoginUserData, LoginUserErrors, LoginUserResponses, LogoutUserData, LogoutUserErrors, LogoutUserResponses, ReadFileData, ReadFileErrors, ReadFileResponses, RuntimeData, RuntimeErrors, RuntimeResponses, SearchData, SearchErrors, SearchFsData, SearchFsErrors, SearchFsResponses, SearchNodesData, SearchNodesErrors, SearchNodesResponses, SearchResponses, SearchServersData, SearchServersErrors, SearchServersResponses, SearchTemplatesData, SearchTemplatesErrors, SearchTemplatesResponses, SendCommandData, SendCommandErrors, SendCommandResponses, StartServerData, StartServerErrors, StartServerResponses, StopServerData, StopServerErrors, StopServerResponses, UploadFileData, UploadFileErrors, UploadFileResponses } from './types.gen';
+import type { AddNodeData, AddNodeErrors, AddNodeResponses, AddTemplateData, AddTemplateErrors, AddTemplateResponses, CreateServerData, CreateServerErrors, CreateServerResponses, CreateUserAccountData, CreateUserAccountErrors, CreateUserAccountResponses, DeleteFileData, DeleteFileErrors, DeleteFileResponses, DeleteNodeData, DeleteNodeErrors, DeleteNodeResponses, DeleteServerData, DeleteServerErrors, DeleteServerResponses, DeleteTemplateData, DeleteTemplateErrors, DeleteTemplateResponses, DiskUsageData, DiskUsageErrors, DiskUsageResponses, GetArchiveData, GetArchiveErrors, GetArchiveResponses, GetNodeData, GetNodeErrors, GetNodeResponses, GetServerInfoData, GetServerInfoErrors, GetServerInfoResponses, GetServerStatusData, GetServerStatusErrors, GetServerStatusResponses, GetTemplateData, GetTemplateErrors, GetTemplateResponses, GetUserData, GetUserErrors, GetUserResponses, HandleHttpGetData, HandleHttpGetErrors, HandleHttpGetResponses, HandleHttpPostData, HandleHttpPostResponses, LoginUserData, LoginUserErrors, LoginUserResponses, LogoutUserData, LogoutUserErrors, LogoutUserResponses, ReadFileData, ReadFileErrors, ReadFileResponses, RuntimeData, RuntimeErrors, RuntimeResponses, SearchData, SearchErrors, SearchFsData, SearchFsErrors, SearchFsResponses, SearchNodesData, SearchNodesErrors, SearchNodesResponses, SearchResponses, SearchServersData, SearchServersErrors, SearchServersResponses, SearchTemplatesData, SearchTemplatesErrors, SearchTemplatesResponses, SendCommandData, SendCommandErrors, SendCommandResponses, StartServerData, StartServerErrors, StartServerResponses, StopServerData, StopServerErrors, StopServerResponses, UpdateTemplateData, UpdateTemplateErrors, UpdateTemplateResponses, UploadFileData, UploadFileErrors, UploadFileResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -41,6 +41,21 @@ export const getTemplate = <ThrowOnError extends boolean = false>(options: Optio
     return (options.client ?? client).get<GetTemplateResponses, GetTemplateErrors, ThrowOnError>({
         url: '/templates/{template_id}',
         ...options
+    });
+};
+
+/**
+ * Update Template
+ * update a template by id
+ */
+export const updateTemplate = <ThrowOnError extends boolean = false>(options: Options<UpdateTemplateData, ThrowOnError>) => {
+    return (options.client ?? client).patch<UpdateTemplateResponses, UpdateTemplateErrors, ThrowOnError>({
+        url: '/templates/{template_id}',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
     });
 };
 
@@ -184,17 +199,6 @@ export const getServerStatus = <ThrowOnError extends boolean = false>(options: O
 export const sendCommand = <ThrowOnError extends boolean = false>(options: Options<SendCommandData, ThrowOnError>) => {
     return (options.client ?? client).post<SendCommandResponses, SendCommandErrors, ThrowOnError>({
         url: '/servers/{server_id}/command',
-        ...options
-    });
-};
-
-/**
- * Get Log Message
- * get the last line_count lines of container logs, defaults to 25 if not specified
- */
-export const getLogMessage = <ThrowOnError extends boolean = false>(options: Options<GetLogMessageData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetLogMessageResponses, GetLogMessageErrors, ThrowOnError>({
-        url: '/servers/{server_id}/logs',
         ...options
     });
 };

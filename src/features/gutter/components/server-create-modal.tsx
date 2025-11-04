@@ -14,10 +14,11 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useAsyncFn, useMap } from 'react-use'
 import { z } from 'zod/v4'
+import { toaster } from '../../../../lib/chakra/toaster'
 import { createServer, getTemplate, searchTemplates, TemplatesRead } from '../../../../lib/hey-api/client'
-import { TemplateModule } from '../../../components/template-module'
+import { CheckboxModule, ListModule, NumberModule, SelectModule, TextModule } from '../../../components/template-module'
 import { MenuSelectButton } from '../../../mocks/menu-select-button'
-import { TemplateModuleSchema, TemplateModuleType } from '../../../utils/template-schema'
+import { FieldType, NumberModuleSchema, SelectModuleSchema } from '../../../utils/template-schema'
 
 const formSchema = z.object({
     name: z.string().min(1),
@@ -39,11 +40,12 @@ export const ServerCreateDialog = () => {
         control
     } = useForm<FormData>({
         // ensure env is always an array at runtime
-        defaultValues: { env: {} }
+        defaultValues: { env: {}, cpu: 1, memory: 1, disk: 16, name: '', template_name: '', description: '', tag: '' }
     })
 
     const [templateMap, { set: setTemplateMap, setAll: setAllTemplateMap }] = useMap<{ [key: string]: number }>({})
     const [selectedTemplate, setSelectedTemplate] = useState<TemplatesRead | undefined>(undefined)
+    const [createServerLoading, setCreateServerLoading] = useState(false)
     const [open, setOpen] = useState(false)
     //names only
     const templateList = createListCollection({
@@ -61,6 +63,7 @@ export const ServerCreateDialog = () => {
     }, [])
 
     const onSubmit = handleSubmit(data => {
+        setCreateServerLoading(true)
         // transform env array to object map for API
         const envAsStrings = Object.fromEntries(
             Object.entries(data.env).map(([key, value]) => [key, typeof value === 'boolean' ? String(value) : value])
@@ -77,6 +80,14 @@ export const ServerCreateDialog = () => {
                 memory: data.memory
             }
         })
+            .then(() => {
+                setCreateServerLoading(false)
+                setOpen(false)
+            })
+            .catch(ret => {
+                setCreateServerLoading(false)
+                toaster.error({ title: 'Error creating server', description: ret.message || 'Unknown error occurred' })
+            })
     })
 
     const handleTemplateChange = async (templateName: string) => {
@@ -90,6 +101,7 @@ export const ServerCreateDialog = () => {
 
     return (
         <Dialog.Root
+            lazyMount
             size="lg"
             open={open}
             onOpenChange={e => {
@@ -120,9 +132,8 @@ export const ServerCreateDialog = () => {
                                 <ScrollArea.Content scrollSnapType={'y mandatory'} as="form" onSubmit={onSubmit}>
                                     <Dialog.Body>
                                         <Fieldset.Root display="grid" gridTemplateColumns="1fr 1fr 1fr" gap="4">
-                                            <TemplateModule
+                                            <TextModule
                                                 key="server-name"
-                                                type={TemplateModuleType.TEXT}
                                                 label="Server Name"
                                                 required={true}
                                                 gridColumn={'1 / span 3'}
@@ -133,7 +144,7 @@ export const ServerCreateDialog = () => {
                                                 <Field.Label>Template</Field.Label>
                                                 <Combobox.Root
                                                     collection={templateList}
-                                                    onInputValueChange={e => handleTemplateChange(e.inputValue)}
+                                                    onValueChange={e => handleTemplateChange(e.value[0])}
                                                 >
                                                     <Combobox.Control>
                                                         <Combobox.Input />
@@ -155,25 +166,22 @@ export const ServerCreateDialog = () => {
                                                     </Combobox.Positioner>
                                                 </Combobox.Root>
                                             </Field.Root>
-                                            <TemplateModule
+                                            <NumberModule
                                                 key="cpu"
-                                                type={TemplateModuleType.NUMBER}
                                                 label="CPU Cores"
                                                 required={false}
                                                 control={control}
                                                 hookName={'cpu'}
                                             />
-                                            <TemplateModule
+                                            <NumberModule
                                                 key="memory"
-                                                type={TemplateModuleType.NUMBER}
                                                 label="Memory (GB)"
                                                 required={false}
                                                 control={control}
                                                 hookName={'memory'}
                                             />
-                                            <TemplateModule
+                                            <NumberModule
                                                 key="disk-space"
-                                                type={TemplateModuleType.NUMBER}
                                                 label="Disk Space (GB)"
                                                 required={false}
                                                 control={control}
@@ -181,18 +189,91 @@ export const ServerCreateDialog = () => {
                                             />
                                             {/* env */}
                                             {selectedTemplate?.modules?.map((field, index) => {
-                                                const template = JSON.parse(field) as TemplateModuleSchema
-                                                return (
-                                                    <TemplateModule
-                                                        key={`env-${index}`}
-                                                        type={template.type.toLowerCase() as TemplateModuleType}
-                                                        label={template.label}
-                                                        description={template.description}
-                                                        required={template.required}
-                                                        control={control}
-                                                        hookName={`env.${template.label}`}
-                                                    />
-                                                )
+                                                const template = JSON.parse(field) as any
+
+                                                switch (template.type.toLowerCase()) {
+                                                    case FieldType.NUMBER:
+                                                        const numberTemplate = template as NumberModuleSchema
+                                                        return (
+                                                            <NumberModule
+                                                                key={`env-${index}`}
+                                                                label={numberTemplate.label}
+                                                                min={numberTemplate.min}
+                                                                max={numberTemplate.max}
+                                                                step={numberTemplate.step}
+                                                                slider={numberTemplate.slider}
+                                                                description={numberTemplate.description}
+                                                                required={numberTemplate.required}
+                                                                disabled={numberTemplate.readonly}
+                                                                control={control}
+                                                                hookName={`env.${numberTemplate.label}`}
+                                                            />
+                                                        )
+                                                    case FieldType.LIST:
+                                                        return (
+                                                            <ListModule
+                                                                key={`env-${index}`}
+                                                                label={template.label}
+                                                                description={template.description}
+                                                                required={template.required}
+                                                                disabled={template.readonly}
+                                                                control={control}
+                                                                hookName={`env.${template.label}`}
+                                                            />
+                                                        )
+                                                    case FieldType.SELECT:
+                                                        const selectedTemplate = template as SelectModuleSchema
+                                                        return (
+                                                            <SelectModule
+                                                                options={selectedTemplate.options}
+                                                                key={`env-${index}`}
+                                                                label={template.label}
+                                                                description={template.description}
+                                                                withinPortal
+                                                                required={template.required}
+                                                                disabled={template.readonly}
+                                                                control={control}
+                                                                hookName={`env.${template.label}`}
+                                                            />
+                                                        )
+                                                    case FieldType.BUTTON:
+                                                        return (
+                                                            <TextModule
+                                                                key={`env-${index}`}
+                                                                label={template.label}
+                                                                description={template.description}
+                                                                required={template.required}
+                                                                disabled={template.readonly}
+                                                                control={control}
+                                                                hookName={`env.${template.label}`}
+                                                            />
+                                                        )
+
+                                                    case FieldType.CHECKBOX:
+                                                        return (
+                                                            <CheckboxModule
+                                                                key={`env-${index}`}
+                                                                label={template.label}
+                                                                description={template.description}
+                                                                required={template.required}
+                                                                control={control}
+                                                                hookName={`env.${template.label}`}
+                                                                disabled={template.readonly}
+                                                            />
+                                                        )
+                                                    default:
+                                                        return (
+                                                            <TextModule
+                                                                key={`env-${index}`}
+                                                                label={template.label}
+                                                                description={template.description}
+                                                                required={template.required}
+                                                                control={control}
+                                                                hookName={`env.${template.label}`}
+                                                                disabled={template.readonly}
+                                                            />
+                                                        )
+                                                }
                                             })}
                                         </Fieldset.Root>
                                     </Dialog.Body>
@@ -214,3 +295,5 @@ export const ServerCreateDialog = () => {
         </Dialog.Root>
     )
 }
+
+export default ServerCreateDialog

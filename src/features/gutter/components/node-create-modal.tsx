@@ -8,3 +8,5 @@ export const NodeCreateDialog = () => {
         </MenuSelectButton>
     )
 }
+
+export default NodeCreateDialog

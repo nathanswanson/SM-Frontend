@@ -3,14 +3,15 @@
     "private": true,
     "version": "1.0.2",
     "scripts": {
-        "openapi-ts": "curl -k https://api.localhost/openapi.json -o openapi.json && openapi-ts",
+        "openapi-ts": "curl -k https://localhost/openapi.json -o openapi.json && openapi-ts",
         "dev": "vite --port=4000",
         "theme:typegen": "chakra typegen ./src/theme.ts",
         "build": "tsc && vite build",
         "preview": "vite preview",
         "test": "vitest",
         "storybook": "storybook dev -p 6006",
-        "build-storybook": "storybook build"
+        "build-storybook": "storybook build",
+        "test-storybook": "vitest --project=storybook"
     },
     "dependencies": {
         "@chakra-ui/charts": "3.28.0",
@@ -48,7 +49,6 @@
         "@chakra-ui/cli": "^3.28.0",
         "@hey-api/openapi-ts": "0.84.4",
         "@hookform/devtools": "^4.4.0",
-        "@mswjs/socket.io-binding": "^0.2.0",
         "@storybook/addon-vitest": "^10.0.2",
         "@storybook/icons": "^1.6.0",
         "@storybook/react-vite": "^10.0.2",

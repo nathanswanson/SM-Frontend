@@ -92,3 +92,5 @@ const SearchComboBox = () => {
         </Combobox.Root>
     )
 }
+
+export default NavBar

@@ -16,11 +16,13 @@ const LogView = ({ messages }: LogTerminalProps) => {
 
     // Initialize Shiki highlighter
     useAsync(async () => {
-        createHighlighterCore({
-            themes: [githubLight], // or any theme you prefer
-            langs: [import('@shikijs/langs/log')],
-            engine: createJavaScriptRegexEngine()
-        }).then(setHighlighter)
+        if (!highlighter) {
+            createHighlighterCore({
+                themes: [githubLight], // or any theme you prefer
+                langs: [import('@shikijs/langs/log')],
+                engine: createJavaScriptRegexEngine()
+            }).then(setHighlighter)
+        }
     }, [])
 
     // Listen for log messages from the server

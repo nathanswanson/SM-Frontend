@@ -65,16 +65,6 @@ export type ContainerFileUploadResponse = {
 };
 
 /**
- * ContainerLogsResponse
- */
-export type ContainerLogsResponse = {
-    /**
-     * Items
-     */
-    items: Array<string>;
-};
-
-/**
  * CreateUserRequest
  */
 export type CreateUserRequest = {
@@ -670,6 +660,42 @@ export type GetTemplateResponses = {
 
 export type GetTemplateResponse = GetTemplateResponses[keyof GetTemplateResponses];
 
+export type UpdateTemplateData = {
+    body: TemplatesBase;
+    headers?: {
+        /**
+         * Authorization
+         */
+        authorization?: string | null;
+    };
+    path: {
+        /**
+         * Template Id
+         */
+        template_id: number;
+    };
+    query?: never;
+    url: '/templates/{template_id}';
+};
+
+export type UpdateTemplateErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type UpdateTemplateError = UpdateTemplateErrors[keyof UpdateTemplateErrors];
+
+export type UpdateTemplateResponses = {
+    /**
+     * Successful Response
+     */
+    200: TemplateCreateResponse;
+};
+
+export type UpdateTemplateResponse = UpdateTemplateResponses[keyof UpdateTemplateResponses];
+
 export type DeleteTemplateData = {
     body?: never;
     headers?: {
@@ -1066,47 +1092,6 @@ export type SendCommandResponses = {
 };
 
 export type SendCommandResponse = SendCommandResponses[keyof SendCommandResponses];
-
-export type GetLogMessageData = {
-    body?: never;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
-    path: {
-        /**
-         * Server Id
-         */
-        server_id: number;
-    };
-    query?: {
-        /**
-         * Line Count
-         */
-        line_count?: number | null;
-    };
-    url: '/servers/{server_id}/logs';
-};
-
-export type GetLogMessageErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type GetLogMessageError = GetLogMessageErrors[keyof GetLogMessageErrors];
-
-export type GetLogMessageResponses = {
-    /**
-     * Successful Response
-     */
-    200: ContainerLogsResponse;
-};
-
-export type GetLogMessageResponse = GetLogMessageResponses[keyof GetLogMessageResponses];
 
 export type AddNodeData = {
     body: NodesBase;
