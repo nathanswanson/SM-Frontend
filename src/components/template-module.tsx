@@ -83,6 +83,7 @@ export const CheckboxModule = ({
 }
 
 export const SelectModule = ({
+    type = FieldType.SELECT, // @ts-ignore
     hookName,
     control,
     label,
@@ -91,8 +92,7 @@ export const SelectModule = ({
     invalid,
     options,
     withinPortal,
-    disabled,
-    type = FieldType.SELECT
+    disabled
 }: SelectModuleProps) => {
     const collection = createListCollection<string>({ items: options })
     return (

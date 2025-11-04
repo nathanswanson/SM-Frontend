@@ -1,6 +1,6 @@
 import { ChakraProvider, HStack, SkipNavLink, VStack } from '@chakra-ui/react'
 import { ThemeProvider } from 'next-themes'
-import { Provider } from 'urql'
+import { Provider as URQLProvider } from 'urql'
 import { ColorModeProvider } from '../lib/chakra/color-mode'
 import { Toaster } from '../lib/chakra/toaster'
 import { GhostNav } from './components/ghost-nav'
@@ -31,9 +31,9 @@ export default function Page() {
                         {/* <Suspense> add fallback */}
                         <NavBar width="100%" justifyContent="flex-end" />
                         {/* </Suspense> */}
-                        <Provider value={graphql_client}>
+                        <URQLProvider value={graphql_client}>
                             <MainContent />
-                        </Provider>
+                        </URQLProvider>
                         <Toaster />
                     </VStack>
                 </HStack>

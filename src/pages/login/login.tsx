@@ -18,6 +18,8 @@ import { Toaster, toaster } from '../../../lib/chakra/toaster'
 import { getUser, loginUser } from '../../../lib/hey-api/client'
 import { useUserDataContext } from '../../providers/user-data'
 
+console.log(origin)
+
 async function checkLoginStatus() {
     try {
         const response = await getUser({
@@ -72,6 +74,7 @@ export const Login = ({ children }: { children: React.ReactNode }) => {
             }).then(response => {
                 if (response.response.status === 200) {
                     setIsLoggedIn(true)
+                    window.sessionStorage.setItem('logged_in', 'true')
                 } else {
                     toaster.error({
                         title: 'Login Failed',

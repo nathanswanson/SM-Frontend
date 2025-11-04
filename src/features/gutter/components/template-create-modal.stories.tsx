@@ -120,6 +120,6 @@ export const WithPreFill: Story = {
         await userEvent.click(required)
         await userEvent.click(readonly)
 
-        await userEvent.click(within(dialog).getByRole('button', { name: 'Create Template' }))
+        await userEvent.click(within(dialog).getByRole('button', { name: 'Save Changes' }))
     }
 }

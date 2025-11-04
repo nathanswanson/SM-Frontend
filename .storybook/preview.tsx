@@ -2,12 +2,14 @@ import { AbsoluteCenter, Badge, Box } from '@chakra-ui/react'
 import type { Preview } from '@storybook/react-vite'
 import { http, passthrough } from 'msw'
 import { initialize, mswLoader } from 'msw-storybook-addon'
-import React from 'react'
 import { spyOn } from 'storybook/test'
+import { Provider as URQLProvider } from 'urql'
 import { Toaster } from '../lib/chakra/toaster'
 import { SM } from '../src/App'
 import { handlers } from '../src/mocks/handlers'
+import { graphql_client } from '../src/providers/graphql'
 import { getBaseUrl } from '../src/utils/api'
+
 const worker = initialize()
 
 const preview: Preview = {
@@ -56,7 +58,9 @@ const preview: Preview = {
                             >
                                 {apiSource === 'real' ? `Real API: ${getBaseUrl()}` : 'Mock API'}
                             </Badge>
-                            <Story />
+                            <URQLProvider value={graphql_client}>
+                                <Story />
+                            </URQLProvider>
                         </Box>
                     </AbsoluteCenter>
                     <Toaster />

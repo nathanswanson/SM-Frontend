@@ -4,7 +4,7 @@ import { HStack } from '@chakra-ui/react/stack'
 import { Status } from '@chakra-ui/react/status'
 import { Delete, PlayCircle, RotateCcw, StopCircle } from 'lucide-react'
 import { useState } from 'react'
-import { startServer, stopServer } from '../../../../lib/hey-api/client/sdk.gen'
+import { deleteServer, startServer, stopServer } from '../../../../lib/hey-api/client/sdk.gen'
 import CommandButton from '../../../components/command-button'
 import { Tooltip } from '../../../components/tooltip'
 import { useSelectedServerContext } from '../../../providers/selected-server-context'
@@ -57,20 +57,22 @@ export const ConsoleCommands = ({ ...props }) => {
     }
 
     const delete_server = async () => {
+        if (!serverInfo) {
+            return
+        }
         setCommandLoading(true)
-        // deleteServer({
-        //     credentials: 'include',
-        //     path: { server_id: serverInfo?.id ?? -1 }
-        // })
-        //     .then(response => {
-        //         if (response.response.ok) {
-        //             // setSelectedServer(undefined)
-        //             // setServerOnline(false)
-        //         }
-        //     })
-        //     .finally(() => {
-        //         // setCommandLoading(false)
-        //     })
+        deleteServer({
+            path: { server_id: serverInfo.id }
+        })
+            .then(response => {
+                if (response.response.ok) {
+                    setSelectedServer(undefined)
+                    setServerOnline(false)
+                }
+            })
+            .finally(() => {
+                setCommandLoading(false)
+            })
     }
 
     return (

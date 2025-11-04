@@ -1,5 +1,5 @@
 import { LoremIpsum } from 'lorem-ipsum'
-import { http, HttpResponse, passthrough } from 'msw'
+import { graphql, http, HttpResponse, passthrough } from 'msw'
 import { ServerStatusResponse } from '../../lib/hey-api/client/types.gen'
 import { getBaseUrl } from '../utils/api'
 import { LocalDB } from './local-db'
@@ -29,7 +29,12 @@ function generateLogLine(serverName: string): string {
     return `[${new Date().toISOString()}][${serverName}][INFO]:${lorem.generateSentences(1)}`
 }
 
+const graphql_endpoint = graphql.link(ip + '/graphql')
+
 export const handlers: any[] = [
+    // graphql
+    graphql_endpoint.query('getMetrics', () => {}),
+
     //public functions
     http.post(`${ip}/users/token`, () => {
         InternalMockData.loggedIn = true

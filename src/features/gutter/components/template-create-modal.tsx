@@ -12,6 +12,7 @@ import {
     Portal,
     ScrollArea,
     Select,
+    Show,
     Table,
     Text,
     Textarea,
@@ -26,6 +27,7 @@ import { z } from 'zod/v4'
 import { toaster } from '../../../../lib/chakra/toaster'
 import {
     addTemplate,
+    deleteTemplate,
     getTemplate,
     searchTemplates,
     TemplatesRead,
@@ -108,6 +110,7 @@ export const TemplateCreateDialog = ({ usingSelectedTemplate }: TemplateCreateDi
     const [open, setOpen] = useState(false)
     const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined)
     const [isCreatingNew, setIsCreatingNew] = useState(false)
+    const [loadingTemplateDelete, setLoadingTemplateDelete] = useState<boolean>(false)
 
     const templateList = createListCollection({
         items: Object.keys(templateMap)
@@ -159,6 +162,17 @@ export const TemplateCreateDialog = ({ usingSelectedTemplate }: TemplateCreateDi
         append({ ...emptyTemplateModule })
     }
 
+    const handleDeleteTemplate = () => {
+        if (!selectedTemplate) {
+            toaster.error({ title: 'No template selected to delete' })
+            return
+        }
+        setLoadingTemplateDelete(true)
+        deleteTemplate({ query: { template_id: selectedTemplate.id } }).finally(() => {
+            setLoadingTemplateDelete(false)
+            setOpen(false)
+        })
+    }
     const handleTemplateSelect = async (templateName: string) => {
         if (templateName === 'New Template') {
             setSelectedTemplate(null)
@@ -278,14 +292,14 @@ export const TemplateCreateDialog = ({ usingSelectedTemplate }: TemplateCreateDi
             <Portal>
                 <Dialog.Backdrop />
                 <Dialog.Positioner>
-                    <Dialog.Content maxH="80vh">
+                    <Dialog.Content maxH="80vh" as="form" onSubmit={handleSubmit(onSubmit, onError)}>
                         <Dialog.Header>Template Management</Dialog.Header>
                         <Dialog.CloseTrigger asChild>
                             <CloseButton size="sm" />
                         </Dialog.CloseTrigger>
                         <ScrollArea.Root>
                             <ScrollArea.Viewport>
-                                <ScrollArea.Content as="form" onSubmit={handleSubmit(onSubmit, onError)}>
+                                <ScrollArea.Content>
                                     <Dialog.Body>
                                         <Text color="fg.error" whiteSpace={'pre-wrap'}>
                                             {errorMessage}
@@ -461,20 +475,27 @@ export const TemplateCreateDialog = ({ usingSelectedTemplate }: TemplateCreateDi
                                             </VStack>
                                         </Fieldset.Root>
                                     </Dialog.Body>
-                                    <Dialog.Footer>
-                                        <Dialog.ActionTrigger asChild>
-                                            <Button variant="subtle">Cancel</Button>
-                                        </Dialog.ActionTrigger>
-                                        <Button loading={loadingTemplateCreate} type="submit">
-                                            {isCreatingNew ? 'Create Template' : 'Save Changes'}
-                                        </Button>
-                                    </Dialog.Footer>
                                 </ScrollArea.Content>
                             </ScrollArea.Viewport>
                             <ScrollArea.Scrollbar>
                                 <ScrollArea.Thumb />
                             </ScrollArea.Scrollbar>
                         </ScrollArea.Root>
+                        <Dialog.Footer>
+                            <Dialog.ActionTrigger asChild>
+                                <Button variant="subtle">Cancel</Button>
+                            </Dialog.ActionTrigger>
+                            <Show when={!isCreatingNew}>
+                                <Dialog.ActionTrigger asChild>
+                                    <Button loading={loadingTemplateDelete} onClick={handleDeleteTemplate}>
+                                        Delete
+                                    </Button>
+                                </Dialog.ActionTrigger>
+                            </Show>
+                            <Button loading={loadingTemplateCreate} type="submit">
+                                {isCreatingNew ? 'Create Template' : 'Save Changes'}
+                            </Button>
+                        </Dialog.Footer>
                     </Dialog.Content>
                 </Dialog.Positioner>
             </Portal>
