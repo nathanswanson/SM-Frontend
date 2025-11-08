@@ -13,7 +13,7 @@ import { SelectedServerProvider } from './providers/selected-server-context'
 import { UserDataProvider } from './providers/user-data'
 import { WindowProvider } from './providers/window-context'
 import { system } from './theme'
-const mockGraphQlClient = origin.includes('demo') ? await import('./mocks/graphql') : null
+const mockGraphQlClient = true ? (await import('./mocks/graphql')).mockGraphQlClient : null
 
 const NavBar = lazy(() => import('./features/nav_bar/nav-bar'))
 export default function Page() {

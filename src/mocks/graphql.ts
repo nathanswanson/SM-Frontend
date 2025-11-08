@@ -112,3 +112,5 @@ export const mockGraphQlClient = {
         }
     }
 }
+
+export default mockGraphQlClient

@@ -4,10 +4,10 @@ import { client as apiClient } from '../../lib/hey-api/client/client.gen'
 export const getBaseUrl = () => {
     // In development, use the dev server URL
     if (import.meta.env.DEV) {
-        return 'https://localhost'
+        return 'https://home.localhost/api'
     }
     // In production, use relative URLs or current origin
-    return window.location.origin
+    return window.location.origin + '/api'
 }
 
 export const getAuthToken = () => {

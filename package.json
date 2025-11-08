@@ -3,10 +3,10 @@
     "private": true,
     "version": "1.0.2",
     "scripts": {
-        "openapi-ts": "curl -k https://localhost/openapi.json -o openapi.json && openapi-ts",
+        "openapi-ts": "curl -k https://home.localhost/api/openapi.json -o openapi.json && openapi-ts",
         "dev": "vite --port=4000",
         "theme:typegen": "chakra typegen ./src/theme.ts",
-        "build": "tsc && vite build",
+        "build": "tsc && vite build ",
         "preview": "vite preview",
         "test": "vitest",
         "storybook": "storybook dev -p 6006",

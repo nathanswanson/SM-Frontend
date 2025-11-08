@@ -2,7 +2,6 @@ import React from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App'
 import { mockingEnabled } from './utils/mode'
-console.log(origin)
 
 async function preLoad() {
     if (mockingEnabled()) await enableMocking()
