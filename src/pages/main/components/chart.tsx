@@ -1,6 +1,5 @@
 import { Card, HStack, Stat } from '@chakra-ui/react'
 import React, { useState } from 'react'
-import { SparkLine } from './spark-card'
 
 const SparkLineLazy = React.lazy(() => import('./spark-card').then(module => ({ default: module.SparkLine })))
 
@@ -39,7 +38,7 @@ export const SMChart = ({ label, color, unit, data }: LightCardProps) => {
                 </Card.Body>
                 {/* <React.Suspense fallback={<div>Loading...</div>}>
                     {data && data.length > 0 && ( */}
-                <SparkLine
+                <SparkLineLazy
                     color={`${color}.500`}
                     data={data.map(item => ({ value: item }))}
                     highlightedIndex={highlightedIndex}

@@ -1,12 +1,11 @@
 import { ChakraProvider, HStack, SkipNavLink, VStack } from '@chakra-ui/react'
 import { ThemeProvider } from 'next-themes'
+import { lazy } from 'react'
 import { Provider as URQLProvider } from 'urql'
 import { ColorModeProvider } from '../lib/chakra/color-mode'
 import { Toaster } from '../lib/chakra/toaster'
 import { GhostNav } from './components/ghost-nav'
 import { Gutter } from './features/gutter/gutter'
-// import { NavBar } from './features/nav_bar/nav-bar'
-import { lazy } from 'react'
 import { Login } from './pages/login/login'
 import { MainContent } from './pages/main/server-manager'
 import { graphql_client } from './providers/graphql'
@@ -14,6 +13,7 @@ import { SelectedServerProvider } from './providers/selected-server-context'
 import { UserDataProvider } from './providers/user-data'
 import { WindowProvider } from './providers/window-context'
 import { system } from './theme'
+const mockGraphQlClient = origin.includes('demo') ? await import('./mocks/graphql') : null
 
 const NavBar = lazy(() => import('./features/nav_bar/nav-bar'))
 export default function Page() {
@@ -31,7 +31,7 @@ export default function Page() {
                         {/* <Suspense> add fallback */}
                         <NavBar width="100%" justifyContent="flex-end" />
                         {/* </Suspense> */}
-                        <URQLProvider value={graphql_client}>
+                        <URQLProvider value={mockGraphQlClient ?? graphql_client}>
                             <MainContent />
                         </URQLProvider>
                         <Toaster />

@@ -17,14 +17,11 @@ import { PasswordInput } from '../../../lib/chakra/password-input'
 import { Toaster, toaster } from '../../../lib/chakra/toaster'
 import { getUser, loginUser } from '../../../lib/hey-api/client'
 import { useUserDataContext } from '../../providers/user-data'
-
-console.log(origin)
+import { setAuthToken } from '../../utils/api'
 
 async function checkLoginStatus() {
     try {
-        const response = await getUser({
-            credentials: 'include'
-        })
+        const response = await getUser()
         return response.response.status === 200
     } catch {
         return false
@@ -58,10 +55,9 @@ export const Login = ({ children }: { children: React.ReactNode }) => {
     useEffect(() => {
         if (isLoggedIn) {
             // Fetch user data
-            getUser({ credentials: 'include' }).then(response => {
+            getUser().then(response => {
                 setUserData(response.data)
             })
-            window.sessionStorage.setItem('logged_in', 'true')
         }
     }, [isLoggedIn])
 
@@ -69,12 +65,12 @@ export const Login = ({ children }: { children: React.ReactNode }) => {
         setLoginLoading(true)
         try {
             await loginUser({
-                body: { username, password },
-                credentials: 'include'
+                body: { username, password }
             }).then(response => {
-                if (response.response.status === 200) {
+                if (response.response.status === 200 && response.data?.access_token) {
+                    setAuthToken(response.data.access_token)
+
                     setIsLoggedIn(true)
-                    window.sessionStorage.setItem('logged_in', 'true')
                 } else {
                     toaster.error({
                         title: 'Login Failed',

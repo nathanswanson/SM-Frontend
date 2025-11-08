@@ -50,7 +50,6 @@ export const LogManager = ({ ...props }) => {
     function submit_command(command: string) {
         if (serverInfo) {
             sendCommand({
-                credentials: 'include',
                 path: {
                     server_id: serverInfo.id
                 },

@@ -2,9 +2,7 @@ import React from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App'
 import { mockingEnabled } from './utils/mode'
-if (!import.meta.env.VITE_SM_MODE) {
-    console.warn('VITE_SM_MODE is not set, defaulting to production')
-}
+console.log(origin)
 
 async function preLoad() {
     if (mockingEnabled()) await enableMocking()

@@ -11,7 +11,7 @@ import {
     VStack,
     useBreakpointValue
 } from '@chakra-ui/react'
-import { MenuSelectButton } from '../../mocks/menu-select-button'
+import { MenuSelectButton } from '../../components/menu-select-button'
 
 import { LogOut, Menu } from 'lucide-react'
 import { ColorModeButton } from '../../../lib/chakra/color-mode.js'
@@ -83,7 +83,7 @@ const MenuOptions = ({ ...props }) => {
             <SettingsModal />
             <MenuSelectButton
                 onClick={async () => {
-                    await logoutUser({ credentials: 'include' }).then(() => {})
+                    await logoutUser().then(() => {})
                 }}
                 color="danger.500"
             >

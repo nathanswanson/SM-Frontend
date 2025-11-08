@@ -21,9 +21,7 @@ export const FileActionBar = ({ ...props }) => {
             const paths = template?.data?.exposed_volume || []
             const res = await fetch(
                 `${getBaseUrl()}/volumes/${serverInfo.id}/fs/archive?paths=${encodeURIComponent(JSON.stringify(paths))}`,
-                {
-                    credentials: 'include'
-                }
+                {}
             )
             const contentLength = res.headers.get('Content-Length')
             const totalSize = contentLength ? parseInt(contentLength, 10) : 0

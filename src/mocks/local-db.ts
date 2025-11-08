@@ -160,7 +160,38 @@ export class LocalDB {
             }
         })
     }
+    public async update(key: string, id: number, updatedObject: BaseType) {
+        await this.ready
+        return new Promise((resolve, reject) => {
+            if (!this.db) {
+                return reject(new Error('Database not initialized.'))
+            }
+            const t = this.db.transaction(key, 'readwrite')
+            t.onerror = event => {
+                reject((event.target as IDBRequest).error)
+            }
+            const os = t.objectStore(key)
 
+            const getReq = os.get(id)
+            getReq.onsuccess = event => {
+                const data = (event.target as IDBRequest).result
+                if (data === undefined) {
+                    return resolve(null)
+                }
+                const updated = { ...data, ...updatedObject }
+                const putReq = os.put(updated)
+                putReq.onsuccess = () => {
+                    resolve(updated)
+                }
+                putReq.onerror = event => {
+                    reject((event.target as IDBRequest).error)
+                }
+            }
+            getReq.onerror = event => {
+                reject((event.target as IDBRequest).error)
+            }
+        })
+    }
     public async del(key: string, id: number) {
         await this.ready
         return new Promise((resolve, reject) => {

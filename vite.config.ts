@@ -22,7 +22,7 @@ export default defineConfig({
         watch: {}
         // hmr: false
     },
-
+    base: '/',
     test: {
         projects: [
             {

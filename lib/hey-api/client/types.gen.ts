@@ -531,6 +531,24 @@ export type TemplatesRead = {
 };
 
 /**
+ * Token
+ */
+export type Token = {
+    /**
+     * Access Token
+     */
+    access_token: string;
+    /**
+     * Token Type
+     */
+    token_type: string;
+    /**
+     * Expire Time
+     */
+    expire_time?: number | null;
+};
+
+/**
  * UserListResponse
  */
 export type UserListResponse = {
@@ -595,12 +613,6 @@ export type CreateUserRequestWritable = {
 
 export type AddTemplateData = {
     body: TemplatesBase;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
     path?: never;
     query?: never;
     url: '/templates/';
@@ -626,12 +638,6 @@ export type AddTemplateResponse = AddTemplateResponses[keyof AddTemplateResponse
 
 export type GetTemplateData = {
     body?: never;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
     path: {
         /**
          * Template Id
@@ -662,12 +668,6 @@ export type GetTemplateResponse = GetTemplateResponses[keyof GetTemplateResponse
 
 export type UpdateTemplateData = {
     body: TemplatesBase;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
     path: {
         /**
          * Template Id
@@ -698,12 +698,6 @@ export type UpdateTemplateResponse = UpdateTemplateResponses[keyof UpdateTemplat
 
 export type DeleteTemplateData = {
     body?: never;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
     path?: never;
     query: {
         /**
@@ -777,8 +771,10 @@ export type LoginUserResponses = {
     /**
      * Successful Response
      */
-    200: unknown;
+    200: Token;
 };
+
+export type LoginUserResponse = LoginUserResponses[keyof LoginUserResponses];
 
 export type LogoutUserData = {
     body?: never;
@@ -873,12 +869,6 @@ export type CreateServerResponse = CreateServerResponses[keyof CreateServerRespo
 
 export type DeleteServerData = {
     body?: never;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
     path: {
         /**
          * Server Id
@@ -909,12 +899,6 @@ export type DeleteServerResponse = DeleteServerResponses[keyof DeleteServerRespo
 
 export type GetServerInfoData = {
     body?: never;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
     path: {
         /**
          * Server Id
@@ -945,12 +929,6 @@ export type GetServerInfoResponse = GetServerInfoResponses[keyof GetServerInfoRe
 
 export type StartServerData = {
     body?: never;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
     path: {
         /**
          * Server Id
@@ -981,12 +959,6 @@ export type StartServerResponse = StartServerResponses[keyof StartServerResponse
 
 export type StopServerData = {
     body?: never;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
     path: {
         /**
          * Server Id
@@ -1017,12 +989,6 @@ export type StopServerResponse = StopServerResponses[keyof StopServerResponses];
 
 export type GetServerStatusData = {
     body?: never;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
     path: {
         /**
          * Server Id
@@ -1054,12 +1020,6 @@ export type GetServerStatusResponse = GetServerStatusResponses[keyof GetServerSt
 
 export type SendCommandData = {
     body?: never;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
     path: {
         /**
          * Server Id
@@ -1095,12 +1055,6 @@ export type SendCommandResponse = SendCommandResponses[keyof SendCommandResponse
 
 export type AddNodeData = {
     body: NodesBase;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
     path?: never;
     query?: never;
     url: '/nodes/';
@@ -1126,12 +1080,6 @@ export type AddNodeResponse = AddNodeResponses[keyof AddNodeResponses];
 
 export type DeleteNodeData = {
     body?: never;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
     path: {
         /**
          * Node Id
@@ -1165,12 +1113,6 @@ export type DeleteNodeResponse = DeleteNodeResponses[keyof DeleteNodeResponses];
 
 export type GetNodeData = {
     body?: never;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
     path: {
         /**
          * Node Id
@@ -1201,12 +1143,6 @@ export type GetNodeResponse = GetNodeResponses[keyof GetNodeResponses];
 
 export type DiskUsageData = {
     body?: never;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
     path: {
         /**
          * Node Id
@@ -1237,12 +1173,6 @@ export type DiskUsageResponse = DiskUsageResponses[keyof DiskUsageResponses];
 
 export type RuntimeData = {
     body?: never;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
     path: {
         /**
          * Node Id
@@ -1437,12 +1367,6 @@ export type SearchTemplatesResponse = SearchTemplatesResponses[keyof SearchTempl
 
 export type GetArchiveData = {
     body?: never;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
     path: {
         /**
          * Server Id
@@ -1476,12 +1400,6 @@ export type GetArchiveResponses = {
 
 export type ReadFileData = {
     body?: never;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
     path: {
         /**
          * Server Id
@@ -1515,12 +1433,6 @@ export type ReadFileResponses = {
 
 export type UploadFileData = {
     body?: never;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
     path: {
         /**
          * Server Id
@@ -1556,12 +1468,6 @@ export type UploadFileResponse = UploadFileResponses[keyof UploadFileResponses];
 
 export type DeleteFileData = {
     body?: never;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
     path: {
         /**
          * Path

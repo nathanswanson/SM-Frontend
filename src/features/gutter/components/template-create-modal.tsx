@@ -33,6 +33,7 @@ import {
     TemplatesRead,
     updateTemplate
 } from '../../../../lib/hey-api/client'
+import { MenuSelectButton } from '../../../components/menu-select-button'
 import {
     CheckboxModule,
     ListModule,
@@ -42,7 +43,6 @@ import {
     TemplateModule,
     TextModule
 } from '../../../components/template-module'
-import { MenuSelectButton } from '../../../mocks/menu-select-button'
 import {
     buttonModuleSchema,
     checkboxModuleSchema,

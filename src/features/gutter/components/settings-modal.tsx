@@ -1,6 +1,6 @@
 import { Button, Dialog, Portal, Text } from '@chakra-ui/react'
 import { Settings } from 'lucide-react'
-import { MenuSelectButton } from '../../../mocks/menu-select-button'
+import { MenuSelectButton } from '../../../components/menu-select-button'
 
 export const SettingsModal = ({}) => {
     return (

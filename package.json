@@ -40,6 +40,7 @@
         "urql": "^5.0.1",
         "use-stick-to-bottom": "^1.1.1",
         "uuid": "^13.0.0",
+        "wonka": "^6.3.5",
         "zod": "4.1.12"
     },
     "overrides": {

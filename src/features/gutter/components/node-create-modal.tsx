@@ -1,5 +1,5 @@
 import { ServerCog } from 'lucide-react'
-import { MenuSelectButton } from '../../../mocks/menu-select-button'
+import { MenuSelectButton } from '../../../components/menu-select-button'
 
 export const NodeCreateDialog = () => {
     return (

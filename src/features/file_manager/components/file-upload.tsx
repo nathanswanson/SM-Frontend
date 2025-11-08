@@ -43,7 +43,6 @@ export const FileUploadDialog = (props: FileUploaddialogProps) => {
             await fetch(
                 `${getBaseUrl()}/volumes/${serverInfo.id}/fs/?path=${encodeURIComponent(props.uploadPath + file.name)}`,
                 {
-                    credentials: 'include',
                     method: 'POST',
                     body: file.stream().pipeThrough(progressStream),
                     headers: {
@@ -81,14 +80,16 @@ export const FileUploadDialog = (props: FileUploaddialogProps) => {
                             <CloseButton />
                         </Dialog.CloseTrigger>
                     </Dialog.Header>
-                    <FileUpload.Root allowDrop onFileAccept={handleFileAccept}>
-                        <FileUpload.HiddenInput />
-                        <FileUpload.Dropzone>
-                            <FileUpload.DropzoneContent>
-                                <Box>Drag and drop files here</Box>
-                            </FileUpload.DropzoneContent>
-                        </FileUpload.Dropzone>
-                    </FileUpload.Root>
+                    <Dialog.Body>
+                        <FileUpload.Root width="100%" allowDrop onFileAccept={handleFileAccept}>
+                            <FileUpload.HiddenInput />
+                            <FileUpload.Dropzone width="100%">
+                                <FileUpload.DropzoneContent>
+                                    <Box>Drag and drop files here</Box>
+                                </FileUpload.DropzoneContent>
+                            </FileUpload.Dropzone>
+                        </FileUpload.Root>
+                    </Dialog.Body>
                 </Dialog.Content>
                 <Dialog.CloseTrigger />
             </Dialog.Positioner>

@@ -3,7 +3,7 @@ import React from 'react'
 import { getTemplate, TemplatesRead } from '../../../lib/hey-api/client'
 import { InfoList } from '../../components/info-list'
 import { useSelectedServerContext } from '../../providers/selected-server-context'
-import { getFrontendUrl } from '../../utils/api'
+import { getBaseUrl } from '../../utils/api'
 export const ServerOverview = () => {
     const { serverOnline, serverInfo } = useSelectedServerContext()
     const [templateInfo, setTemplateInfo] = React.useState<TemplatesRead | undefined>(undefined)
@@ -19,7 +19,7 @@ export const ServerOverview = () => {
     const items = [
         { id: 'template', value: templateInfo?.name ?? 'N/A' },
         { id: 'status', value: serverOnline ? 'Online' : 'Offline' },
-        { id: 'address', value: `${getFrontendUrl()}:${serverInfo?.port ?? '0000'}` },
+        { id: 'address', value: `${getBaseUrl()}:${serverInfo?.port ?? '0000'}` },
         { id: 'total cpu', value: serverInfo?.cpu ? `${serverInfo.cpu} cores` : 'N/A' },
         { id: 'total memory', value: serverInfo?.memory ? `${serverInfo.memory} GB` : 'N/A' },
         { id: 'total disk', value: serverInfo?.disk ? `${serverInfo.disk} GB` : 'N/A' }

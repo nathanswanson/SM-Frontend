@@ -13,7 +13,7 @@ interface IHardwareInfoProps extends ComponentProps<typeof Group> {
 export const NodeOverview = () => {
     const [hardwareInfo, setHardwareInfo] = useState<NodesRead | undefined>(undefined)
     const hardwareState = useAsync(async () => {
-        const hardwareInfo = await getNode({ credentials: 'include', path: { node_id: 1 } })
+        const hardwareInfo = await getNode({ path: { node_id: 1 } })
         setHardwareInfo(hardwareInfo.data)
     }, [])
 

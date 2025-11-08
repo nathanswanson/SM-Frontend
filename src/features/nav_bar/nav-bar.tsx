@@ -28,7 +28,7 @@ const SearchComboBox = () => {
     })
 
     const state = useAsync(async () => {
-        const container_list = await searchServers({ credentials: 'include' })
+        const container_list = await searchServers()
         if (container_list.data?.items) {
             setServerList(container_list.data?.items || {})
         }

@@ -18,7 +18,7 @@ export const ConsoleCommands = ({ ...props }) => {
         setCommandLoading(true)
         // await api call
         if (serverInfo) {
-            startServer({ credentials: 'include', path: { server_id: serverInfo.id } })
+            startServer({ path: { server_id: serverInfo.id } })
                 .then(response => {
                     if (response.response.ok) {
                         setServerOnline(true)
@@ -33,7 +33,7 @@ export const ConsoleCommands = ({ ...props }) => {
     const stop_server = async () => {
         setCommandLoading(true)
         if (serverInfo) {
-            stopServer({ credentials: 'include', path: { server_id: serverInfo.id } })
+            stopServer({ path: { server_id: serverInfo.id } })
                 .then(response => {
                     if (response.response.ok) {
                         setServerOnline(false)

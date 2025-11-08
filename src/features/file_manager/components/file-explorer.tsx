@@ -111,7 +111,6 @@ const FileTree = () => {
         if (!serverOnline) return []
         if (!serverInfo) return []
         const strings = await searchFs({
-            credentials: 'include',
             path: { server_id: serverInfo?.id, path: path }
         })
         if (!strings.data) return []
@@ -138,7 +137,6 @@ const FileTree = () => {
                 const path = e.selectedNodes[0]['full_path']
                 if (serverInfo) {
                     await readFile({
-                        credentials: 'include',
                         path: { server_id: serverInfo?.id },
                         query: { path: path }
                     }).then(dl => {
@@ -206,11 +204,6 @@ const FileTree = () => {
             .then(async blob => {
                 console.log(blob)
                 //TODO: upload file
-                // await uploadFile({
-                //     credentials: 'include',
-                //     path: { container_name: selectedServer, path: path },
-                //     body: { file: blob }
-                // })
             })
     }
 

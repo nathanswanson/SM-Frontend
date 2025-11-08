@@ -16,8 +16,8 @@ import { useAsyncFn, useMap } from 'react-use'
 import { z } from 'zod/v4'
 import { toaster } from '../../../../lib/chakra/toaster'
 import { createServer, getTemplate, searchTemplates, TemplatesRead } from '../../../../lib/hey-api/client'
+import { MenuSelectButton } from '../../../components/menu-select-button'
 import { CheckboxModule, ListModule, NumberModule, SelectModule, TextModule } from '../../../components/template-module'
-import { MenuSelectButton } from '../../../mocks/menu-select-button'
 import { FieldType, NumberModuleSchema, SelectModuleSchema } from '../../../utils/template-schema'
 
 const formSchema = z.object({

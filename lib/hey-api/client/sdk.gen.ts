@@ -24,6 +24,12 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
  */
 export const addTemplate = <ThrowOnError extends boolean = false>(options: Options<AddTemplateData, ThrowOnError>) => {
     return (options.client ?? client).post<AddTemplateResponses, AddTemplateErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/templates/',
         ...options,
         headers: {
@@ -39,6 +45,12 @@ export const addTemplate = <ThrowOnError extends boolean = false>(options: Optio
  */
 export const getTemplate = <ThrowOnError extends boolean = false>(options: Options<GetTemplateData, ThrowOnError>) => {
     return (options.client ?? client).get<GetTemplateResponses, GetTemplateErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/templates/{template_id}',
         ...options
     });
@@ -50,6 +62,12 @@ export const getTemplate = <ThrowOnError extends boolean = false>(options: Optio
  */
 export const updateTemplate = <ThrowOnError extends boolean = false>(options: Options<UpdateTemplateData, ThrowOnError>) => {
     return (options.client ?? client).patch<UpdateTemplateResponses, UpdateTemplateErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/templates/{template_id}',
         ...options,
         headers: {
@@ -65,6 +83,12 @@ export const updateTemplate = <ThrowOnError extends boolean = false>(options: Op
  */
 export const deleteTemplate = <ThrowOnError extends boolean = false>(options: Options<DeleteTemplateData, ThrowOnError>) => {
     return (options.client ?? client).delete<DeleteTemplateResponses, DeleteTemplateErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/templates/{name}/delete',
         ...options
     });
@@ -87,7 +111,7 @@ export const createUserAccount = <ThrowOnError extends boolean = false>(options:
 
 /**
  * Login User
- * login user, return access token in cookie
+ * login user, return access token
  */
 export const loginUser = <ThrowOnError extends boolean = false>(options: Options<LoginUserData, ThrowOnError>) => {
     return (options.client ?? client).post<LoginUserResponses, LoginUserErrors, ThrowOnError>({
@@ -129,6 +153,12 @@ export const getUser = <ThrowOnError extends boolean = false>(options?: Options<
  */
 export const createServer = <ThrowOnError extends boolean = false>(options: Options<CreateServerData, ThrowOnError>) => {
     return (options.client ?? client).post<CreateServerResponses, CreateServerErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/servers/',
         ...options,
         headers: {
@@ -144,6 +174,12 @@ export const createServer = <ThrowOnError extends boolean = false>(options: Opti
  */
 export const deleteServer = <ThrowOnError extends boolean = false>(options: Options<DeleteServerData, ThrowOnError>) => {
     return (options.client ?? client).delete<DeleteServerResponses, DeleteServerErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/servers/{server_id}',
         ...options
     });
@@ -155,6 +191,12 @@ export const deleteServer = <ThrowOnError extends boolean = false>(options: Opti
  */
 export const getServerInfo = <ThrowOnError extends boolean = false>(options: Options<GetServerInfoData, ThrowOnError>) => {
     return (options.client ?? client).get<GetServerInfoResponses, GetServerInfoErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/servers/{server_id}',
         ...options
     });
@@ -166,6 +208,12 @@ export const getServerInfo = <ThrowOnError extends boolean = false>(options: Opt
  */
 export const startServer = <ThrowOnError extends boolean = false>(options: Options<StartServerData, ThrowOnError>) => {
     return (options.client ?? client).post<StartServerResponses, StartServerErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/servers/{server_id}/start',
         ...options
     });
@@ -177,6 +225,12 @@ export const startServer = <ThrowOnError extends boolean = false>(options: Optio
  */
 export const stopServer = <ThrowOnError extends boolean = false>(options: Options<StopServerData, ThrowOnError>) => {
     return (options.client ?? client).post<StopServerResponses, StopServerErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/servers/{server_id}/stop',
         ...options
     });
@@ -188,6 +242,12 @@ export const stopServer = <ThrowOnError extends boolean = false>(options: Option
  */
 export const getServerStatus = <ThrowOnError extends boolean = false>(options: Options<GetServerStatusData, ThrowOnError>) => {
     return (options.client ?? client).get<GetServerStatusResponses, GetServerStatusErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/servers/{server_id}/status',
         ...options
     });
@@ -198,6 +258,12 @@ export const getServerStatus = <ThrowOnError extends boolean = false>(options: O
  */
 export const sendCommand = <ThrowOnError extends boolean = false>(options: Options<SendCommandData, ThrowOnError>) => {
     return (options.client ?? client).post<SendCommandResponses, SendCommandErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/servers/{server_id}/command',
         ...options
     });
@@ -209,6 +275,12 @@ export const sendCommand = <ThrowOnError extends boolean = false>(options: Optio
  */
 export const addNode = <ThrowOnError extends boolean = false>(options: Options<AddNodeData, ThrowOnError>) => {
     return (options.client ?? client).post<AddNodeResponses, AddNodeErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/nodes/',
         ...options,
         headers: {
@@ -224,6 +296,12 @@ export const addNode = <ThrowOnError extends boolean = false>(options: Options<A
  */
 export const deleteNode = <ThrowOnError extends boolean = false>(options: Options<DeleteNodeData, ThrowOnError>) => {
     return (options.client ?? client).delete<DeleteNodeResponses, DeleteNodeErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/nodes/{node_id}',
         ...options
     });
@@ -236,6 +314,12 @@ export const deleteNode = <ThrowOnError extends boolean = false>(options: Option
  */
 export const getNode = <ThrowOnError extends boolean = false>(options: Options<GetNodeData, ThrowOnError>) => {
     return (options.client ?? client).get<GetNodeResponses, GetNodeErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/nodes/{node_id}',
         ...options
     });
@@ -247,6 +331,12 @@ export const getNode = <ThrowOnError extends boolean = false>(options: Options<G
  */
 export const diskUsage = <ThrowOnError extends boolean = false>(options: Options<DiskUsageData, ThrowOnError>) => {
     return (options.client ?? client).get<DiskUsageResponses, DiskUsageErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/nodes/{node_id}/disk_usage',
         ...options
     });
@@ -258,6 +348,12 @@ export const diskUsage = <ThrowOnError extends boolean = false>(options: Options
  */
 export const runtime = <ThrowOnError extends boolean = false>(options: Options<RuntimeData, ThrowOnError>) => {
     return (options.client ?? client).get<RuntimeResponses, RuntimeErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/nodes/{node_id}/runtime',
         ...options
     });
@@ -269,6 +365,12 @@ export const runtime = <ThrowOnError extends boolean = false>(options: Options<R
  */
 export const search = <ThrowOnError extends boolean = false>(options?: Options<SearchData, ThrowOnError>) => {
     return (options?.client ?? client).get<SearchResponses, SearchErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/search/users/',
         ...options
     });
@@ -280,6 +382,12 @@ export const search = <ThrowOnError extends boolean = false>(options?: Options<S
  */
 export const searchServers = <ThrowOnError extends boolean = false>(options?: Options<SearchServersData, ThrowOnError>) => {
     return (options?.client ?? client).get<SearchServersResponses, SearchServersErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/search/servers/',
         ...options
     });
@@ -291,6 +399,12 @@ export const searchServers = <ThrowOnError extends boolean = false>(options?: Op
  */
 export const searchFs = <ThrowOnError extends boolean = false>(options: Options<SearchFsData, ThrowOnError>) => {
     return (options.client ?? client).get<SearchFsResponses, SearchFsErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/search/fs/{server_id}/{path}',
         ...options
     });
@@ -302,6 +416,12 @@ export const searchFs = <ThrowOnError extends boolean = false>(options: Options<
  */
 export const searchNodes = <ThrowOnError extends boolean = false>(options?: Options<SearchNodesData, ThrowOnError>) => {
     return (options?.client ?? client).get<SearchNodesResponses, SearchNodesErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/search/nodes/',
         ...options
     });
@@ -313,6 +433,12 @@ export const searchNodes = <ThrowOnError extends boolean = false>(options?: Opti
  */
 export const searchTemplates = <ThrowOnError extends boolean = false>(options?: Options<SearchTemplatesData, ThrowOnError>) => {
     return (options?.client ?? client).get<SearchTemplatesResponses, SearchTemplatesErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/search/templates/',
         ...options
     });
@@ -323,6 +449,12 @@ export const searchTemplates = <ThrowOnError extends boolean = false>(options?: 
  */
 export const getArchive = <ThrowOnError extends boolean = false>(options: Options<GetArchiveData, ThrowOnError>) => {
     return (options.client ?? client).get<GetArchiveResponses, GetArchiveErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/volumes/{server_id}/fs/archive',
         ...options
     });
@@ -334,6 +466,12 @@ export const getArchive = <ThrowOnError extends boolean = false>(options: Option
  */
 export const readFile = <ThrowOnError extends boolean = false>(options: Options<ReadFileData, ThrowOnError>) => {
     return (options.client ?? client).get<ReadFileResponses, ReadFileErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/volumes/{server_id}/fs',
         ...options
     });
@@ -345,6 +483,12 @@ export const readFile = <ThrowOnError extends boolean = false>(options: Options<
  */
 export const uploadFile = <ThrowOnError extends boolean = false>(options: Options<UploadFileData, ThrowOnError>) => {
     return (options.client ?? client).post<UploadFileResponses, UploadFileErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/volumes/{server_id}/fs/',
         ...options
     });
@@ -356,6 +500,12 @@ export const uploadFile = <ThrowOnError extends boolean = false>(options: Option
  */
 export const deleteFile = <ThrowOnError extends boolean = false>(options: Options<DeleteFileData, ThrowOnError>) => {
     return (options.client ?? client).delete<DeleteFileResponses, DeleteFileErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/volumes/{server_id}/fs/{path}',
         ...options
     });

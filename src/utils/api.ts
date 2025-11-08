@@ -2,21 +2,39 @@ import { toaster } from '../../lib/chakra/toaster'
 import { client as apiClient } from '../../lib/hey-api/client/client.gen'
 
 export const getBaseUrl = () => {
-    // if (import.meta.env.PROD) {
-    //     return window.location.origin
-    // }
-    return import.meta.env.VITE_SM_MODE ? `https://localhost` : origin
-    // return envUrl;
+    // In development, use the dev server URL
+    if (import.meta.env.DEV) {
+        return 'https://localhost'
+    }
+    // In production, use relative URLs or current origin
+    return window.location.origin
 }
 
-export const getFrontendUrl = () => {
-    // in prod this equals getBaseURL()
-    return getBaseUrl()
+export const getAuthToken = () => {
+    return window.sessionStorage.getItem('auth_token') || ''
 }
 
+export const setAuthToken = (token: string) => {
+    window.sessionStorage.setItem('auth_token', token)
+    updateClientAuth(token)
+}
+
+export const removeAccessToken = () => {
+    sessionStorage.removeItem('access_token')
+    updateClientAuth('')
+}
+
+export const updateClientAuth = (token: string) => {
+    apiClient.setConfig({
+        baseUrl: getBaseUrl(),
+        auth: token ? token : ''
+    })
+}
+
+const initialToken = getAuthToken()
 apiClient.setConfig({
     baseUrl: getBaseUrl(),
-    credentials: 'include'
+    auth: initialToken ? `Bearer ${initialToken}` : ''
 })
 
 apiClient.interceptors.error.use(async (error: any, options: any) => {
@@ -25,12 +43,10 @@ apiClient.interceptors.error.use(async (error: any, options: any) => {
         console.log(error)
     }
     if (options.status == 401) {
-        if (window.sessionStorage.getItem('logged_in')) {
+        if (getAuthToken() != '') {
             console.log('Logging out due to 401')
-
-            window.sessionStorage.removeItem('logged_in')
-            window.location.reload()
-            toaster.error({ title: 'error' })
+            // removeAccessToken()
+            // window.location.reload()
         }
         return Promise.reject(error)
     }
