@@ -83,7 +83,9 @@ const MenuOptions = ({ ...props }) => {
             <SettingsModal />
             <MenuSelectButton
                 onClick={async () => {
-                    await logoutUser().then(() => {})
+                    await logoutUser().then(() => {
+                        window.location.reload()
+                    })
                 }}
                 color="danger.500"
             >

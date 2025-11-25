@@ -72,6 +72,10 @@ export type CreateUserRequest = {
      * Username
      */
     username: string;
+    /**
+     * Scopes
+     */
+    scopes: Array<string>;
 };
 
 /**
@@ -121,9 +125,9 @@ export type NodeUptimeResponse = {
 };
 
 /**
- * NodesBase
+ * NodesCreate
  */
-export type NodesBase = {
+export type NodesCreate = {
     /**
      * Name
      * Node name
@@ -273,9 +277,9 @@ export type ServerStopResponse = {
 };
 
 /**
- * ServersBase
+ * ServersCreate
  */
-export type ServersBase = {
+export type ServersCreate = {
     /**
      * Name
      * Server name
@@ -415,9 +419,9 @@ export type TemplateListResponse = {
 };
 
 /**
- * TemplatesBase
+ * TemplatesCreate
  */
-export type TemplatesBase = {
+export type TemplatesCreate = {
     /**
      * Name
      * Template name
@@ -531,24 +535,6 @@ export type TemplatesRead = {
 };
 
 /**
- * Token
- */
-export type Token = {
-    /**
-     * Access Token
-     */
-    access_token: string;
-    /**
-     * Token Type
-     */
-    token_type: string;
-    /**
-     * Expire Time
-     */
-    expire_time?: number | null;
-};
-
-/**
  * UserListResponse
  */
 export type UserListResponse = {
@@ -573,6 +559,11 @@ export type UsersBase = {
      * Disabled
      */
     disabled?: boolean;
+    /**
+     * Scopes
+     * List of scopes assigned to the user
+     */
+    scopes: Array<string> | null;
     /**
      * Admin
      */
@@ -609,10 +600,14 @@ export type CreateUserRequestWritable = {
      * Password
      */
     password: string;
+    /**
+     * Scopes
+     */
+    scopes: Array<string>;
 };
 
 export type AddTemplateData = {
-    body: TemplatesBase;
+    body: TemplatesCreate;
     path?: never;
     query?: never;
     url: '/templates/';
@@ -667,7 +662,7 @@ export type GetTemplateResponses = {
 export type GetTemplateResponse = GetTemplateResponses[keyof GetTemplateResponses];
 
 export type UpdateTemplateData = {
-    body: TemplatesBase;
+    body: TemplatesCreate;
     path: {
         /**
          * Template Id
@@ -726,6 +721,25 @@ export type DeleteTemplateResponses = {
 
 export type DeleteTemplateResponse = DeleteTemplateResponses[keyof DeleteTemplateResponses];
 
+export type DeleteUserAccountData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/users/';
+};
+
+export type DeleteUserAccountResponses = {
+    /**
+     * Response Delete User Account Users  Delete
+     * Successful Response
+     */
+    200: {
+        [key: string]: unknown;
+    };
+};
+
+export type DeleteUserAccountResponse = DeleteUserAccountResponses[keyof DeleteUserAccountResponses];
+
 export type CreateUserAccountData = {
     body: CreateUserRequestWritable;
     path?: never;
@@ -751,6 +765,20 @@ export type CreateUserAccountResponses = {
 
 export type CreateUserAccountResponse = CreateUserAccountResponses[keyof CreateUserAccountResponses];
 
+export type RefreshTokenData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/users/refresh';
+};
+
+export type RefreshTokenResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
+
 export type LoginUserData = {
     body: BodyLoginUserUsersTokenPost;
     path?: never;
@@ -771,32 +799,15 @@ export type LoginUserResponses = {
     /**
      * Successful Response
      */
-    200: Token;
+    200: unknown;
 };
-
-export type LoginUserResponse = LoginUserResponses[keyof LoginUserResponses];
 
 export type LogoutUserData = {
     body?: never;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
     path?: never;
     query?: never;
     url: '/users/revoke';
 };
-
-export type LogoutUserErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type LogoutUserError = LogoutUserErrors[keyof LogoutUserErrors];
 
 export type LogoutUserResponses = {
     /**
@@ -807,25 +818,10 @@ export type LogoutUserResponses = {
 
 export type GetUserData = {
     body?: never;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
     path?: never;
     query?: never;
     url: '/users/me';
 };
-
-export type GetUserErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type GetUserError = GetUserErrors[keyof GetUserErrors];
 
 export type GetUserResponses = {
     /**
@@ -837,13 +833,7 @@ export type GetUserResponses = {
 export type GetUserResponse = GetUserResponses[keyof GetUserResponses];
 
 export type CreateServerData = {
-    body: ServersBase;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
+    body: ServersCreate;
     path?: never;
     query?: never;
     url: '/servers/';
@@ -1054,7 +1044,7 @@ export type SendCommandResponses = {
 export type SendCommandResponse = SendCommandResponses[keyof SendCommandResponses];
 
 export type AddNodeData = {
-    body: NodesBase;
+    body: NodesCreate;
     path?: never;
     query?: never;
     url: '/nodes/';
@@ -1203,25 +1193,10 @@ export type RuntimeResponse = RuntimeResponses[keyof RuntimeResponses];
 
 export type SearchData = {
     body?: never;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
     path?: never;
     query?: never;
     url: '/search/users/';
 };
-
-export type SearchErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type SearchError = SearchErrors[keyof SearchErrors];
 
 export type SearchResponses = {
     /**
@@ -1234,25 +1209,10 @@ export type SearchResponse = SearchResponses[keyof SearchResponses];
 
 export type SearchServersData = {
     body?: never;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
     path?: never;
     query?: never;
     url: '/search/servers/';
 };
-
-export type SearchServersErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type SearchServersError = SearchServersErrors[keyof SearchServersErrors];
 
 export type SearchServersResponses = {
     /**
@@ -1265,12 +1225,6 @@ export type SearchServersResponse = SearchServersResponses[keyof SearchServersRe
 
 export type SearchFsData = {
     body?: never;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
     path: {
         /**
          * Server Id
@@ -1305,25 +1259,10 @@ export type SearchFsResponse = SearchFsResponses[keyof SearchFsResponses];
 
 export type SearchNodesData = {
     body?: never;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
     path?: never;
     query?: never;
     url: '/search/nodes/';
 };
-
-export type SearchNodesErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type SearchNodesError = SearchNodesErrors[keyof SearchNodesErrors];
 
 export type SearchNodesResponses = {
     /**
@@ -1336,25 +1275,10 @@ export type SearchNodesResponse = SearchNodesResponses[keyof SearchNodesResponse
 
 export type SearchTemplatesData = {
     body?: never;
-    headers?: {
-        /**
-         * Authorization
-         */
-        authorization?: string | null;
-    };
     path?: never;
     query?: never;
     url: '/search/templates/';
 };
-
-export type SearchTemplatesErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type SearchTemplatesError = SearchTemplatesErrors[keyof SearchTemplatesErrors];
 
 export type SearchTemplatesResponses = {
     /**

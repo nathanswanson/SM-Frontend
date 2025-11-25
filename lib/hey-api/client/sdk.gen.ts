@@ -2,7 +2,7 @@
 
 import { type Client, type Options as Options2, type TDataShape, urlSearchParamsBodySerializer } from './client';
 import { client } from './client.gen';
-import type { AddNodeData, AddNodeErrors, AddNodeResponses, AddTemplateData, AddTemplateErrors, AddTemplateResponses, CreateServerData, CreateServerErrors, CreateServerResponses, CreateUserAccountData, CreateUserAccountErrors, CreateUserAccountResponses, DeleteFileData, DeleteFileErrors, DeleteFileResponses, DeleteNodeData, DeleteNodeErrors, DeleteNodeResponses, DeleteServerData, DeleteServerErrors, DeleteServerResponses, DeleteTemplateData, DeleteTemplateErrors, DeleteTemplateResponses, DiskUsageData, DiskUsageErrors, DiskUsageResponses, GetArchiveData, GetArchiveErrors, GetArchiveResponses, GetNodeData, GetNodeErrors, GetNodeResponses, GetServerInfoData, GetServerInfoErrors, GetServerInfoResponses, GetServerStatusData, GetServerStatusErrors, GetServerStatusResponses, GetTemplateData, GetTemplateErrors, GetTemplateResponses, GetUserData, GetUserErrors, GetUserResponses, HandleHttpGetData, HandleHttpGetErrors, HandleHttpGetResponses, HandleHttpPostData, HandleHttpPostResponses, LoginUserData, LoginUserErrors, LoginUserResponses, LogoutUserData, LogoutUserErrors, LogoutUserResponses, ReadFileData, ReadFileErrors, ReadFileResponses, RuntimeData, RuntimeErrors, RuntimeResponses, SearchData, SearchErrors, SearchFsData, SearchFsErrors, SearchFsResponses, SearchNodesData, SearchNodesErrors, SearchNodesResponses, SearchResponses, SearchServersData, SearchServersErrors, SearchServersResponses, SearchTemplatesData, SearchTemplatesErrors, SearchTemplatesResponses, SendCommandData, SendCommandErrors, SendCommandResponses, StartServerData, StartServerErrors, StartServerResponses, StopServerData, StopServerErrors, StopServerResponses, UpdateTemplateData, UpdateTemplateErrors, UpdateTemplateResponses, UploadFileData, UploadFileErrors, UploadFileResponses } from './types.gen';
+import type { AddNodeData, AddNodeErrors, AddNodeResponses, AddTemplateData, AddTemplateErrors, AddTemplateResponses, CreateServerData, CreateServerErrors, CreateServerResponses, CreateUserAccountData, CreateUserAccountErrors, CreateUserAccountResponses, DeleteFileData, DeleteFileErrors, DeleteFileResponses, DeleteNodeData, DeleteNodeErrors, DeleteNodeResponses, DeleteServerData, DeleteServerErrors, DeleteServerResponses, DeleteTemplateData, DeleteTemplateErrors, DeleteTemplateResponses, DeleteUserAccountData, DeleteUserAccountResponses, DiskUsageData, DiskUsageErrors, DiskUsageResponses, GetArchiveData, GetArchiveErrors, GetArchiveResponses, GetNodeData, GetNodeErrors, GetNodeResponses, GetServerInfoData, GetServerInfoErrors, GetServerInfoResponses, GetServerStatusData, GetServerStatusErrors, GetServerStatusResponses, GetTemplateData, GetTemplateErrors, GetTemplateResponses, GetUserData, GetUserResponses, HandleHttpGetData, HandleHttpGetErrors, HandleHttpGetResponses, HandleHttpPostData, HandleHttpPostResponses, LoginUserData, LoginUserErrors, LoginUserResponses, LogoutUserData, LogoutUserResponses, ReadFileData, ReadFileErrors, ReadFileResponses, RefreshTokenData, RefreshTokenResponses, RuntimeData, RuntimeErrors, RuntimeResponses, SearchData, SearchFsData, SearchFsErrors, SearchFsResponses, SearchNodesData, SearchNodesResponses, SearchResponses, SearchServersData, SearchServersResponses, SearchTemplatesData, SearchTemplatesResponses, SendCommandData, SendCommandErrors, SendCommandResponses, StartServerData, StartServerErrors, StartServerResponses, StopServerData, StopServerErrors, StopServerResponses, UpdateTemplateData, UpdateTemplateErrors, UpdateTemplateResponses, UploadFileData, UploadFileErrors, UploadFileResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -95,6 +95,23 @@ export const deleteTemplate = <ThrowOnError extends boolean = false>(options: Op
 };
 
 /**
+ * Delete User Account
+ * delete current user account
+ */
+export const deleteUserAccount = <ThrowOnError extends boolean = false>(options?: Options<DeleteUserAccountData, ThrowOnError>) => {
+    return (options?.client ?? client).delete<DeleteUserAccountResponses, unknown, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/users/',
+        ...options
+    });
+};
+
+/**
  * Create User Account
  * create a new user account
  */
@@ -110,8 +127,19 @@ export const createUserAccount = <ThrowOnError extends boolean = false>(options:
 };
 
 /**
+ * Refresh Token
+ * refresh access token using refresh token
+ */
+export const refreshToken = <ThrowOnError extends boolean = false>(options?: Options<RefreshTokenData, ThrowOnError>) => {
+    return (options?.client ?? client).post<RefreshTokenResponses, unknown, ThrowOnError>({
+        url: '/users/refresh',
+        ...options
+    });
+};
+
+/**
  * Login User
- * login user, return access token
+ * login user, return access token and set refresh token to cookie
  */
 export const loginUser = <ThrowOnError extends boolean = false>(options: Options<LoginUserData, ThrowOnError>) => {
     return (options.client ?? client).post<LoginUserResponses, LoginUserErrors, ThrowOnError>({
@@ -130,7 +158,13 @@ export const loginUser = <ThrowOnError extends boolean = false>(options: Options
  * logout user, delete access token cookie
  */
 export const logoutUser = <ThrowOnError extends boolean = false>(options?: Options<LogoutUserData, ThrowOnError>) => {
-    return (options?.client ?? client).post<LogoutUserResponses, LogoutUserErrors, ThrowOnError>({
+    return (options?.client ?? client).post<LogoutUserResponses, unknown, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/users/revoke',
         ...options
     });
@@ -141,7 +175,13 @@ export const logoutUser = <ThrowOnError extends boolean = false>(options?: Optio
  * get current user information
  */
 export const getUser = <ThrowOnError extends boolean = false>(options?: Options<GetUserData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetUserResponses, GetUserErrors, ThrowOnError>({
+    return (options?.client ?? client).get<GetUserResponses, unknown, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/users/me',
         ...options
     });
@@ -364,7 +404,7 @@ export const runtime = <ThrowOnError extends boolean = false>(options: Options<R
  * Search for users by username or email
  */
 export const search = <ThrowOnError extends boolean = false>(options?: Options<SearchData, ThrowOnError>) => {
-    return (options?.client ?? client).get<SearchResponses, SearchErrors, ThrowOnError>({
+    return (options?.client ?? client).get<SearchResponses, unknown, ThrowOnError>({
         security: [
             {
                 scheme: 'bearer',
@@ -381,7 +421,7 @@ export const search = <ThrowOnError extends boolean = false>(options?: Options<S
  * Search for servers by name
  */
 export const searchServers = <ThrowOnError extends boolean = false>(options?: Options<SearchServersData, ThrowOnError>) => {
-    return (options?.client ?? client).get<SearchServersResponses, SearchServersErrors, ThrowOnError>({
+    return (options?.client ?? client).get<SearchServersResponses, unknown, ThrowOnError>({
         security: [
             {
                 scheme: 'bearer',
@@ -415,7 +455,7 @@ export const searchFs = <ThrowOnError extends boolean = false>(options: Options<
  * Search for nodes by name
  */
 export const searchNodes = <ThrowOnError extends boolean = false>(options?: Options<SearchNodesData, ThrowOnError>) => {
-    return (options?.client ?? client).get<SearchNodesResponses, SearchNodesErrors, ThrowOnError>({
+    return (options?.client ?? client).get<SearchNodesResponses, unknown, ThrowOnError>({
         security: [
             {
                 scheme: 'bearer',
@@ -432,7 +472,7 @@ export const searchNodes = <ThrowOnError extends boolean = false>(options?: Opti
  * Search for templates by name
  */
 export const searchTemplates = <ThrowOnError extends boolean = false>(options?: Options<SearchTemplatesData, ThrowOnError>) => {
-    return (options?.client ?? client).get<SearchTemplatesResponses, SearchTemplatesErrors, ThrowOnError>({
+    return (options?.client ?? client).get<SearchTemplatesResponses, unknown, ThrowOnError>({
         security: [
             {
                 scheme: 'bearer',

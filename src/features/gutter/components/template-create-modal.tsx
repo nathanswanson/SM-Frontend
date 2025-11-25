@@ -518,14 +518,11 @@ const ModuleRow = ({ index, control, register, remove, errors }: ModuleRowProps)
         name: `modules.${index}.type`
     })
 
-    const watcherOptions =
-        watcherType == FieldType.SELECT
-            ? useWatch({
-                  control,
-                  defaultValue: [] as string[],
-                  name: `modules.${index}.options`
-              })
-            : undefined
+    const watcherOptions = useWatch({
+        control,
+        defaultValue: [] as string[],
+        name: `modules.${index}.options`
+    })
 
     return (
         <Table.Row key={`template-row-${index}`}>

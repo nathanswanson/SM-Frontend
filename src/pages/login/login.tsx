@@ -13,36 +13,56 @@ import {
 } from '@chakra-ui/react'
 import { CircleArrowRight } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { useAsync } from 'react-use'
 import { PasswordInput } from '../../../lib/chakra/password-input'
 import { Toaster, toaster } from '../../../lib/chakra/toaster'
-import { getUser, loginUser } from '../../../lib/hey-api/client'
+import { getUser, loginUser, refreshToken } from '../../../lib/hey-api/client'
 import { useUserDataContext } from '../../providers/user-data'
-import { setAuthToken } from '../../utils/api'
+import { setAccessToken } from '../../utils/api'
 
-async function checkLoginStatus() {
-    try {
-        const response = await getUser()
-        return response.response.status === 200
-    } catch {
-        return false
-    }
+async function refresh(): Promise<string | null> {
+    return refreshToken({ credentials: 'include' }).then(data => {
+        if (data.data) {
+            console.log(data)
+            return (data.data as any).access_token as string
+        }
+        return null
+    })
 }
+
+const LoginState = {
+    CHECKING: 'checking',
+    LOGGED_OUT: 'logged_out',
+    LOGGED_IN: 'logged_in'
+}
+
+type LoginStateType = (typeof LoginState)[keyof typeof LoginState]
 
 export const Login = ({ children }: { children: React.ReactNode }) => {
     const [username, setUsername] = useState<string>('')
     const [password, setPassword] = useState<string>('')
     const [loginLoading, setLoginLoading] = useState<boolean>(false)
     const [checkingStatus, setCheckingStatus] = useState<boolean>(true)
-    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false)
+    const [loginState, setLoginState] = useState<LoginStateType>(LoginState.CHECKING)
     const { setUserData } = useUserDataContext()
 
-    useEffect(() => {
+    useAsync(async () => {
         // Check login status on mount
-        checkLoginStatus().then(loggedIn => {
-            setIsLoggedIn(loggedIn)
-            setCheckingStatus(false)
-        })
+        refresh()
+            .then(token => {
+                if (token) {
+                    setAccessToken(token)
+                    setLoginState(LoginState.LOGGED_IN)
+                }
+            })
+            .catch(() => {
+                setLoginState(LoginState.LOGGED_OUT)
+            })
+            .finally(() => {
+                setCheckingStatus(false)
+            })
     }, [])
+
     const createAccount = async () => {
         setLoginLoading(true)
         toaster.error({
@@ -53,13 +73,13 @@ export const Login = ({ children }: { children: React.ReactNode }) => {
     }
 
     useEffect(() => {
-        if (isLoggedIn) {
+        if (loginState === LoginState.LOGGED_IN) {
             // Fetch user data
             getUser().then(response => {
                 setUserData(response.data)
             })
         }
-    }, [isLoggedIn])
+    }, [LoginState])
 
     const login = async () => {
         setLoginLoading(true)
@@ -67,10 +87,10 @@ export const Login = ({ children }: { children: React.ReactNode }) => {
             await loginUser({
                 body: { username, password }
             }).then(response => {
-                if (response.response.status === 200 && response.data?.access_token) {
-                    setAuthToken(response.data.access_token)
+                if (response.response.status === 200 && response.data) {
+                    setAccessToken((response.data as any).access_token as string)
 
-                    setIsLoggedIn(true)
+                    setLoginState(LoginState.LOGGED_IN)
                 } else {
                     toaster.error({
                         title: 'Login Failed',
@@ -92,7 +112,7 @@ export const Login = ({ children }: { children: React.ReactNode }) => {
         )
     }
 
-    if (isLoggedIn) {
+    if (loginState === LoginState.LOGGED_IN) {
         return <Box>{children}</Box>
     }
 

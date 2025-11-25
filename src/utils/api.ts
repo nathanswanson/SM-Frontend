@@ -10,12 +10,12 @@ export const getBaseUrl = () => {
     return window.location.origin + '/api'
 }
 
-export const getAuthToken = () => {
-    return window.sessionStorage.getItem('auth_token') || ''
+export const getAccessToken = () => {
+    return window.sessionStorage.getItem('access_token') || ''
 }
 
-export const setAuthToken = (token: string) => {
-    window.sessionStorage.setItem('auth_token', token)
+export const setAccessToken = (token: string) => {
+    window.sessionStorage.setItem('access_token', token)
     updateClientAuth(token)
 }
 
@@ -31,10 +31,11 @@ export const updateClientAuth = (token: string) => {
     })
 }
 
-const initialToken = getAuthToken()
+const initialToken = getAccessToken()
 apiClient.setConfig({
     baseUrl: getBaseUrl(),
-    auth: initialToken ? `Bearer ${initialToken}` : ''
+    auth: initialToken ? `Bearer ${initialToken}` : '',
+    credentials: 'include'
 })
 
 apiClient.interceptors.error.use(async (error: any, options: any) => {
@@ -43,7 +44,7 @@ apiClient.interceptors.error.use(async (error: any, options: any) => {
         console.log(error)
     }
     if (options.status == 401) {
-        if (getAuthToken() != '') {
+        if (getAccessToken() != '') {
             console.log('Logging out due to 401')
             // removeAccessToken()
             // window.location.reload()

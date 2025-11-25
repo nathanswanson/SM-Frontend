@@ -1,9 +1,9 @@
 import {
-    NodesBase,
+    NodesCreate,
     NodesRead,
-    ServersBase,
+    ServersCreate,
     ServersRead,
-    TemplatesBase,
+    TemplatesCreate,
     TemplatesRead,
     UsersBase
 } from '../../lib/hey-api/client'
@@ -20,8 +20,8 @@ interface LocalDBData {
 
 export const dbTestData: LocalDBData = {
     users: [
-        { username: 'John', admin: true, disabled: false },
-        { username: 'Jane', admin: false, disabled: false }
+        { username: 'John', admin: true, disabled: false, scopes: ['admin'] },
+        { username: 'Jane', admin: false, disabled: false, scopes: [] }
     ],
     servers: [
         {
@@ -90,7 +90,7 @@ export const dbTestData: LocalDBData = {
         }
     ]
 }
-export type BaseType = ServersBase | TemplatesBase | UsersBase | NodesBase
+export type BaseType = ServersCreate | TemplatesCreate | UsersBase | NodesCreate
 
 export class LocalDB {
     private db: IDBDatabase | null = null
