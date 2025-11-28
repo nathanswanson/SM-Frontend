@@ -3,7 +3,7 @@ import { fetch } from 'ofetch'
 import { toaster } from '../../../../lib/chakra/toaster'
 import { useFileTransferContext } from '../../../providers/file-transfer'
 import { useSelectedServerContext } from '../../../providers/selected-server-context'
-import { getBaseUrl } from '../../../utils/api'
+import { getAccessToken, getBaseUrl } from '../../../utils/api'
 
 interface FileUploaddialogProps {
     isOpen: boolean
@@ -48,7 +48,8 @@ export const FileUploadDialog = (props: FileUploaddialogProps) => {
                     headers: {
                         'X-Upload-Path': props.uploadPath,
                         'Content-Type': 'application/octet-stream',
-                        'X-File-Name': file.name
+                        'X-File-Name': file.name,
+                        Authorization: `Bearer ${getAccessToken()} ?? ''}`
                     },
                     // @ts-ignore
                     duplex: 'half'

@@ -16,10 +16,14 @@ export const ServerOverview = () => {
             })
         }
     }, [serverInfo])
+
+    // remove http(s):// from base url
+    const trimedBaseUrl = getBaseUrl().replace(/^https?:\/\//, '')
+
     const items = [
         { id: 'template', value: templateInfo?.name ?? 'N/A' },
         { id: 'status', value: serverOnline ? 'Online' : 'Offline' },
-        { id: 'address', value: `${getBaseUrl()}:${serverInfo?.port ?? '0000'}` },
+        { id: 'address', value: `${trimedBaseUrl}:${serverInfo?.port ?? '0000'}` },
         { id: 'total cpu', value: serverInfo?.cpu ? `${serverInfo.cpu} cores` : 'N/A' },
         { id: 'total memory', value: serverInfo?.memory ? `${serverInfo.memory} GB` : 'N/A' },
         { id: 'total disk', value: serverInfo?.disk ? `${serverInfo.disk} GB` : 'N/A' }

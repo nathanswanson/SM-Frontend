@@ -3,8 +3,8 @@ import { Grid } from '@chakra-ui/react/grid'
 import { VStack } from '@chakra-ui/react/stack'
 import { useEffect, useState } from 'react'
 import { useSubscription } from 'urql'
-import { ActionHalo } from '../../components/action-halo'
-import CardModule from '../../components/card'
+import { ActionHalo } from '../../components/card/action-halo'
+import CardModule from '../../components/card/card'
 import { ConsoleCommands } from '../../features/console/components/command-bar'
 import { LogManager } from '../../features/console/console'
 import { FileManagerHalo } from '../../features/file_manager/file-manager'
@@ -35,7 +35,10 @@ const cap50 = <T,>(arr: T[], next: T): T[] => [...arr, next].slice(-50)
 
 export const MainContent = ({ ...props }) => {
     const { serverInfo } = useSelectedServerContext()
-    const [res] = useSubscription({ query: subscribe(serverInfo?.container_name ?? '') }, handleSubscription)
+    const [res] = useSubscription(
+        { query: subscribe(serverInfo?.container_name ?? ''), pause: !serverInfo?.container_name },
+        handleSubscription
+    )
     const [cpuData, setCpuData] = useState<number[]>([])
     const [memData, setMemData] = useState<number[]>([])
     const [netData, setNetData] = useState<number[]>([])
@@ -101,7 +104,7 @@ const Cards = ({ ...props }) => {
                     <ConsoleCommands />
                 </ActionHalo.Header>
                 <ActionHalo.Contents>
-                    <CardModule header="console">
+                    <CardModule expandable header="Console">
                         <LogManager />
                     </CardModule>
                 </ActionHalo.Contents>

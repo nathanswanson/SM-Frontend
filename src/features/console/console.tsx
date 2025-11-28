@@ -3,6 +3,7 @@ import { Button, HStack, Input, VStack } from '@chakra-ui/react'
 
 import { ChevronRight } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
+import { useEffectOnce } from 'react-use'
 import { useSubscription } from 'urql'
 import { sendCommand } from '../../../lib/hey-api/client'
 import { DisabledModule } from '../../components/disabled-module'
@@ -37,6 +38,12 @@ export const LogManager = ({ ...props }) => {
         },
         handleSubscription
     )
+
+    useEffectOnce(() => {
+        const cached_command = window.localStorage.getItem('console_command')
+        setCommandText(cached_command ?? '')
+    })
+
     useEffect(() => {
         if (res && res.data) {
             setLogMessages(prev => cap50(prev, res.data))
@@ -61,7 +68,7 @@ export const LogManager = ({ ...props }) => {
     }
 
     return (
-        <VStack flexGrow={1} h="350px" maxW="700px" width="100%" {...props}>
+        <VStack flexGrow={1} h="100%" width="100%" {...props}>
             {!serverInfo ? <DisabledModule requester="logs" /> : <LazyLogView messages={logMessages} />}
             <HStack width="100%">
                 <Input
@@ -74,6 +81,7 @@ export const LogManager = ({ ...props }) => {
                     }}
                     value={commandText}
                     onChange={event => {
+                        window.localStorage.setItem('console_command', event.target.value)
                         setCommandText(event.target.value)
                     }}
                 ></Input>

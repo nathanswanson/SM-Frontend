@@ -1,5 +1,5 @@
-import { ActionHalo } from '../../components/action-halo'
-import { CardModuleRaw } from '../../components/card'
+import { ActionHalo } from '../../components/card/action-halo'
+import { CardModuleRaw } from '../../components/card/card'
 import { FileTransferProvider } from '../../providers/file-transfer'
 import { FileActionBar } from './components/file-action-bar'
 import { FileManager } from './components/file-explorer'

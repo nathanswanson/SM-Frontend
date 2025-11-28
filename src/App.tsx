@@ -13,7 +13,8 @@ import { SelectedServerProvider } from './providers/selected-server-context'
 import { UserDataProvider } from './providers/user-data'
 import { WindowProvider } from './providers/window-context'
 import { system } from './theme'
-const mockGraphQlClient = true ? (await import('./mocks/graphql')).mockGraphQlClient : null
+import { mockingEnabled } from './utils/mode'
+const mockGraphQlClient = mockingEnabled() ? (await import('./mocks/graphql')).mockGraphQlClient : null
 
 const NavBar = lazy(() => import('./features/nav_bar/nav-bar'))
 export default function Page() {
@@ -34,10 +35,10 @@ export default function Page() {
                         <URQLProvider value={mockGraphQlClient ?? graphql_client}>
                             <MainContent />
                         </URQLProvider>
-                        <Toaster />
                     </VStack>
                 </HStack>
             </Login>
+            <Toaster />
         </SM>
     )
 }

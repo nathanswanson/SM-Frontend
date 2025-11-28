@@ -3,17 +3,19 @@ import { useEffect, useRef, useState } from 'react'
 import { createHighlighterCore, createJavaScriptRegexEngine, type HighlighterCore } from 'shiki'
 
 // theme
+import githubDark from '@shikijs/themes/github-dark'
 import githubLight from '@shikijs/themes/github-light'
 import { purify } from '../../../utils/dom'
 
 interface LogTerminalProps {
     messages: string[]
+    height?: string | number
 }
 
 // Cache the highlighter promise globally, but only create it when first needed
 let cachedHighlighterPromise: Promise<HighlighterCore> | null = null
 
-const LogView = ({ messages }: LogTerminalProps) => {
+const LogView = ({ messages, height }: LogTerminalProps & { height?: string | number }) => {
     const [highlighter, setHighlighter] = useState<HighlighterCore | null>(null)
     const viewportRef = useRef<HTMLDivElement>(null)
 
@@ -23,7 +25,7 @@ const LogView = ({ messages }: LogTerminalProps) => {
 
         if (!cachedHighlighterPromise) {
             cachedHighlighterPromise = createHighlighterCore({
-                themes: [githubLight],
+                themes: [githubLight, githubDark],
                 langs: [import('@shikijs/langs/log')],
                 engine: createJavaScriptRegexEngine()
             })
@@ -49,13 +51,14 @@ const LogView = ({ messages }: LogTerminalProps) => {
     }, [messages])
 
     return (
-        <ScrollArea.Root borderWidth={1}>
-            <ScrollArea.Viewport scrollBehavior={'smooth'} ref={viewportRef}>
-                <ScrollArea.Content textStyle="sm">
+        <ScrollArea.Root ref={viewportRef}>
+            <ScrollArea.Viewport ref={viewportRef}>
+                <ScrollArea.Content height={'0px'}>
                     {messages.map((log, idx) => (
                         <Container
-                            p="0"
-                            width="auto"
+                            p={0}
+                            m={0}
+                            maxWidth={'670px'}
                             key={idx}
                             dangerouslySetInnerHTML={{
                                 __html: highlighter
@@ -70,6 +73,9 @@ const LogView = ({ messages }: LogTerminalProps) => {
                 </ScrollArea.Content>
             </ScrollArea.Viewport>
             <ScrollArea.Scrollbar>
+                <ScrollArea.Thumb />
+            </ScrollArea.Scrollbar>
+            <ScrollArea.Scrollbar orientation="horizontal">
                 <ScrollArea.Thumb />
             </ScrollArea.Scrollbar>
 

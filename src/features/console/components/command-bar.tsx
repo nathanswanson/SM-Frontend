@@ -47,13 +47,13 @@ export const ConsoleCommands = ({ ...props }) => {
 
     const restartServer = async () => {
         setCommandLoading(true)
-        // stop_server()
-        //     .then(() => {
-        //         // start_server()
-        //     })
-        //     .finally(() => {
-        //         // setCommandLoading(false)
-        //     })
+        stop_server()
+            .then(() => {
+                // start_server()
+            })
+            .finally(() => {
+                // setCommandLoading(false)
+            })
     }
 
     const delete_server = async () => {

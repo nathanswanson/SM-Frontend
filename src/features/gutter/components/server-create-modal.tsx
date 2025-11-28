@@ -15,9 +15,10 @@ import { useForm } from 'react-hook-form'
 import { useAsyncFn, useMap } from 'react-use'
 import { z } from 'zod/v4'
 import { toaster } from '../../../../lib/chakra/toaster'
-import { createServer, getTemplate, searchTemplates, TemplatesRead } from '../../../../lib/hey-api/client'
+import { createServer, getTemplate, searchTemplates, ServersRead, TemplatesRead } from '../../../../lib/hey-api/client'
 import { MenuSelectButton } from '../../../components/menu-select-button'
 import { CheckboxModule, ListModule, NumberModule, SelectModule, TextModule } from '../../../components/template-module'
+import { useSelectedServerContext } from '../../../providers/selected-server-context'
 import { FieldType, NumberModuleSchema, SelectModuleSchema } from '../../../utils/template-schema'
 
 const formSchema = z.object({
@@ -46,6 +47,7 @@ export const ServerCreateDialog = () => {
     const [templateMap, { set: setTemplateMap, setAll: setAllTemplateMap }] = useMap<{ [key: string]: number }>({})
     const [selectedTemplate, setSelectedTemplate] = useState<TemplatesRead | undefined>(undefined)
     const [createServerLoading, setCreateServerLoading] = useState(false)
+    const { setSelectedServer } = useSelectedServerContext()
     const [open, setOpen] = useState(false)
     //names only
     const templateList = createListCollection({
@@ -80,8 +82,9 @@ export const ServerCreateDialog = () => {
                 memory: data.memory
             }
         })
-            .then(() => {
+            .then((server: { data: ServersRead | undefined }) => {
                 setCreateServerLoading(false)
+                setSelectedServer(server.data?.id)
                 setOpen(false)
             })
             .catch(ret => {

@@ -13,12 +13,12 @@ import {
 } from '@chakra-ui/react'
 import { CircleArrowRight } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { useAsync } from 'react-use'
+import { useAsync, useEffectOnce } from 'react-use'
 import { PasswordInput } from '../../../lib/chakra/password-input'
 import { Toaster, toaster } from '../../../lib/chakra/toaster'
 import { getUser, loginUser, refreshToken } from '../../../lib/hey-api/client'
 import { useUserDataContext } from '../../providers/user-data'
-import { setAccessToken } from '../../utils/api'
+import { client, getAccessToken, removeAccessToken, setAccessToken } from '../../utils/api'
 
 async function refresh(): Promise<string | null> {
     return refreshToken({ credentials: 'include' }).then(data => {
@@ -37,6 +37,48 @@ const LoginState = {
 }
 
 type LoginStateType = (typeof LoginState)[keyof typeof LoginState]
+
+client.interceptors.error.use(async (error: any, options: any) => {
+    // silently ignore for refresh token endpoint
+    if (options.url.endsWith('/users/refresh')) {
+        return Promise.reject(error)
+    }
+
+    if (import.meta.env.DEV) {
+        console.log(`Backend returned error:${error}`)
+    }
+
+    if (options.status == 401) {
+        if (getAccessToken() != '') {
+            // try refresh token
+            refreshToken({ credentials: 'include' })
+                .then(data => {
+                    if (data.data) {
+                        const newToken = (data.data as any).access_token as string
+                        setAccessToken(newToken)
+                        // retry original request
+                        return client.request(options.config)
+                    }
+                })
+                .then(res => {
+                    setAccessToken((res?.data as any).access_token)
+                })
+                .catch(() => {
+                    // logout user
+                    removeAccessToken()
+                    window.localStorage.setItem('error', 'Session expired, please login again.')
+                    window.location.reload()
+                })
+        }
+        return Promise.reject(error)
+    }
+    if (options.status == 422) {
+        if (error?.detail?.message) {
+            toaster.error({ title: 'Error', description: error.detail.message })
+        }
+    }
+    return error
+})
 
 export const Login = ({ children }: { children: React.ReactNode }) => {
     const [username, setUsername] = useState<string>('')
@@ -62,6 +104,14 @@ export const Login = ({ children }: { children: React.ReactNode }) => {
                 setCheckingStatus(false)
             })
     }, [])
+
+    useEffectOnce(() => {
+        const error = window.localStorage.getItem('error')
+        if (error) {
+            toaster.error({ title: 'Error', description: error })
+            window.localStorage.removeItem('error')
+        }
+    })
 
     const createAccount = async () => {
         setLoginLoading(true)
