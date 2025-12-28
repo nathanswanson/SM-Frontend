@@ -1,4 +1,4 @@
-FROM node:24 AS builder
+FROM --platform=$BUILDPLATFORM node:24 AS builder
 WORKDIR /app
 RUN wget -qO- https://get.pnpm.io/install.sh | ENV="$HOME/.shrc" SHELL="$(which sh)" sh -
 

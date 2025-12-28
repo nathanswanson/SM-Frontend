@@ -23,7 +23,6 @@ import { client, getAccessToken, removeAccessToken, setAccessToken } from '../..
 async function refresh(): Promise<string | null> {
     return refreshToken({ credentials: 'include' }).then(data => {
         if (data.data) {
-            console.log(data)
             return (data.data as any).access_token as string
         }
         return null
