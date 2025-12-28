@@ -1,10 +1,6 @@
 import { Container, ScrollArea } from '@chakra-ui/react'
 import { useEffect, useRef, useState } from 'react'
 import { createHighlighterCore, createJavaScriptRegexEngine, type HighlighterCore } from 'shiki'
-
-// theme
-import githubDark from '@shikijs/themes/github-dark'
-import githubLight from '@shikijs/themes/github-light'
 import { purify } from '../../../utils/dom'
 
 interface LogTerminalProps {
@@ -25,8 +21,11 @@ const LogView = ({ messages, height }: LogTerminalProps & { height?: string | nu
 
         if (!cachedHighlighterPromise) {
             cachedHighlighterPromise = createHighlighterCore({
-                themes: [githubLight, githubDark],
-                langs: [import('@shikijs/langs/log')],
+                themes: [
+                    import('shiki/themes/github-light.mjs'),
+                    import('shiki/themes/github-dark.mjs')
+                ],
+                langs: [import('shiki/langs/log.mjs')],
                 engine: createJavaScriptRegexEngine()
             })
         }
@@ -63,9 +62,9 @@ const LogView = ({ messages, height }: LogTerminalProps & { height?: string | nu
                             dangerouslySetInnerHTML={{
                                 __html: highlighter
                                     ? highlighter.codeToHtml(log, {
-                                          lang: 'log',
-                                          theme: 'github-light'
-                                      })
+                                        lang: 'log',
+                                        theme: 'github-light'
+                                    })
                                     : purify(log)
                             }}
                         />
