@@ -501,6 +501,23 @@ export const getArchive = <ThrowOnError extends boolean = false>(options: Option
 };
 
 /**
+ * Delete File
+ * delete a file in a container volume
+ */
+export const deleteFile = <ThrowOnError extends boolean = false>(options: Options<DeleteFileData, ThrowOnError>) => {
+    return (options.client ?? client).delete<DeleteFileResponses, DeleteFileErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/volumes/{server_id}/fs',
+        ...options
+    });
+};
+
+/**
  * Read File
  * read a file in a container volume, returns a tar archive of the file
  */
@@ -523,6 +540,7 @@ export const readFile = <ThrowOnError extends boolean = false>(options: Options<
  */
 export const uploadFile = <ThrowOnError extends boolean = false>(options: Options<UploadFileData, ThrowOnError>) => {
     return (options.client ?? client).post<UploadFileResponses, UploadFileErrors, ThrowOnError>({
+        bodySerializer: null,
         security: [
             {
                 scheme: 'bearer',
@@ -530,24 +548,11 @@ export const uploadFile = <ThrowOnError extends boolean = false>(options: Option
             }
         ],
         url: '/volumes/{server_id}/fs/',
-        ...options
-    });
-};
-
-/**
- * Delete File
- * delete a file in a container volume
- */
-export const deleteFile = <ThrowOnError extends boolean = false>(options: Options<DeleteFileData, ThrowOnError>) => {
-    return (options.client ?? client).delete<DeleteFileResponses, DeleteFileErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/volumes/{server_id}/fs/{path}',
-        ...options
+        ...options,
+        headers: {
+            'Content-Type': 'application/octet-stream',
+            ...options.headers
+        }
     });
 };
 

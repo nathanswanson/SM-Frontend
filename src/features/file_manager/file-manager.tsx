@@ -12,7 +12,7 @@ export const FileManagerHalo = ({ ...props }) => {
                     <FileActionBar />
                 </ActionHalo.Header>
                 <ActionHalo.Contents>
-                    <CardModuleRaw flexGrow={1} header="Files">
+                    <CardModuleRaw flexGrow={1} header="Files" overflow="auto">
                         <FileManager />
                     </CardModuleRaw>
                 </ActionHalo.Contents>

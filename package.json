@@ -3,7 +3,7 @@
     "private": true,
     "version": "1.0.2",
     "scripts": {
-        "openapi-ts": "curl -k https://home.localhost/api/openapi.json -o openapi.json && openapi-ts",
+        "openapi-ts": "curl -k ${OPENAPI_URL:-https://home.localhost/api/openapi.json} -o openapi.json && openapi-ts",
         "dev": "vite --port=4000",
         "theme:typegen": "chakra typegen ./src/theme.ts",
         "build": "npm run theme:typegen && tsc && vite build ",

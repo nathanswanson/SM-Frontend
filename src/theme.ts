@@ -82,6 +82,11 @@ const config = defineConfig({
         }
     },
     globalCss: {
+        'html, body, #root': {
+            height: '100%',
+            margin: 0,
+            overflow: 'hidden'
+        },
         body: {
             _dark: { bg: 'gray.900' },
             _light: { bg: 'gray.50' },

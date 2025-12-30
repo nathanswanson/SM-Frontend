@@ -54,16 +54,17 @@ export const MainContent = ({ ...props }) => {
     }, [res])
 
     return (
-        <VStack {...props}>
+        <VStack height="100%" gap={0} {...props}>
             <SimpleGrid
                 hideBelow={'md'}
                 gridTemplateColumns="repeat(auto-fit, minmax(250px, 1fr))"
-                margin="8"
-                gap={'4em'}
+                paddingX="8"
+                paddingTop="4"
+                paddingBottom="6"
+                gap={'2em'}
                 justifyContent={'space-evenly'}
                 width="100%"
-                mb="1.5em"
-                // flexFlow={'row wrap'}
+                flexShrink={0}
             >
                 <SMChart color="red" unit="Cores" label="Cpu" data={cpuData} />
                 <SMChart color="blue" unit="GB" label="Memory" data={memData} />
@@ -71,7 +72,7 @@ export const MainContent = ({ ...props }) => {
                 <SMChart color="orange" unit="GB" label="Disk" data={diskData} />
             </SimpleGrid>
 
-            <SkipNavContent>
+            <SkipNavContent style={{ display: 'flex', flex: 1, width: '100%', minHeight: 0 }}>
                 <Cards />
             </SkipNavContent>
         </VStack>
@@ -81,9 +82,11 @@ export const MainContent = ({ ...props }) => {
 const Cards = ({ ...props }) => {
     return (
         <Grid
-            alignSelf="flex-start"
             gap="1.5em"
-            // minW={'1400px'}
+            padding="1em"
+            width="100%"
+            flex={1}
+            minHeight={0}
             templateColumns={[
                 'repeat(3, 1fr);',
                 'repeat(3, 1fr);',
@@ -91,8 +94,7 @@ const Cards = ({ ...props }) => {
                 'repeat(9, 1fr);',
                 'repeat(12, 1fr);'
             ]}
-            autoRows={'minmax(330px, max-content);'}
-            flexWrap={'wrap'}
+            templateRows="repeat(2, minmax(0, 320px))"
             {...props}
         >
             <CardModule header="Node" colSize={3}>
@@ -104,7 +106,7 @@ const Cards = ({ ...props }) => {
                     <ConsoleCommands />
                 </ActionHalo.Header>
                 <ActionHalo.Contents>
-                    <CardModule expandable header="Console">
+                    <CardModule expandable header="Console" overflow="auto">
                         <LogManager />
                     </CardModule>
                 </ActionHalo.Contents>

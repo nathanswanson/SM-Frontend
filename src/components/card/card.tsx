@@ -30,9 +30,9 @@ export const CardModule = ({
     return (
         <GridItem
             flexDirection="column"
-            height="100%"
             display="flex"
             width="100%"
+            minHeight={0}
             colSpan={{ smOnly: BASE_COL_SPAN, base: colSize }}
             rowSpan={rowSize}
         >
@@ -50,6 +50,7 @@ export const CardModuleRaw = ({ children, header, expandable, ...rest }: CardMod
             display="flex"
             flexDirection="column"
             flexGrow={1}
+            minHeight={0}
             borderRadius={'sm'}
             overflow={'hidden'}
             shadow="sm"
@@ -57,7 +58,7 @@ export const CardModuleRaw = ({ children, header, expandable, ...rest }: CardMod
         >
             {/* Header */}
             {header ? (
-                <Card.Header px={4} py={3} borderBottomWidth="2px" borderBottomColor="bg.muted" fontWeight="semibold">
+                <Card.Header px={4} py={3} borderBottomWidth="2px" borderBottomColor="bg.muted" fontWeight="semibold" flexShrink={0}>
                     <HStack justifyContent="space-between" width="100%">
                         {header}
                         {expandable !== undefined ? (
@@ -69,7 +70,7 @@ export const CardModuleRaw = ({ children, header, expandable, ...rest }: CardMod
                 </Card.Header>
             ) : null}
 
-            <Card.Body display="flex" flexGrow={1} width="100%" {...rest}>
+            <Card.Body display="flex" flexGrow={1} minHeight={0} width="100%" p={4} {...rest}>
                 {children}
             </Card.Body>
         </Card.Root>

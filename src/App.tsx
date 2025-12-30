@@ -24,16 +24,23 @@ export default function Page() {
                 <SkipNavLink>Skip to content</SkipNavLink>
 
                 <GhostNav />
-                <HStack p="1em" alignItems={'flex-start'} justifySelf={'center'} maxWidth={1980}>
-                    <Gutter top="100px" width="20%" />
+                <HStack
+                    p="1em"
+                    alignItems={'stretch'}
+                    justifySelf={'center'}
+                    maxWidth={1980}
+                    height="calc(100vh - 2em)"
+                    overflow="hidden"
+                >
+                    <Gutter width="280px" flexShrink={0} />
 
-                    <VStack marginY="6" marginX="auto" paddingX="6" marginTop="0" marginBottom="0">
+                    <VStack marginX="auto" paddingX="4" height="100%" overflow="hidden" flex={1}>
                         {/* nav bar */}
                         {/* <Suspense> add fallback */}
-                        <NavBar width="100%" justifyContent="flex-end" />
+                        <NavBar width="100%" justifyContent="flex-end" flexShrink={0} />
                         {/* </Suspense> */}
                         <URQLProvider value={mockGraphQlClient ?? graphql_client}>
-                            <MainContent />
+                            <MainContent flex={1} overflow="hidden" />
                         </URQLProvider>
                     </VStack>
                 </HStack>
