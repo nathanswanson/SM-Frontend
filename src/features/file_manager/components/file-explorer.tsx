@@ -1,12 +1,16 @@
 'use client'
 
 import { Box, Breadcrumb, Flex, HStack, IconButton, ScrollArea, Spinner, Text, VStack } from '@chakra-ui/react'
-import { ChevronRight, Download, Edit, File, Folder, FolderUp, Home, Plus, RefreshCw } from 'lucide-react'
-import { useCallback, useEffect, useState } from 'react'
+import { ChevronRight, Download, Edit, File, Folder, FolderUp, Home, Plus, RefreshCw, Upload } from 'lucide-react'
+import { DragEvent, useCallback, useEffect, useState } from 'react'
+import { fetch } from 'ofetch'
 
 import { readFile, searchFs, ServersRead, uploadFile } from '../../../../lib/hey-api/client'
 import { DisabledModule } from '../../../components/disabled-module'
 import { useSelectedServerContext } from '../../../providers/selected-server-context'
+import { useFileTransferContext } from '../../../providers/file-transfer'
+import { toaster } from '../../../../lib/chakra/toaster'
+import { getAccessToken, getBaseUrl } from '../../../utils/api'
 import { FileUploadDialog } from './file-upload'
 import { TextEditorDialog } from './text-editor'
 import { SFTPCredentialsDialog } from './sftp-creds'
@@ -49,7 +53,7 @@ export const FileManager = ({ ...props }) => {
             {!serverInfo ? (
                 <DisabledModule requester="files" />
             ) : (
-                <Box height="30em" {...props}>
+                <Box height={{ base: 'auto', sm: '30em' }} minHeight={{ base: '20em', sm: 'auto' }} {...props}>
                     <FileExplorer />
                 </Box>
             )}
@@ -59,6 +63,7 @@ export const FileManager = ({ ...props }) => {
 
 const FileExplorer = () => {
     const { serverInfo, serverOnline } = useSelectedServerContext()
+    const { setTransferProgress, setFile } = useFileTransferContext()
     const [currentPath, setCurrentPath] = useState<string>('/')
     const [files, setFiles] = useState<FileItem[]>([])
     const [loading, setLoading] = useState<boolean>(false)
@@ -69,9 +74,12 @@ const FileExplorer = () => {
     // State for file upload dialog
     const [isFileUploadDialogOpen, setIsFileUploadDialogOpen] = useState(false)
     const [fileUploadPath, setFileUploadPath] = useState<string>('')
-    
+
     // State for selected file
     const [selectedFile, setSelectedFile] = useState<FileItem | null>(null)
+
+    // State for drag and drop
+    const [isDragOver, setIsDragOver] = useState<boolean>(false)
 
     const loadDirectory = useCallback(
         async (path: string) => {
@@ -221,10 +229,136 @@ const FileExplorer = () => {
         setIsFileUploadDialogOpen(true)
     }
 
+    const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
+        e.preventDefault()
+        e.stopPropagation()
+        if (e.dataTransfer.types.includes('Files')) {
+            setIsDragOver(true)
+        }
+    }
+
+    const handleDragLeave = (e: DragEvent<HTMLDivElement>) => {
+        e.preventDefault()
+        e.stopPropagation()
+        setIsDragOver(false)
+    }
+
+    const handleDrop = async (e: DragEvent<HTMLDivElement>) => {
+        e.preventDefault()
+        e.stopPropagation()
+        setIsDragOver(false)
+
+        if (!serverInfo) return
+
+        const droppedFiles = Array.from(e.dataTransfer.files)
+        if (droppedFiles.length === 0) return
+
+        for (const file of droppedFiles) {
+            if (!file.name) {
+                console.error('File has no name, skipping upload.')
+                continue
+            }
+
+            setFile({
+                fileName: file.name,
+                sizeTotal: file.size,
+                downloadPath: currentPath + file.name,
+                direction: 'upload'
+            })
+
+            let uploadedBytes = 0
+            setTransferProgress(0)
+
+            const progressStream = new TransformStream<Uint8Array, Uint8Array>({
+                transform(chunk, controller) {
+                    uploadedBytes += chunk.length
+                    setTransferProgress(uploadedBytes)
+                    controller.enqueue(chunk)
+                }
+            })
+
+            try {
+                const response = await fetch(
+                    `${getBaseUrl()}/volumes/${serverInfo.id}/fs/?path=${encodeURIComponent(currentPath + file.name)}`,
+                    {
+                        method: 'POST',
+                        body: file.stream().pipeThrough(progressStream),
+                        headers: {
+                            'X-Upload-Path': currentPath,
+                            'Content-Type': 'application/octet-stream',
+                            'X-File-Name': file.name,
+                            Authorization: `Bearer ${getAccessToken()} ?? ''}`
+                        },
+                        // @ts-ignore
+                        duplex: 'half'
+                    }
+                )
+
+                if (!response.ok) {
+                    console.error('File upload failed:', response.status, response.statusText)
+                    toaster.error({
+                        title: 'Upload failed',
+                        description: `Failed to upload ${file.name}`,
+                        closable: true,
+                        duration: 5000
+                    })
+                } else {
+                    toaster.success({
+                        title: 'File uploaded',
+                        description: `Successfully uploaded ${file.name}`,
+                        closable: true,
+                        duration: 5000
+                    })
+                    // Refresh the directory after successful upload
+                    loadDirectory(currentPath)
+                }
+            } catch (error) {
+                console.error('File upload error:', error)
+                toaster.error({
+                    title: 'Upload failed',
+                    description: `Error uploading ${file.name}`,
+                    closable: true,
+                    duration: 5000
+                })
+            }
+        }
+    }
+
     const breadcrumbItems = getBreadcrumbItems()
 
     return (
-        <Flex direction="column" height="100%" gap={2}>
+        <Flex
+            direction="column"
+            height="100%"
+            gap={2}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            position="relative"
+        >
+            {/* Drag overlay */}
+            {isDragOver && (
+                <Flex
+                    position="absolute"
+                    inset={0}
+                    bg="bg.emphasized"
+                    opacity={0.9}
+                    zIndex={10}
+                    justify="center"
+                    align="center"
+                    borderRadius="md"
+                    border="2px dashed"
+                    borderColor="blue.500"
+                    pointerEvents="none"
+                >
+                    <VStack gap={2}>
+                        <Upload size={48} />
+                        <Text fontSize="lg" fontWeight="semibold">
+                            Drop files to upload to {currentPath}
+                        </Text>
+                    </VStack>
+                </Flex>
+            )}
             {/* Toolbar */}
             <HStack justifyContent="space-between" px={2} py={1} borderBottomWidth="1px">
                 <HStack gap={1}>
@@ -319,7 +453,7 @@ const FileExplorer = () => {
                                 <Text color="fg.muted">Empty folder</Text>
                             </Flex>
                         ) : (
-                            <VStack align="stretch" gap={0}>
+                            <VStack align="stretch" gap={0} pb={4}>
                                 {files.map(file => (
                                     <HStack
                                         key={file.fullPath}
@@ -327,7 +461,9 @@ const FileExplorer = () => {
                                         py={2}
                                         cursor="pointer"
                                         bg={selectedFile?.fullPath === file.fullPath ? 'bg.emphasized' : undefined}
-                                        _hover={{ bg: 'bg.subtle' }}
+                                        _hover={{
+                                            bg: selectedFile?.fullPath === file.fullPath ? 'bg.emphasized' : 'bg.subtle'
+                                        }}
                                         onClick={() => handleFileClick(file)}
                                         onDoubleClick={() => {
                                             if (!file.isDirectory) handleEdit()

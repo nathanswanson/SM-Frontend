@@ -33,8 +33,8 @@ export const CardModule = ({
             display="flex"
             width="100%"
             minHeight={0}
-            colSpan={{ smOnly: BASE_COL_SPAN, base: colSize }}
-            rowSpan={rowSize}
+            colSpan={{ base: 1, sm: BASE_COL_SPAN, md: colSize }}
+            rowSpan={{ base: 1, sm: rowSize }}
         >
             <CardModuleRaw header={label} expandable={expandable} {...rest}>
                 {children}
@@ -58,7 +58,14 @@ export const CardModuleRaw = ({ children, header, expandable, ...rest }: CardMod
         >
             {/* Header */}
             {header ? (
-                <Card.Header px={4} py={3} borderBottomWidth="2px" borderBottomColor="bg.muted" fontWeight="semibold" flexShrink={0}>
+                <Card.Header
+                    px={4}
+                    py={3}
+                    borderBottomWidth="2px"
+                    borderBottomColor="bg.muted"
+                    fontWeight="semibold"
+                    flexShrink={0}
+                >
                     <HStack justifyContent="space-between" width="100%">
                         {header}
                         {expandable !== undefined ? (

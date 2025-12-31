@@ -85,16 +85,10 @@ const Cards = ({ ...props }) => {
             gap="1.5em"
             padding="1em"
             width="100%"
-            flex={1}
-            minHeight={0}
-            templateColumns={[
-                'repeat(3, 1fr);',
-                'repeat(3, 1fr);',
-                'repeat(6, 1fr);',
-                'repeat(9, 1fr);',
-                'repeat(12, 1fr);'
-            ]}
-            templateRows="repeat(2, minmax(0, 320px))"
+            flex={{ base: 'none', sm: 1 }}
+            minHeight={{ base: 'auto', sm: 0 }}
+            templateColumns={['1fr', 'repeat(3, 1fr)', 'repeat(6, 1fr)', 'repeat(9, 1fr)', 'repeat(12, 1fr)']}
+            templateRows={{ base: 'auto', sm: 'repeat(2, minmax(0, 320px))' }}
             {...props}
         >
             <CardModule header="Node" colSize={3}>
