@@ -72,13 +72,13 @@ const MenuOptions = ({ ...props }) => {
     const { userData } = useUserDataContext()
 
     return (
-        <VStack paddingTop="1em" rowGap={'0.05em'} alignItems={'flex-start'} {...props}>
+        <VStack paddingTop="1em" gap="1" alignItems="stretch" {...props}>
             <TemplateCreateDialog />
             <Show when={userData?.admin}>
                 <NodeCreateDialog />
             </Show>
             <ServerCreateDialog />
-            <HStack width="100%" borderBottomWidth="0px" paddingTop={'1.5em'} borderColor="border" />
+            <HStack width="100%" borderBottomWidth="0px" paddingTop="1em" borderColor="border" />
 
             <SettingsModal />
             <MenuSelectButton
@@ -88,11 +88,12 @@ const MenuOptions = ({ ...props }) => {
                     })
                 }}
                 color="danger.500"
+                justifyContent="flex-start"
             >
                 <LogOut />
                 Sign Out
             </MenuSelectButton>
-            <HStack width="100%" paddingTop={'1.5em'} borderBottomWidth="1px" borderColor="border" />
+            <HStack width="100%" paddingTop="1em" borderBottomWidth="1px" borderColor="border" />
             <ColorModeButton />
         </VStack>
     )
@@ -101,9 +102,9 @@ const MenuOptions = ({ ...props }) => {
 export const Gutter = ({ ...props }) => {
     return (
         <CollapseWrapper>
-            <VStack as="nav" alignSelf={'flex-start'} p="12px" {...props}>
+            <VStack as="nav" alignItems="stretch" p="1em" pt="0" {...props}>
                 <UserProfile width="100%" />
-                <MenuOptions />
+                <MenuOptions width="100%" />
             </VStack>
         </CollapseWrapper>
     )

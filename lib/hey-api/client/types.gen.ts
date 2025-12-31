@@ -384,6 +384,10 @@ export type ServersRead = {
      * Port
      */
     port: Array<number>;
+    /**
+     * Linked Users
+     */
+    linked_users?: Array<UsersRead>;
 };
 
 /**
@@ -568,6 +572,34 @@ export type UsersBase = {
      * Admin
      */
     admin?: boolean;
+};
+
+/**
+ * UsersRead
+ */
+export type UsersRead = {
+    /**
+     * Username
+     * Username
+     */
+    username: string;
+    /**
+     * Disabled
+     */
+    disabled?: boolean;
+    /**
+     * Scopes
+     * List of scopes assigned to the user
+     */
+    scopes: Array<string> | null;
+    /**
+     * Admin
+     */
+    admin?: boolean;
+    /**
+     * Id
+     */
+    id: number;
 };
 
 /**
@@ -1322,6 +1354,42 @@ export type GetArchiveResponses = {
     200: unknown;
 };
 
+export type DeleteFileData = {
+    body?: never;
+    path: {
+        /**
+         * Server Id
+         */
+        server_id: number;
+    };
+    query: {
+        /**
+         * Path
+         * Absolute path to file
+         */
+        path: string;
+    };
+    url: '/volumes/{server_id}/fs';
+};
+
+export type DeleteFileErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type DeleteFileError = DeleteFileErrors[keyof DeleteFileErrors];
+
+export type DeleteFileResponses = {
+    /**
+     * Successful Response
+     */
+    200: ContainerFileDeleteResponse;
+};
+
+export type DeleteFileResponse = DeleteFileResponses[keyof DeleteFileResponses];
+
 export type ReadFileData = {
     body?: never;
     path: {
@@ -1333,6 +1401,7 @@ export type ReadFileData = {
     query: {
         /**
          * Path
+         * Absolute path to file
          */
         path: string;
     };
@@ -1356,7 +1425,7 @@ export type ReadFileResponses = {
 };
 
 export type UploadFileData = {
-    body?: never;
+    body: Blob | File;
     path: {
         /**
          * Server Id
@@ -1389,41 +1458,6 @@ export type UploadFileResponses = {
 };
 
 export type UploadFileResponse = UploadFileResponses[keyof UploadFileResponses];
-
-export type DeleteFileData = {
-    body?: never;
-    path: {
-        /**
-         * Path
-         */
-        path: string;
-    };
-    query: {
-        /**
-         * Container Name
-         */
-        container_name: string;
-    };
-    url: '/volumes/{server_id}/fs/{path}';
-};
-
-export type DeleteFileErrors = {
-    /**
-     * Validation Error
-     */
-    422: HttpValidationError;
-};
-
-export type DeleteFileError = DeleteFileErrors[keyof DeleteFileErrors];
-
-export type DeleteFileResponses = {
-    /**
-     * Successful Response
-     */
-    200: ContainerFileDeleteResponse;
-};
-
-export type DeleteFileResponse = DeleteFileResponses[keyof DeleteFileResponses];
 
 export type HandleHttpGetData = {
     body?: never;

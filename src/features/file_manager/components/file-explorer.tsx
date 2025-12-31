@@ -1,24 +1,19 @@
 'use client'
 
-import { Box, createTreeCollection, Group, HStack, IconButton, ScrollArea, TreeView } from '@chakra-ui/react'
-import { File, Folder, LoaderCircle, Plus } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { Box, Breadcrumb, Flex, HStack, IconButton, ScrollArea, Spinner, Text, VStack } from '@chakra-ui/react'
+import { ChevronRight, Download, Edit, File, Folder, FolderUp, Home, Plus, RefreshCw, Upload } from 'lucide-react'
+import { DragEvent, useCallback, useEffect, useState } from 'react'
+import { fetch } from 'ofetch'
 
-import { readFile, searchFs, ServersRead } from '../../../../lib/hey-api/client'
+import { readFile, searchFs, ServersRead, uploadFile } from '../../../../lib/hey-api/client'
 import { DisabledModule } from '../../../components/disabled-module'
 import { useSelectedServerContext } from '../../../providers/selected-server-context'
+import { useFileTransferContext } from '../../../providers/file-transfer'
+import { toaster } from '../../../../lib/chakra/toaster'
+import { getAccessToken, getBaseUrl } from '../../../utils/api'
 import { FileUploadDialog } from './file-upload'
 import { TextEditorDialog } from './text-editor'
-
-function getRelativePath(from: string, to: string): string {
-    if (from !== '/') {
-        throw new Error('Only supporting relative from root path')
-    }
-    if (to.startsWith(from)) {
-        return to.substring(from.length)
-    }
-    return to
-}
+import { SFTPCredentialsDialog } from './sftp-creds'
 
 const TEXT_EDITOR_FILE_SIZE_LIMIT = 1024 * 1024 * 5 // 5 MB
 const ALLOWED_TEXT_FILE_EXTENSIONS = [
@@ -40,37 +35,15 @@ const ALLOWED_TEXT_FILE_EXTENSIONS = [
     '.rs',
     '.log',
     '.sh',
-    '.properties'
+    '.properties',
+    '.yaml'
 ]
 
-interface Node {
-    id: string
+interface FileItem {
     name: string
-    full_path: string
-    children?: Node[]
-    childrenCount?: number
-    disabled?: boolean
+    fullPath: string
+    isDirectory: boolean
 }
-
-// function to load children of a node
-
-const initialCollection = createTreeCollection<Node>({
-    nodeToValue: node => node.id,
-    nodeToString: node => node.name,
-    rootNode: {
-        id: 'ROOT',
-        name: '',
-        full_path: '',
-        children: [
-            {
-                id: '/',
-                name: '/',
-                full_path: '/',
-                childrenCount: 1
-            }
-        ]
-    }
-})
 
 export const FileManager = ({ ...props }) => {
     const { serverInfo } = useSelectedServerContext()
@@ -80,110 +53,155 @@ export const FileManager = ({ ...props }) => {
             {!serverInfo ? (
                 <DisabledModule requester="files" />
             ) : (
-                <ScrollArea.Root height="30em" {...props}>
-                    <ScrollArea.Viewport>
-                        <ScrollArea.Content>
-                            <FileTree />
-                        </ScrollArea.Content>
-                        <ScrollArea.Scrollbar>
-                            <ScrollArea.Thumb />
-                        </ScrollArea.Scrollbar>
-                    </ScrollArea.Viewport>
-                </ScrollArea.Root>
+                <Box height={{ base: 'auto', sm: '30em' }} minHeight={{ base: '20em', sm: 'auto' }} {...props}>
+                    <FileExplorer />
+                </Box>
             )}
         </>
     )
 }
 
-const FileTree = () => {
-    const [collection, setCollection] = useState(initialCollection)
+const FileExplorer = () => {
     const { serverInfo, serverOnline } = useSelectedServerContext()
+    const { setTransferProgress, setFile } = useFileTransferContext()
+    const [currentPath, setCurrentPath] = useState<string>('/')
+    const [files, setFiles] = useState<FileItem[]>([])
+    const [loading, setLoading] = useState<boolean>(false)
     const [editorInputStream, setEditorInputStream] = useState<ReadableStream<Uint8Array> | null>(null)
     const [isEditorOpen, setIsEditorOpen] = useState<boolean>(false)
     const [editorFilePath, setEditorFilePath] = useState<string>('.txt')
-    const [selectedValue, setSelectedValue] = useState<string[]>([]) //TODO: why is this needed?
 
     // State for file upload dialog
     const [isFileUploadDialogOpen, setIsFileUploadDialogOpen] = useState(false)
     const [fileUploadPath, setFileUploadPath] = useState<string>('')
 
-    async function getPathFiles(path: string, serverInfo: ServersRead): Promise<Node[]> {
-        if (!serverOnline) return []
-        if (!serverInfo) return []
-        const strings = await searchFs({
-            path: { server_id: serverInfo?.id, path: path }
-        })
-        if (!strings.data) return []
-        return strings.data.items.map(filePath => {
-            return {
-                id: filePath,
-                full_path: path + filePath,
-                name: filePath,
-                ...(filePath.endsWith('/') ? { childrenCount: 1 } : {})
-            }
-        })
-    }
+    // State for selected file
+    const [selectedFile, setSelectedFile] = useState<FileItem | null>(null)
 
-    function loadChildren(details: TreeView.LoadChildrenDetails<Node>): Promise<Node[]> {
-        const value = details.valuePath.join('')
-        if (!serverInfo) return Promise.resolve([])
-        return getPathFiles(value, serverInfo)
-    }
+    // State for drag and drop
+    const [isDragOver, setIsDragOver] = useState<boolean>(false)
 
-    async function handleFileSelect(e: TreeView.SelectionChangeDetails<Node>) {
-        if (e.selectedNodes.length > 0) {
-            if (!e.focusedValue?.endsWith('/')) {
-                if (!serverInfo) return
-                const path = e.selectedNodes[0]['full_path']
-                if (serverInfo) {
-                    await readFile({
-                        path: { server_id: serverInfo?.id },
-                        query: { path: path }
-                    }).then(dl => {
-                        if (dl.data) {
-                            const data = dl.data as Blob
-                            const stream = typeof data.stream === 'function' ? data.stream() : new Response(data).body
-
-                            if (stream) {
-                                if (
-                                    data.size > TEXT_EDITOR_FILE_SIZE_LIMIT ||
-                                    !ALLOWED_TEXT_FILE_EXTENSIONS.some(ext => path.endsWith(ext))
-                                ) {
-                                    // download file instead of opening in editor
-                                    const url = URL.createObjectURL(data)
-                                    const a = document.createElement('a')
-                                    a.href = url
-                                    a.download = path.split('/').pop() || 'download'
-                                    document.body.appendChild(a)
-                                    a.click()
-                                    document.body.removeChild(a)
-                                    setTimeout(() => URL.revokeObjectURL(url), 5000)
-                                    return
-                                } else {
-                                    setEditorInputStream(stream)
-                                    setIsEditorOpen(true)
-                                    setEditorFilePath(path)
-                                }
-                            }
+    const loadDirectory = useCallback(
+        async (path: string) => {
+            if (!serverOnline || !serverInfo) return
+            setLoading(true)
+            try {
+                const result = await searchFs({
+                    path: { server_id: serverInfo.id, path: path }
+                })
+                if (result.data) {
+                    const items: FileItem[] = result.data.items.map(fullPath => {
+                        const isDirectory = fullPath.endsWith('/')
+                        const name = isDirectory
+                            ? fullPath.slice(0, -1).split('/').pop() || ''
+                            : fullPath.split('/').pop() || fullPath
+                        return {
+                            name,
+                            fullPath,
+                            isDirectory
                         }
                     })
+                    // Sort: directories first, then files, alphabetically
+                    items.sort((a, b) => {
+                        if (a.isDirectory && !b.isDirectory) return -1
+                        if (!a.isDirectory && b.isDirectory) return 1
+                        return a.name.localeCompare(b.name)
+                    })
+                    setFiles(items)
+                }
+            } finally {
+                setLoading(false)
+            }
+        },
+        [serverInfo, serverOnline]
+    )
+
+    useEffect(() => {
+        loadDirectory(currentPath)
+    }, [currentPath, loadDirectory])
+
+    const navigateTo = (path: string) => {
+        setCurrentPath(path)
+    }
+
+    const navigateUp = () => {
+        if (currentPath === '/') return
+        const parts = currentPath.split('/').filter(Boolean)
+        parts.pop()
+        const parentPath = parts.length === 0 ? '/' : '/' + parts.join('/') + '/'
+        setCurrentPath(parentPath)
+    }
+
+    const getBreadcrumbItems = () => {
+        const parts = currentPath.split('/').filter(Boolean)
+        const items: { label: string; path: string }[] = [{ label: 'Root', path: '/' }]
+        let accumulatedPath = ''
+        for (const part of parts) {
+            accumulatedPath += '/' + part
+            items.push({ label: part, path: accumulatedPath + '/' })
+        }
+        return items
+    }
+
+    function handleFileClick(file: FileItem) {
+        if (file.isDirectory) {
+            navigateTo(file.fullPath)
+            setSelectedFile(null)
+        } else {
+            setSelectedFile(file)
+        }
+    }
+
+    async function handleDownload() {
+        if (!serverInfo || !selectedFile || selectedFile.isDirectory) return
+        const response = await readFile({
+            path: { server_id: serverInfo.id },
+            query: { path: selectedFile.fullPath }
+        })
+        if (response.data) {
+            const data = response.data as Blob
+            const url = URL.createObjectURL(data)
+            const a = document.createElement('a')
+            a.href = url
+            a.download = selectedFile.name
+            document.body.appendChild(a)
+            a.click()
+            document.body.removeChild(a)
+            setTimeout(() => URL.revokeObjectURL(url), 5000)
+        }
+    }
+
+    async function handleEdit() {
+        if (!serverInfo || !selectedFile || selectedFile.isDirectory) return
+        const response = await readFile({
+            path: { server_id: serverInfo.id },
+            query: { path: selectedFile.fullPath }
+        })
+        if (response.data) {
+            const data = response.data as Blob
+            const stream = typeof data.stream === 'function' ? data.stream() : new Response(data).body
+
+            if (stream) {
+                if (
+                    data.size > TEXT_EDITOR_FILE_SIZE_LIMIT ||
+                    !ALLOWED_TEXT_FILE_EXTENSIONS.some(ext => selectedFile.fullPath.endsWith(ext))
+                ) {
+                    // File too large or not a text file - just download instead
+                    handleDownload()
+                } else {
+                    setEditorInputStream(stream)
+                    setIsEditorOpen(true)
+                    setEditorFilePath(selectedFile.fullPath)
                 }
             }
         }
     }
-    useEffect(() => {
-        if (initialCollection.rootNode.children) {
-            initialCollection.rootNode['children'][0].disabled = !serverOnline
-
-            setCollection(initialCollection)
-        }
-    }, [serverInfo, serverOnline])
 
     async function handleEditorOutputStream(path: string, outStream: ReadableStream<Uint8Array> | undefined) {
         if (!outStream) return
         if (!serverInfo) return
         const reader = outStream.getReader()
-        const blob = await new Response(
+        await new Response(
             new ReadableStream({
                 start(controller) {
                     function push() {
@@ -202,69 +220,272 @@ const FileTree = () => {
         )
             .blob()
             .then(async blob => {
-                console.log(blob)
-                //TODO: upload file
+                uploadFile({ path: { server_id: serverInfo.id }, query: { path: path }, body: blob })
             })
     }
 
-    const handleFileUploadButton = (path: string) => {
-        console.log('upload to path:', path)
-        setFileUploadPath(path)
+    const handleFileUploadButton = () => {
+        setFileUploadPath(currentPath)
         setIsFileUploadDialogOpen(true)
     }
 
+    const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
+        e.preventDefault()
+        e.stopPropagation()
+        if (e.dataTransfer.types.includes('Files')) {
+            setIsDragOver(true)
+        }
+    }
+
+    const handleDragLeave = (e: DragEvent<HTMLDivElement>) => {
+        e.preventDefault()
+        e.stopPropagation()
+        setIsDragOver(false)
+    }
+
+    const handleDrop = async (e: DragEvent<HTMLDivElement>) => {
+        e.preventDefault()
+        e.stopPropagation()
+        setIsDragOver(false)
+
+        if (!serverInfo) return
+
+        const droppedFiles = Array.from(e.dataTransfer.files)
+        if (droppedFiles.length === 0) return
+
+        for (const file of droppedFiles) {
+            if (!file.name) {
+                console.error('File has no name, skipping upload.')
+                continue
+            }
+
+            setFile({
+                fileName: file.name,
+                sizeTotal: file.size,
+                downloadPath: currentPath + file.name,
+                direction: 'upload'
+            })
+
+            let uploadedBytes = 0
+            setTransferProgress(0)
+
+            const progressStream = new TransformStream<Uint8Array, Uint8Array>({
+                transform(chunk, controller) {
+                    uploadedBytes += chunk.length
+                    setTransferProgress(uploadedBytes)
+                    controller.enqueue(chunk)
+                }
+            })
+
+            try {
+                const response = await fetch(
+                    `${getBaseUrl()}/volumes/${serverInfo.id}/fs/?path=${encodeURIComponent(currentPath + file.name)}`,
+                    {
+                        method: 'POST',
+                        body: file.stream().pipeThrough(progressStream),
+                        headers: {
+                            'X-Upload-Path': currentPath,
+                            'Content-Type': 'application/octet-stream',
+                            'X-File-Name': file.name,
+                            Authorization: `Bearer ${getAccessToken()} ?? ''}`
+                        },
+                        // @ts-ignore
+                        duplex: 'half'
+                    }
+                )
+
+                if (!response.ok) {
+                    console.error('File upload failed:', response.status, response.statusText)
+                    toaster.error({
+                        title: 'Upload failed',
+                        description: `Failed to upload ${file.name}`,
+                        closable: true,
+                        duration: 5000
+                    })
+                } else {
+                    toaster.success({
+                        title: 'File uploaded',
+                        description: `Successfully uploaded ${file.name}`,
+                        closable: true,
+                        duration: 5000
+                    })
+                    // Refresh the directory after successful upload
+                    loadDirectory(currentPath)
+                }
+            } catch (error) {
+                console.error('File upload error:', error)
+                toaster.error({
+                    title: 'Upload failed',
+                    description: `Error uploading ${file.name}`,
+                    closable: true,
+                    duration: 5000
+                })
+            }
+        }
+    }
+
+    const breadcrumbItems = getBreadcrumbItems()
+
     return (
-        <Box flexGrow={1}>
-            <TreeView.Root
-                size="md"
-                collection={collection}
-                loadChildren={loadChildren}
-                onLoadChildrenComplete={e => setCollection(e.collection)}
-                onSelectionChange={handleFileSelect}
-                selectedValue={selectedValue}
-            >
-                <TreeView.Tree>
-                    <TreeView.Node<Node>
-                        indentGuide={<TreeView.BranchIndentGuide />}
-                        render={({ node, nodeState }) =>
-                            nodeState.isBranch ? (
-                                <HStack width="100%" justifyContent={'space-between'}>
-                                    <TreeView.BranchControl width="100%">
-                                        {nodeState.loading ? (
-                                            <LoaderCircle
-                                                style={{
-                                                    animation: 'spin 1s infinite'
-                                                }}
-                                            />
-                                        ) : (
-                                            <HStack>
-                                                <Group>
-                                                    <Folder />
-                                                    <TreeView.BranchText>{node.name}</TreeView.BranchText>
-                                                </Group>
-                                            </HStack>
-                                        )}
-                                    </TreeView.BranchControl>
-                                    <IconButton
-                                        id={`file-upload-${node.full_path}`}
-                                        variant={'ghost'}
-                                        onClick={() => {
-                                            handleFileUploadButton(node.full_path)
-                                        }}
-                                    >
-                                        <Plus />
-                                    </IconButton>
-                                </HStack>
+        <Flex
+            direction="column"
+            height="100%"
+            gap={2}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            position="relative"
+        >
+            {/* Drag overlay */}
+            {isDragOver && (
+                <Flex
+                    position="absolute"
+                    inset={0}
+                    bg="bg.emphasized"
+                    opacity={0.9}
+                    zIndex={10}
+                    justify="center"
+                    align="center"
+                    borderRadius="md"
+                    border="2px dashed"
+                    borderColor="blue.500"
+                    pointerEvents="none"
+                >
+                    <VStack gap={2}>
+                        <Upload size={48} />
+                        <Text fontSize="lg" fontWeight="semibold">
+                            Drop files to upload to {currentPath}
+                        </Text>
+                    </VStack>
+                </Flex>
+            )}
+            {/* Toolbar */}
+            <HStack justifyContent="space-between" px={2} py={1} borderBottomWidth="1px">
+                <HStack gap={1}>
+                    <IconButton
+                        aria-label="Go to root"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => navigateTo('/')}
+                        disabled={currentPath === '/'}
+                    >
+                        <Home size={16} />
+                    </IconButton>
+                    <IconButton
+                        aria-label="Go up"
+                        variant="ghost"
+                        size="sm"
+                        onClick={navigateUp}
+                        disabled={currentPath === '/'}
+                    >
+                        <FolderUp size={16} />
+                    </IconButton>
+                    <IconButton
+                        aria-label="Refresh"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => loadDirectory(currentPath)}
+                    >
+                        <RefreshCw size={16} />
+                    </IconButton>
+                </HStack>
+                <HStack gap={1}>
+                    <IconButton
+                        aria-label="Edit file"
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleEdit}
+                        disabled={!selectedFile || selectedFile.isDirectory}
+                    >
+                        <Edit size={16} />
+                    </IconButton>
+                    <IconButton
+                        aria-label="Download file"
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleDownload}
+                        disabled={!selectedFile || selectedFile.isDirectory}
+                    >
+                        <Download size={16} />
+                    </IconButton>
+                    <IconButton aria-label="Upload file" variant="ghost" size="sm" onClick={handleFileUploadButton}>
+                        <Plus size={16} />
+                    </IconButton>
+                </HStack>
+            </HStack>
+
+            {/* Breadcrumb Navigation */}
+            <Breadcrumb.Root px={2}>
+                <Breadcrumb.List>
+                    {breadcrumbItems.map((item, index) => (
+                        <Breadcrumb.Item key={item.path}>
+                            {index === breadcrumbItems.length - 1 ? (
+                                <Breadcrumb.CurrentLink fontWeight="semibold">{item.label}</Breadcrumb.CurrentLink>
                             ) : (
-                                <TreeView.Item>
-                                    <File />
-                                    <TreeView.ItemText>{node.name}</TreeView.ItemText>
-                                </TreeView.Item>
-                            )
-                        }
-                    />
-                </TreeView.Tree>
-            </TreeView.Root>
+                                <Breadcrumb.Link
+                                    cursor="pointer"
+                                    onClick={() => navigateTo(item.path)}
+                                    _hover={{ textDecoration: 'underline' }}
+                                >
+                                    {item.label}
+                                </Breadcrumb.Link>
+                            )}
+                            {index < breadcrumbItems.length - 1 && (
+                                <Breadcrumb.Separator>
+                                    <ChevronRight size={14} />
+                                </Breadcrumb.Separator>
+                            )}
+                        </Breadcrumb.Item>
+                    ))}
+                </Breadcrumb.List>
+            </Breadcrumb.Root>
+
+            {/* File List */}
+            <ScrollArea.Root flex={1}>
+                <ScrollArea.Viewport>
+                    <ScrollArea.Content>
+                        {loading ? (
+                            <Flex justify="center" align="center" py={8}>
+                                <Spinner size="lg" />
+                            </Flex>
+                        ) : files.length === 0 ? (
+                            <Flex justify="center" align="center" py={8}>
+                                <Text color="fg.muted">Empty folder</Text>
+                            </Flex>
+                        ) : (
+                            <VStack align="stretch" gap={0} pb={4}>
+                                {files.map(file => (
+                                    <HStack
+                                        key={file.fullPath}
+                                        px={3}
+                                        py={2}
+                                        cursor="pointer"
+                                        bg={selectedFile?.fullPath === file.fullPath ? 'bg.emphasized' : undefined}
+                                        _hover={{
+                                            bg: selectedFile?.fullPath === file.fullPath ? 'bg.emphasized' : 'bg.subtle'
+                                        }}
+                                        onClick={() => handleFileClick(file)}
+                                        onDoubleClick={() => {
+                                            if (!file.isDirectory) handleEdit()
+                                        }}
+                                        borderRadius="md"
+                                        mx={1}
+                                    >
+                                        {file.isDirectory ? <Folder size={18} /> : <File size={18} />}
+                                        <Text fontSize="sm" truncate>
+                                            {file.name}
+                                        </Text>
+                                    </HStack>
+                                ))}
+                            </VStack>
+                        )}
+                    </ScrollArea.Content>
+                </ScrollArea.Viewport>
+                <ScrollArea.Scrollbar>
+                    <ScrollArea.Thumb />
+                </ScrollArea.Scrollbar>
+            </ScrollArea.Root>
+
             <TextEditorDialog
                 isOpen={isEditorOpen}
                 setIsOpen={setIsEditorOpen}
@@ -279,6 +500,7 @@ const FileTree = () => {
                 }}
                 uploadPath={fileUploadPath}
             />
-        </Box>
+            <SFTPCredentialsDialog />
+        </Flex>
     )
 }

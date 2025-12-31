@@ -78,8 +78,6 @@ export const TextEditorDialog = ({
 
     // Wrapper to adapt Dialog's OpenChangeDetails => boolean for setIsOpen
     const handleDialogOpenChange = (details: any) => {
-        // Radix/Chakra may pass an object like { open: boolean } or just a boolean.
-        // Normalize both cases to a boolean and forward to setIsOpen.
         if (typeof details === 'boolean') {
             setIsOpen(details)
         } else {

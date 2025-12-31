@@ -22,9 +22,9 @@ export const SMChart = ({ label, color, unit, data }: LightCardProps) => {
                         <HStack gap="0.5em">
                             <Stat.ValueText color={{ _light: 'gray.800', _dark: 'gray.800' }}>
                                 {highlightedIndex !== null && data && data[highlightedIndex]
-                                    ? data[highlightedIndex]
+                                    ? data[highlightedIndex].toFixed(2)
                                     : data && data.length > 0
-                                      ? data[data.length - 1]
+                                      ? data[data.length - 1].toFixed(2)
                                       : '--'}
                             </Stat.ValueText>
 
